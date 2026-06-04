@@ -1,0 +1,296 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  max-height: 520px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 14px;
+  font-family: system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 13px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+h1 span {
+  color: #34d399;
+}
+
+.semaphore {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.semaphore.seguro {
+  background: #22c55e;
+}
+.semaphore.precaucion {
+  background: #eab308;
+}
+.semaphore.peligro {
+  background: #ef4444;
+}
+.semaphore.unknown {
+  background: #64748b;
+}
+
+.auth-box {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.auth-box.hidden {
+  display: none;
+}
+
+.auth-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.auth-box input {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #fff;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #10b981;
+  color: #022c22;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+.auth-error {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #f87171;
+}
+
+.auth-error.hidden {
+  display: none;
+}
+
+.url {
+  margin: 8px 0;
+  font-size: 11px;
+  color: #94a3b8;
+  word-break: break-all;
+}
+
+.serp-hint {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #a7f3d0;
+  background: rgba(52, 211, 153, 0.12);
+  border-radius: 6px;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.score-box {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.score-box.hidden {
+  display: none;
+}
+
+.score {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.score.seguro {
+  color: #22c55e;
+}
+.score.precaucion {
+  color: #eab308;
+}
+.score.peligro {
+  color: #ef4444;
+}
+
+.score-max {
+  color: #64748b;
+}
+
+.level {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+  background: #1e293b;
+}
+
+.status-label {
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.saved-hint {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: #34d399;
+}
+
+.saved-hint.hidden {
+  display: none;
+}
+
+.resumen {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  color: #cbd5e1;
+}
+
+.history-section {
+  margin-bottom: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #334155;
+}
+
+.history-section.hidden {
+  display: none;
+}
+
+.history-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.history-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.history-tabs .tab {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.history-tabs .tab.active[data-risk='bajo'] {
+  background: #14532d;
+  color: #86efac;
+  border-color: #22c55e;
+}
+
+.history-tabs .tab.active[data-risk='medio'] {
+  background: #713f12;
+  color: #fde047;
+  border-color: #eab308;
+}
+
+.history-tabs .tab.active[data-risk='alto'] {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-color: #ef4444;
+}
+
+.history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.history-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #1e293b;
+  font-size: 11px;
+}
+
+.history-list .h-url {
+  display: block;
+  color: #e2e8f0;
+  word-break: break-all;
+}
+
+.history-list .h-meta {
+  color: #64748b;
+}
+
+.history-empty {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.history-empty.hidden {
+  display: none;
+}
+
+.settings label {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.settings input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.settings button {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #334155;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 10px;
+  color: #64748b;
+}

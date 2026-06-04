@@ -1,0 +1,14 @@
+[
+  { "marca": "Banco Galicia", "dominios": ["bancogalicia.com", "bancogalicia.com.ar"] },
+  { "marca": "Banco Nacion", "dominios": ["bna.com.ar", "banco-nacion.com.ar"] },
+  { "marca": "Mercado Pago", "dominios": ["mercadopago.com", "mercadopago.com.ar"] },
+  { "marca": "Mercado Libre", "dominios": ["mercadolibre.com", "mercadolibre.com.ar"] },
+  { "marca": "Santander", "dominios": ["santander.com.ar", "santanderrio.com.ar"] },
+  { "marca": "BBVA", "dominios": ["bbva.com.ar"] },
+  { "marca": "Macro", "dominios": ["macro.com.ar"] },
+  { "marca": "ICBC", "dominios": ["icbc.com.ar"] },
+  { "marca": "AFIP", "dominios": ["afip.gob.ar"] },
+  { "marca": "ANSES", "dominios": ["anses.gob.ar"] },
+  { "marca": "Personal", "dominios": ["personal.com.ar"] },
+  { "marca": "Movistar", "dominios": ["movistar.com.ar"] }
+]

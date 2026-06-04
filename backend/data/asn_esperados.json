@@ -1,0 +1,10 @@
+{
+  "mercadopago": { "asn": "AS16814", "org": ["MercadoLibre", "mercadolibre"] },
+  "mercadolibre": { "asn": "AS16814", "org": ["MercadoLibre", "mercadolibre"] },
+  "bancogalicia": { "asn": "AS10481", "org": ["Telecom Argentina", "Galicia"] },
+  "galicia": { "asn": "AS10481", "org": ["Telecom Argentina", "Galicia"] },
+  "santander": { "asn": "AS21678", "org": ["Santander"] },
+  "bbva": { "asn": "AS16509", "org": ["BBVA", "Amazon"] },
+  "google": { "asn": "AS15169", "org": ["Google"] },
+  "afip": { "asn": null, "org": ["AFIP", "gob.ar"] }
+}

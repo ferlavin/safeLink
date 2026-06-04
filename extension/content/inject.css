@@ -1,0 +1,54 @@
+.safelink-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: help;
+  position: relative;
+  top: -1px;
+}
+
+.safelink-dot.seguro {
+  background: #22c55e;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.6);
+}
+
+.safelink-dot.precaucion {
+  background: #eab308;
+  box-shadow: 0 0 4px rgba(234, 179, 8, 0.6);
+}
+
+.safelink-dot.peligro {
+  background: #ef4444;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+}
+
+.safelink-dot.loading {
+  background: #94a3b8;
+  animation: safelink-pulse 1s ease-in-out infinite;
+}
+
+.safelink-dot.desconocido {
+  background: #64748b;
+  box-shadow: 0 0 4px rgba(100, 116, 139, 0.5);
+}
+
+.safelink-dot-wrap {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+@keyframes safelink-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

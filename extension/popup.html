@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SafeLink</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Safe<span>Link</span></h1>
+      <div id="semaphore" class="semaphore unknown"></div>
+    </header>
+
+    <section id="auth-guest" class="auth-box">
+      <p class="auth-title">Inicia sesion para recordar los sitios que revisaste</p>
+      <input id="loginEmail" type="email" placeholder="Email" />
+      <input id="loginPassword" type="password" placeholder="Contrasena" />
+      <button id="loginBtn" type="button">Iniciar sesion</button>
+      <p id="authError" class="auth-error hidden"></p>
+    </section>
+
+    <section id="auth-user" class="auth-box hidden">
+      <p class="auth-title">
+        Sesion: <span id="userEmail"></span>
+      </p>
+      <button id="logoutBtn" type="button" class="btn-secondary">Cerrar sesion</button>
+    </section>
+
+    <p id="url" class="url">—</p>
+    <p id="serp-hint" class="serp-hint hidden">
+      En Google veras un punto de color al lado de cada resultado. Verde = seguro, amarillo = cuidado, rojo = peligro.
+    </p>
+
+    <div id="score-box" class="score-box hidden">
+      <span id="score" class="score">0</span>
+      <span class="score-max">/100</span>
+      <span id="level" class="level">—</span>
+    </div>
+
+    <p id="status-label" class="status-label">Revisando...</p>
+    <p id="saved-hint" class="saved-hint hidden">Guardado en tu lista</p>
+
+    <ul id="resumen" class="resumen"></ul>
+
+    <section id="history-section" class="history-section hidden">
+      <h2 class="history-title">Sitios que revisaste</h2>
+      <div class="history-tabs">
+        <button type="button" class="tab active" data-risk="bajo">Seguros</button>
+        <button type="button" class="tab" data-risk="medio">A revisar</button>
+        <button type="button" class="tab" data-risk="alto">Peligrosos</button>
+      </div>
+      <ul id="history-list" class="history-list"></ul>
+      <p id="history-empty" class="history-empty hidden">No hay sitios en esta categoria</p>
+    </section>
+
+    <section class="settings">
+      <label for="apiUrl">Servidor SafeLink</label>
+      <input id="apiUrl" type="url" placeholder="http://localhost:8000" />
+      <button id="saveApi" type="button">Guardar API</button>
+    </section>
+
+    <p class="hint">Pasa el cursor sobre el icono o un punto de color para ver el resumen. Con sesion, guardamos los sitios que visitas.</p>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

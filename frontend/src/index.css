@@ -1,0 +1,248 @@
+@import "tailwindcss";
+
+@source "../index.html";
+@source "./**/*.{js,jsx}";
+
+@theme {
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-ibm-plex: "IBM Plex Sans", sans-serif;
+
+  --color-ocean-twilight: #324ab2;
+  --color-neon-ice: #15f4ee;
+  --color-hot-fuchsia: #ff004f;
+  --color-pitch-black: #100c08;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float-slow 8s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 10s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(1deg);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(-2deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+    filter: blur(100px);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(140px);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    @apply bg-pitch-black text-white font-plus-jakarta overflow-x-hidden antialiased;
+  }
+
+  a {
+    @apply transition-colors duration-300;
+  }
+}
+
+/* Paneles tipo vidrio */
+@utility glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+@utility glass-panel-heavy {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Texto con gradiente aurora */
+@utility text-gradient-aurora {
+  background: linear-gradient(
+    to right,
+    var(--color-neon-ice),
+    #4facfe,
+    var(--color-ocean-twilight)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Brillo fucsia (alertas, mapa) */
+@utility glow-fuchsia {
+  box-shadow:
+    0 0 15px var(--color-hot-fuchsia),
+    0 0 30px var(--color-hot-fuchsia);
+}
+
+@utility glow-neon {
+  box-shadow:
+    0 0 20px rgba(21, 244, 238, 0.35),
+    0 0 40px rgba(21, 244, 238, 0.15);
+}
+
+/* Textura de ruido sutil */
+@utility bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Resplandor de fondo del hero */
+@utility hero-blob-left {
+  background-color: var(--color-ocean-twilight);
+  filter: blur(180px);
+}
+
+@utility hero-blob-right {
+  background-color: var(--color-neon-ice);
+  filter: blur(160px);
+}
+
+/* Badge "en vivo" */
+@utility badge-live {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Anillo brillante del buscador */
+@utility scanner-glow-ring {
+  background: linear-gradient(
+    to right,
+    var(--color-neon-ice),
+    var(--color-ocean-twilight)
+  );
+  filter: blur(24px);
+}
+
+/* Botón principal cyan */
+@utility btn-protect {
+  background-color: var(--color-neon-ice);
+  color: #000;
+  box-shadow: 0 0 30px rgba(21, 244, 238, 0.35);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* Tarjeta flotante con hover */
+@utility widget-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition:
+    border-color 0.4s ease,
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+/* Tarjeta de feature (grid) */
+@utility feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition:
+    border-color 0.5s ease,
+    transform 0.5s ease;
+}
+
+/* Tarjeta de amenaza en el feed */
+@utility threat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: border-color 0.3s ease;
+}
+
+/* Mapa decorativo */
+@utility map-panel {
+  background-color: rgba(255, 255, 255, 0.02);
+  background-image: url("https://www.transparenttextures.com/patterns/dark-matter.png");
+  background-blend-mode: overlay;
+}
+
+/* CTA final con halo */
+@utility cta-halo {
+  background: linear-gradient(
+    to top right,
+    color-mix(in srgb, var(--color-ocean-twilight) 30%, transparent),
+    color-mix(in srgb, var(--color-neon-ice) 10%, transparent),
+    color-mix(in srgb, var(--color-hot-fuchsia) 20%, transparent)
+  );
+  filter: blur(64px);
+}
+
+/* Enlaces de navegación */
+@utility nav-link {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+/* Botón blanco del nav */
+@utility btn-nav-install {
+  background: #fff;
+  color: #000;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+/* Punto del mapa */
+@utility map-dot {
+  background-color: var(--color-hot-fuchsia);
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 15px var(--color-hot-fuchsia),
+    0 0 30px var(--color-hot-fuchsia);
+}
