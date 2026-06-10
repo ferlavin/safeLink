@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str = "admin@safelink.app"
     ADMIN_PASSWORD: str = "admin1234"
 
+    GOOGLE_SAFE_BROWSING_API_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

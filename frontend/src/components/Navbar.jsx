@@ -1,11 +1,11 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { ShieldCheck } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
+import ThemeToggle from './ThemeToggle'
 
 const linkClass = ({ isActive }) =>
-  `rounded-md px-3 py-1.5 transition ${
-    isActive
-      ? 'bg-emerald-500/10 text-emerald-400'
-      : 'text-slate-300 hover:text-white'
+  `rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-medium transition whitespace-nowrap ${
+    isActive ? 'app-nav-active' : 'text-[var(--app-text-muted)] hover:text-[var(--app-text)]'
   }`
 
 export default function Navbar() {
@@ -18,18 +18,21 @@ export default function Navbar() {
   }
 
   return (
-    <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/dashboard" className="flex items-center gap-1 text-xl font-bold">
-          <span className="text-emerald-400">Safe</span>
-          <span className="text-white">Link</span>
+    <header className="sticky top-0 z-50 border-b border-[var(--app-border)] bg-[var(--app-bg)]/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <Link to="/dashboard" className="flex shrink-0 items-center gap-2">
+          <div className="w-7 h-7 bg-gradient-to-tr from-neon-ice to-ocean-twilight rounded-md flex items-center justify-center">
+            <ShieldCheck size={16} weight="fill" className="text-black" />
+          </div>
+          <span className="text-base font-bold tracking-tight">SafeLink</span>
         </Link>
-        <nav className="flex items-center gap-2 text-sm">
+
+        <nav className="flex flex-wrap items-center justify-end gap-1 sm:gap-1.5">
           <NavLink to="/dashboard" className={linkClass}>
             Dashboard
           </NavLink>
           <NavLink to="/extension" className={linkClass}>
-            Extension
+            Extensión
           </NavLink>
           <NavLink to="/analyze" className={linkClass}>
             URL
@@ -37,17 +40,27 @@ export default function Navbar() {
           <NavLink to="/threat-map" className={linkClass}>
             Mapa
           </NavLink>
+          <NavLink to="/analyze/security" className={linkClass}>
+            Avanzado
+          </NavLink>
+          <NavLink to="/settings" className={linkClass}>
+            Apariencia
+          </NavLink>
           {isAdmin && (
             <NavLink to="/admin/users" className={linkClass}>
               Usuarios
             </NavLink>
           )}
-          <span className="mx-2 hidden text-slate-500 sm:inline">
+
+          <ThemeToggle compact />
+
+          <span className="hidden max-w-[140px] truncate text-xs text-[var(--app-text-muted)] lg:inline lg:max-w-[200px]">
             {user?.email}
           </span>
+
           <button
             onClick={handleLogout}
-            className="rounded-md border border-slate-700 px-3 py-1.5 text-slate-300 transition hover:border-rose-500 hover:text-rose-400"
+            className="app-btn-ghost px-2.5 py-1.5 hover:border-hot-fuchsia/40 hover:text-hot-fuchsia"
           >
             Salir
           </button>

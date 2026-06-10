@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { ShieldCheck } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Register() {
@@ -26,78 +27,85 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">
-            <span className="text-emerald-400">Safe</span>
-            <span className="text-white">Link</span>
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">Crea tu cuenta</p>
+    <div className="app-page app-auth-bg flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none" />
+      <div className="absolute top-[-15%] left-[-10%] w-[min(400px,70vw)] h-[min(400px,70vw)] hero-blob-left rounded-full opacity-30 animate-pulse-glow pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[min(320px,55vw)] h-[min(320px,55vw)] hero-blob-right rounded-full opacity-15 animate-glow-pulse pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <div className="w-9 h-9 bg-gradient-to-tr from-neon-ice to-ocean-twilight rounded-lg flex items-center justify-center glow-neon">
+              <ShieldCheck size={20} weight="fill" className="text-black" />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight">SafeLink</h1>
+          </div>
+          <p className="text-sm text-white/45">Creá tu cuenta</p>
         </div>
+
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl"
+          className="app-card space-y-4 rounded-2xl p-6 sm:p-7"
         >
-          <h2 className="text-xl font-semibold text-white">Registro</h2>
+          <h2 className="text-base font-semibold text-white">Registro</h2>
           {error && (
-            <div className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            <div className="rounded-lg border border-hot-fuchsia/40 bg-hot-fuchsia/10 px-3 py-2 text-sm text-hot-fuchsia">
               {error}
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm text-slate-300">
+            <label className="mb-1.5 block text-xs font-medium text-white/55">
               Nombre completo
             </label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+              className="app-input"
               placeholder="Tu nombre"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm text-slate-300">Email</label>
+            <label className="mb-1.5 block text-xs font-medium text-white/55">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+              className="app-input"
               placeholder="tu@email.com"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm text-slate-300">Contrasena</label>
+            <label className="mb-1.5 block text-xs font-medium text-white/55">Contraseña</label>
             <input
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
-              placeholder="Minimo 6 caracteres"
+              className="app-input"
+              placeholder="Mínimo 6 caracteres"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-emerald-500 py-2.5 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-60"
+            className="app-btn-primary w-full py-2.5 hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? 'Creando...' : 'Crear cuenta'}
           </button>
-          <p className="text-center text-sm text-slate-400">
-            Ya tenes cuenta?{' '}
-            <Link to="/login" className="text-emerald-400 hover:underline">
-              Inicia sesion
+          <p className="text-center text-xs text-white/45">
+            ¿Ya tenés cuenta?{' '}
+            <Link to="/login" className="app-link-accent hover:opacity-80">
+              Iniciá sesión
             </Link>
           </p>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
-          <Link to="/extension" className="text-emerald-400 hover:underline">
-            Instalar extension para Chrome
+        <p className="mt-4 text-center text-xs text-white/40">
+          <Link to="/extension" className="app-link-accent hover:opacity-80">
+            Instalar extensión para Chrome
           </Link>
         </p>
       </div>

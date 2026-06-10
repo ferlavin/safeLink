@@ -8,9 +8,11 @@ import AnalyzePdf from './pages/AnalyzePdf'
 import AnalyzeWeb3 from './pages/AnalyzeWeb3'
 import AnalyzeTyposquatting from './pages/AnalyzeTyposquatting'
 import AnalyzeDns from './pages/AnalyzeDns'
+import AnalyzeSecurity from './pages/AnalyzeSecurity'
 import ThreatMap from './pages/ThreatMap'
 import AdminUsers from './pages/AdminUsers'
 import ExtensionInstall from './pages/ExtensionInstall'
+import Settings from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 
@@ -65,6 +67,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <AnalyzeDns />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analyze/security"
+        element={
+          <ProtectedRoute>
+            <AnalyzeSecurity />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />

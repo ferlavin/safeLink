@@ -63,6 +63,50 @@ export const TOOLS = {
     longDesc:
       'Muestra en un mapa las detecciones recientes de la comunidad SafeLink. Se actualiza solo cada pocos segundos.',
   },
+  nlp: {
+    name: 'Clasificador NLP',
+    tag: 'Lenguaje',
+    href: '/analyze/security',
+    category: 'Herramientas avanzadas',
+    shortDesc:
+      'Transformer entrenado a nivel de caracteres que aprende a reconocer URLs de phishing.',
+    longDesc:
+      'Modelo de IA (transformer char-level) entrenado solo con URLs. Aprende patrones como "banco-nacion-seguro-login.xy2" sin consultar ninguna API. Devuelve probabilidad de phishing, categoria y confianza.',
+    anchor: 'nlp',
+  },
+  headers: {
+    name: 'Security headers',
+    tag: 'HTTP',
+    href: '/analyze/security',
+    category: 'Herramientas avanzadas',
+    shortDesc:
+      'Revisa HSTS, CSP, X-Frame-Options y otras cabeceras de seguridad.',
+    longDesc:
+      'Evalua las cabeceras HTTP del sitio y califica que tan bien protegido esta contra XSS, clickjacking y downgrade.',
+    anchor: 'headers',
+  },
+  oauth: {
+    name: 'Detector OAuth phishing',
+    tag: 'Login social',
+    href: '/analyze/security',
+    category: 'Herramientas avanzadas',
+    shortDesc:
+      'Detecta flujos OAuth falsos e imitaciones de Google, Microsoft o Facebook.',
+    longDesc:
+      'Busca redirect_uri sospechosos, parametros OAuth en dominios no oficiales y botones de login social enganosos.',
+    anchor: 'oauth',
+  },
+  forms: {
+    name: 'Doble envio en formularios',
+    tag: 'Formularios',
+    href: '/analyze/security',
+    category: 'Herramientas avanzadas',
+    shortDesc:
+      'Detecta formularios que envian credenciales a mas de un destino.',
+    longDesc:
+      'Analiza formularios de login que postean a dominios externos o envian datos dos veces (action + fetch JS).',
+    anchor: 'forms',
+  },
   url: {
     name: 'Revisar un enlace',
     tag: 'Revision general',
@@ -98,5 +142,10 @@ export const TOOL_CATEGORIES = [
     id: 'tecnico',
     title: 'Revision general',
     tools: [TOOLS.url],
+  },
+  {
+    id: 'avanzado',
+    title: 'Herramientas avanzadas',
+    tools: [TOOLS.nlp, TOOLS.headers, TOOLS.oauth, TOOLS.forms],
   },
 ]

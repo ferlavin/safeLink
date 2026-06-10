@@ -25,6 +25,10 @@ from services.pdf_scanner import analyze_pdf
 from services.threat_map import build_threat_map
 from services.typosquatting_realtime import analyze_typosquatting_realtime
 from services.web3_drainer import analyze_web3_drainer
+from services.nlp_url_transformer import classify_url_transformer
+from services.security_headers import analyze_security_headers
+from services.oauth_phishing import analyze_oauth_phishing
+from services.double_submit_form import analyze_double_submit
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -199,6 +203,80 @@ def analyze_dns_endpoint(
 ):
     try:
         result = analyze_dns_osint(data.url.strip())
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+    return analysis_service.persist_result(db, current_user, result, request)
+
+
+@router.post(
+    "/nlp",
+    response_model=UrlAnalysisResult,
+    summary="Clasificador NLP de URLs",
+    description="Transformer char-level entrenado solo con URLs; aprende patrones de phishing sin consultar APIs.",
+)
+def analyze_nlp_endpoint(
+    data: UrlAnalysisRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = classify_url_transformer(data.url.strip())
+    return analysis_service.persist_result(db, current_user, result, request)
+
+
+@router.post(
+    "/headers",
+    response_model=UrlAnalysisResult,
+    summary="Analizador de security headers",
+    description="Evalua HSTS, CSP, X-Frame-Options y otras cabeceras HTTP de seguridad.",
+)
+async def analyze_headers_endpoint(
+    data: PageAnalysisRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        result = await analyze_security_headers(data.url.strip())
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+    return analysis_service.persist_result(db, current_user, result, request)
+
+
+@router.post(
+    "/oauth",
+    response_model=UrlAnalysisResult,
+    summary="Detector de OAuth phishing",
+    description="Detecta flujos OAuth falsos, redirect_uri sospechosos e imitaciones de login social.",
+)
+async def analyze_oauth_endpoint(
+    data: PageAnalysisRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await analyze_oauth_phishing(data.url.strip())
+    return analysis_service.persist_result(db, current_user, result, request)
+
+
+@router.post(
+    "/forms",
+    response_model=UrlAnalysisResult,
+    summary="Detector de doble envio en formularios",
+    description="Busca formularios que envian credenciales a multiples dominios o con POST paralelo via JS.",
+)
+async def analyze_forms_endpoint(
+    data: PageAnalysisRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        result = await analyze_double_submit(data.url.strip())
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
