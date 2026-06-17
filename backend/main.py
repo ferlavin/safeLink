@@ -4,12 +4,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
+from database.session import Base, engine
+from models import analysis as _analysis_models  # noqa: F401
+from models import search_event as _search_event_models  # noqa: F401
+from models import user as _user_models  # noqa: F401
 from routes import analysis, auth, users
+from seed import seed_admin
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Las tablas ya existen en PostgreSQL (usuarios, analisis_urls, etc.)
+    # Crea las tablas en Supabase si todavia no existen (usuarios, analisis_urls, etc.)
+    Base.metadata.create_all(bind=engine)
+    seed_admin()
     yield
 
 
