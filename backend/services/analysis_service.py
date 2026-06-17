@@ -10,6 +10,7 @@ from models.user import User
 from schemas.analysis import UrlAnalysisHistoryItem
 from services.url_analyzer import analyze_url
 from services.user_copy import humanize_detalle
+from services import enlace_service
 
 
 def save_analysis(db: Session, user: User, result: dict) -> AnalisisUrl:
@@ -74,6 +75,13 @@ def persist_result(
     log_event: bool = True,
 ) -> dict:
     row = save_analysis(db, user, result)
+    enlace_service.persist_scan(
+        db,
+        user.id,
+        result["url"],
+        result["nivel_riesgo"],
+        result["puntuacion_riesgo"],
+    )
     if log_event:
         log_search_event(db, user, result["url"], result["nivel_riesgo"], request)
     detalle = result.get("detalle")

@@ -1,7 +1,10 @@
 import axios from 'axios'
 
+const envUrl = import.meta.env.VITE_API_URL?.trim()
+const baseURL = envUrl || (import.meta.env.DEV ? '/api' : 'http://localhost:8000')
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL,
 })
 
 client.interceptors.request.use((config) => {
@@ -15,7 +18,8 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/auth/login')
+    if (error.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem('safelink_token')
       localStorage.removeItem('safelink_user')
       if (window.location.pathname !== '/login') {

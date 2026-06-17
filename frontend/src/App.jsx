@@ -11,6 +11,8 @@ import AnalyzeDns from './pages/AnalyzeDns'
 import AnalyzeSecurity from './pages/AnalyzeSecurity'
 import ThreatMap from './pages/ThreatMap'
 import AdminUsers from './pages/AdminUsers'
+import AdminReportes from './pages/AdminReportes'
+import Enlaces from './pages/Enlaces'
 import ExtensionInstall from './pages/ExtensionInstall'
 import Settings from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -79,6 +81,14 @@ export default function App() {
         }
       />
       <Route
+        path="/enlaces"
+        element={
+          <ProtectedRoute>
+            <Enlaces />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/settings"
         element={
           <ProtectedRoute>
@@ -92,6 +102,14 @@ export default function App() {
           <ProtectedRoute>
             <ThreatMap />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/reportes"
+        element={
+          <AdminRoute>
+            <AdminReportes />
+          </AdminRoute>
         }
       />
       <Route

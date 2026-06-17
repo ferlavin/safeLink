@@ -19,7 +19,18 @@ export default function Login() {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.detail || 'No se pudo iniciar sesion')
+      const detail = err.response?.data?.detail
+      if (Array.isArray(detail)) {
+        setError(detail.map((d) => d.msg).join('. '))
+      } else if (typeof detail === 'string') {
+        setError(detail)
+      } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        setError(
+          'No se puede conectar al servidor. Verificá que el backend esté corriendo en el puerto 8000.',
+        )
+      } else {
+        setError('No se pudo iniciar sesion')
+      }
     } finally {
       setLoading(false)
     }

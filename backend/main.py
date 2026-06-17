@@ -6,17 +6,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from database.session import Base, engine
 from models import analysis as _analysis_models  # noqa: F401
+from models import enlace as _enlace_models  # noqa: F401
+from models import escaneo as _escaneo_models  # noqa: F401
+from models import historial_login as _historial_login_models  # noqa: F401
+from models import reporte as _reporte_models  # noqa: F401
 from models import search_event as _search_event_models  # noqa: F401
 from models import user as _user_models  # noqa: F401
-from routes import analysis, auth, users
-from seed import seed_admin
+from routes import analysis, auth, enlaces, reportes, users
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Crea las tablas en Supabase si todavia no existen (usuarios, analisis_urls, etc.)
     Base.metadata.create_all(bind=engine)
-    seed_admin()
     yield
 
 
@@ -34,6 +36,8 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(enlaces.router)
+app.include_router(reportes.router)
 app.include_router(analysis.router)
 
 

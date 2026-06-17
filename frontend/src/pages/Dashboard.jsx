@@ -50,16 +50,37 @@ export default function Dashboard() {
           <section className="app-card mb-6 rounded-2xl border-neon-ice/20 p-5 sm:p-6">
             <h2 className="text-base font-semibold text-white sm:text-lg">Administración</h2>
             <p className="mt-1 text-sm text-white/45">
-              Gestión de usuarios, roles y cuentas de la plataforma.
+              Gestión de usuarios, reportes y cuentas de la plataforma.
             </p>
-            <Link
-              to="/admin/users"
-              className="app-btn-primary mt-4 inline-block px-4 py-2 text-sm hover:brightness-110 active:scale-[0.98]"
-            >
-              Gestionar usuarios
-            </Link>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                to="/admin/users"
+                className="app-btn-primary px-4 py-2 text-sm hover:brightness-110 active:scale-[0.98]"
+              >
+                Gestionar usuarios
+              </Link>
+              <Link
+                to="/admin/reportes"
+                className="app-btn-ghost px-4 py-2 text-sm"
+              >
+                Ver reportes
+              </Link>
+            </div>
           </section>
         )}
+
+        <section className="app-card mb-6 rounded-2xl p-5 sm:p-6">
+          <h2 className="text-base font-semibold text-white sm:text-lg">Tus enlaces escaneados</h2>
+          <p className="mt-1 text-sm text-white/45">
+            Revisá el historial de URLs analizadas, sus escaneos y reportá sitios sospechosos.
+          </p>
+          <Link
+            to="/enlaces"
+            className="app-btn-primary mt-4 inline-block px-4 py-2 text-sm hover:brightness-110 active:scale-[0.98]"
+          >
+            Ver mis enlaces
+          </Link>
+        </section>
 
         {TOOL_CATEGORIES.map((cat) => (
           <section key={cat.id} className="mb-8 sm:mb-10">

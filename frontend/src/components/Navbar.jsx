@@ -37,6 +37,9 @@ export default function Navbar() {
           <NavLink to="/analyze" className={linkClass}>
             URL
           </NavLink>
+          <NavLink to="/enlaces" className={linkClass}>
+            Enlaces
+          </NavLink>
           <NavLink to="/threat-map" className={linkClass}>
             Mapa
           </NavLink>
@@ -46,6 +49,11 @@ export default function Navbar() {
           <NavLink to="/settings" className={linkClass}>
             Apariencia
           </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin/reportes" className={linkClass}>
+              Reportes
+            </NavLink>
+          )}
           {isAdmin && (
             <NavLink to="/admin/users" className={linkClass}>
               Usuarios
