@@ -91,12 +91,37 @@
     --app-text-muted: color-mix(in srgb, var(--app-text) 72%, transparent);
   }
 
-  [data-compact='true'] {
-    font-size: 0.9375rem;
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
   }
 
-  html {
-    scroll-behavior: smooth;
+  [data-font-scale='sm'] {
+    font-size: 14px;
+  }
+
+  [data-font-scale='base'] {
+    font-size: 16px;
+  }
+
+  [data-font-scale='lg'] {
+    font-size: 18px;
+  }
+
+  [data-font-scale='xl'] {
+    font-size: 20px;
+  }
+
+  :root {
+    --app-content-max: 72rem;
+  }
+
+  [data-layout='compact'] {
+    --app-content-max: 64rem;
+  }
+
+  [data-layout='wide'] {
+    --app-content-max: 90rem;
   }
 
   html,
@@ -115,6 +140,11 @@
     transition:
       background-color 0.25s ease,
       color 0.25s ease;
+  }
+
+  .app-page > main {
+    width: 100%;
+    max-width: var(--app-content-max);
   }
 
   a {

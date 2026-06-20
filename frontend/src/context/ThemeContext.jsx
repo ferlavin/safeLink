@@ -4,14 +4,22 @@ const STORAGE_KEY = 'safelink_ui_prefs'
 
 const defaultPrefs = {
   theme: 'dark',
-  compact: false,
+  fontScale: 'base',
+  layout: 'comfortable',
   highContrast: false,
 }
 
 function loadPrefs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { ...defaultPrefs, ...JSON.parse(raw) }
+    if (raw) {
+      const parsed = { ...defaultPrefs, ...JSON.parse(raw) }
+      if (parsed.compact && parsed.layout === 'comfortable') {
+        parsed.layout = 'compact'
+      }
+      delete parsed.compact
+      return parsed
+    }
   } catch {
     /* ignore */
   }
@@ -34,7 +42,8 @@ export function ThemeProvider({ children }) {
         : prefs.theme
 
     root.dataset.theme = resolved
-    root.dataset.compact = prefs.compact ? 'true' : 'false'
+    root.dataset.fontScale = prefs.fontScale
+    root.dataset.layout = prefs.layout
     root.dataset.contrast = prefs.highContrast ? 'high' : 'normal'
     root.style.colorScheme = resolved
   }, [prefs])
@@ -53,7 +62,8 @@ export function ThemeProvider({ children }) {
     () => ({
       prefs,
       setTheme: (theme) => setPrefs((p) => ({ ...p, theme })),
-      setCompact: (compact) => setPrefs((p) => ({ ...p, compact })),
+      setFontScale: (fontScale) => setPrefs((p) => ({ ...p, fontScale })),
+      setLayout: (layout) => setPrefs((p) => ({ ...p, layout })),
       setHighContrast: (highContrast) => setPrefs((p) => ({ ...p, highContrast })),
       resetPrefs: () => setPrefs(defaultPrefs),
     }),

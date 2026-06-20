@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from config import settings
+from database.migrations import ensure_schema
 from database.session import Base, engine
 from models import analysis as _analysis_models  # noqa: F401
 from models import enlace as _enlace_models  # noqa: F401
@@ -13,12 +16,14 @@ from models import reporte as _reporte_models  # noqa: F401
 from models import search_event as _search_event_models  # noqa: F401
 from models import user as _user_models  # noqa: F401
 from routes import analysis, auth, enlaces, reportes, users
+from services.avatar_service import ensure_avatar_dir
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Crea las tablas en Supabase si todavia no existen (usuarios, analisis_urls, etc.)
     Base.metadata.create_all(bind=engine)
+    ensure_schema()
+    ensure_avatar_dir()
     yield
 
 
@@ -39,6 +44,10 @@ app.include_router(users.router)
 app.include_router(enlaces.router)
 app.include_router(reportes.router)
 app.include_router(analysis.router)
+
+uploads_dir = Path(__file__).resolve().parent / "uploads"
+uploads_dir.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
 @app.get("/")

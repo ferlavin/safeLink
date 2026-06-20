@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import client from '../api/client'
 
 const AuthContext = createContext(null)
@@ -14,6 +14,22 @@ export function AuthProvider({ children }) {
     localStorage.setItem('safelink_user', JSON.stringify(userData))
     setUser(userData)
   }
+
+  const updateUser = (userData) => {
+    localStorage.setItem('safelink_user', JSON.stringify(userData))
+    setUser(userData)
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('safelink_token')
+    if (!token) return
+    client
+      .get('/auth/me')
+      .then(({ data }) => updateUser(data))
+      .catch(() => {
+        /* sesion invalida manejada por interceptor */
+      })
+  }, [])
 
   const login = async (email, password) => {
     const { data } = await client.post('/auth/login', { email, password })
@@ -36,7 +52,7 @@ export function AuthProvider({ children }) {
   const isAdmin = user?.role === 'admin'
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAdmin, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

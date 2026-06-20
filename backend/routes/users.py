@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from auth.deps import require_admin
 from database.session import get_db
-from schemas.user import UserCreate, UserOut, UserUpdate
+from schemas.user import AdminUserCreate, UserCreate, UserOut, UserUpdate
 from services import user_service
 
 router = APIRouter(
@@ -17,8 +17,8 @@ def list_users(db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def create_user(data: UserCreate, db: Session = Depends(get_db)):
-    return user_service.create_user(db, data)
+def create_user(data: AdminUserCreate, db: Session = Depends(get_db)):
+    return user_service.create_admin_user(db, data)
 
 
 @router.get("/{user_id}", response_model=UserOut)

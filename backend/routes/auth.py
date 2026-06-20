@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
+import time
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from auth.deps import get_current_user
@@ -10,7 +11,7 @@ from models.user import User, UserRole
 from schemas.auth import LoginRequest, Token
 from schemas.historial_login import HistorialLoginOut
 from schemas.user import UserCreate, UserOut
-from services import historial_login_service, user_service
+from services import avatar_service, historial_login_service, user_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -61,3 +62,32 @@ def login_history(
     current_user: User = Depends(get_current_user),
 ):
     return historial_login_service.list_user_logins(db, current_user.id)
+
+
+@router.post("/avatar", response_model=UserOut)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    content = await file.read()
+    avatar_path = avatar_service.process_and_save_avatar(
+        current_user.id, content, file.content_type
+    )
+    version = int(time.time())
+    current_user.avatar_url = f"{avatar_path}?v={version}"
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.delete("/avatar", response_model=UserOut)
+def remove_avatar(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    avatar_service.delete_avatar_file(current_user.id)
+    current_user.avatar_url = None
+    db.commit()
+    db.refresh(current_user)
+    return current_user
