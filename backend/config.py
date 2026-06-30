@@ -20,8 +20,20 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
+    def database_url(self) -> str:
+        url = self.DATABASE_URL.strip()
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        return url
+
+    @property
     def cors_origins(self) -> list[str]:
-        return [o.strip() for o in self.FRONTEND_ORIGIN.split(",") if o.strip()]
+        origins = []
+        for origin in self.FRONTEND_ORIGIN.split(","):
+            cleaned = origin.strip().rstrip("/")
+            if cleaned:
+                origins.append(cleaned)
+        return origins
 
 
 settings = Settings()
