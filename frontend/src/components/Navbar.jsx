@@ -4,25 +4,23 @@ import { useAuth } from '../context/AuthContext'
 import UserOptionsMenu from './UserOptionsMenu'
 
 const linkClass = ({ isActive }) =>
-  `rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-medium transition whitespace-nowrap ${
-    isActive ? 'app-nav-active' : 'text-[var(--app-text-muted)] hover:text-[var(--app-text)]'
-  }`
+  `app-nav-link${isActive ? ' app-nav-link--active' : ''}`
 
 export default function Navbar() {
   const { isAdmin } = useAuth()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--app-border)] bg-[var(--app-bg)]/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[var(--app-content-max)] flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link to="/dashboard" className="flex shrink-0 items-center gap-2">
-          <div className="w-7 h-7 bg-gradient-to-tr from-neon-ice to-ocean-twilight rounded-md flex items-center justify-center">
+    <header className="app-navbar">
+      <div className="app-navbar-inner">
+        <Link to="/dashboard" className="landing-logo">
+          <div className="landing-logo-icon">
             <ShieldCheck size={16} weight="fill" className="text-black" />
           </div>
-          <span className="text-base font-bold tracking-tight">SafeLink</span>
+          SafeLink
         </Link>
 
-        <nav className="flex flex-wrap items-center justify-end gap-1 sm:gap-1.5">
-          <NavLink to="/dashboard" className={linkClass}>
+        <nav className="app-navbar-nav">
+          <NavLink to="/dashboard" className={linkClass} end>
             Dashboard
           </NavLink>
           <NavLink to="/extension" className={linkClass}>
@@ -50,9 +48,11 @@ export default function Navbar() {
               Usuarios
             </NavLink>
           )}
-
-          <UserOptionsMenu />
         </nav>
+
+        <div className="app-navbar-actions">
+          <UserOptionsMenu />
+        </div>
       </div>
     </header>
   )

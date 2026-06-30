@@ -1,8 +1,7 @@
+import { getAssetOrigin } from '../config/env.js'
+
 export function getApiOrigin() {
-  const envUrl = import.meta.env.VITE_API_URL?.trim()
-  if (envUrl) return envUrl.replace(/\/$/, '')
-  if (import.meta.env.DEV) return ''
-  return 'http://localhost:8000'
+  return getAssetOrigin()
 }
 
 export function resolveAssetUrl(path) {

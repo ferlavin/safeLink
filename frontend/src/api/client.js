@@ -1,10 +1,8 @@
 import axios from 'axios'
-
-const envUrl = import.meta.env.VITE_API_URL?.trim()
-const baseURL = envUrl || (import.meta.env.DEV ? '/api' : 'http://localhost:8000')
+import { getClientApiBaseUrl } from '../config/env.js'
 
 const client = axios.create({
-  baseURL,
+  baseURL: getClientApiBaseUrl(),
 })
 
 client.interceptors.request.use((config) => {

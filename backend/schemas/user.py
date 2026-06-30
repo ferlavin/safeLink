@@ -69,6 +69,7 @@ class UserOut(UserBase):
     id: int
     role: UserRole
     is_active: bool
+    is_banned: bool = False
     created_at: datetime | None = None
     avatar_url: str | None = None
     country: str | None = None
@@ -99,4 +100,11 @@ class UserOut(UserBase):
     def coerce_active(cls, v):
         if v is None:
             return True
+        return bool(v)
+
+    @field_validator("is_banned", mode="before")
+    @classmethod
+    def coerce_banned(cls, v):
+        if v is None:
+            return False
         return bool(v)

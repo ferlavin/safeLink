@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, ShieldCheck } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowRight, CheckCircle, LockKey, ShieldCheck } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
 import { COUNTRIES, EXPERIENCE_LEVELS } from '../constants/registration'
+import LandingHeader from '../components/LandingHeader'
 
 const initialForm = {
   email: '',
@@ -32,42 +33,11 @@ function parseApiError(err) {
 }
 
 function StepIndicator({ step }) {
-  const steps = [
-    { id: 1, label: 'Cuenta' },
-    { id: 2, label: 'Perfil' },
-  ]
-
   return (
-    <div className="mb-6 flex items-center justify-center gap-3">
-      {steps.map((item, index) => (
-        <div key={item.id} className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span
-              className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition ${
-                step >= item.id
-                  ? 'bg-[var(--app-accent-muted)] text-[var(--app-accent)]'
-                  : 'border border-[var(--app-border)] text-[var(--app-text-muted)]'
-              }`}
-            >
-              {item.id}
-            </span>
-            <span
-              className={`text-xs font-medium ${
-                step >= item.id ? 'text-[var(--app-text)]' : 'text-[var(--app-text-muted)]'
-              }`}
-            >
-              {item.label}
-            </span>
-          </div>
-          {index < steps.length - 1 && (
-            <div
-              className={`h-px w-8 sm:w-12 ${
-                step > item.id ? 'bg-[var(--app-accent)]' : 'bg-[var(--app-border)]'
-              }`}
-            />
-          )}
-        </div>
-      ))}
+    <div className="auth-steps">
+      <div className={`auth-step-dot ${step >= 1 ? 'active' : ''}`}>1</div>
+      <div className={`auth-step-line ${step > 1 ? 'active' : ''}`} />
+      <div className={`auth-step-dot ${step >= 2 ? 'active' : ''}`}>2</div>
     </div>
   )
 }
@@ -159,269 +129,253 @@ export default function Register() {
   }
 
   return (
-    <div className="app-page app-auth-bg flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none" />
-      <div className="absolute top-[-15%] left-[-10%] w-[min(400px,70vw)] h-[min(400px,70vw)] hero-blob-left rounded-full opacity-30 animate-pulse-glow pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[min(320px,55vw)] h-[min(320px,55vw)] hero-blob-right rounded-full opacity-15 animate-glow-pulse pointer-events-none" />
+    <div className="auth-page">
+      <LandingHeader showNav={false} />
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="mb-2 text-center">
-          <div className="mb-3 inline-flex items-center gap-2">
-            <div className="w-9 h-9 bg-gradient-to-tr from-neon-ice to-ocean-twilight rounded-lg flex items-center justify-center glow-neon">
-              <ShieldCheck size={20} weight="fill" className="text-black" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">SafeLink</h1>
-          </div>
-          <p className="text-sm text-[var(--app-text-muted)]">
-            {step === 1 ? 'Creá tu cuenta segura' : 'Completá tu perfil'}
-          </p>
-        </div>
-
-        <StepIndicator step={step} />
-
-        <form
-          onSubmit={step === 1 ? handleNext : handleSubmit}
-          className="app-card space-y-4 rounded-2xl p-6 sm:p-7"
-        >
-          <div>
-            <h2 className="text-base font-semibold text-[var(--app-text)]">
-              {step === 1 ? 'Paso 1 · Tu cuenta' : 'Paso 2 · Tu perfil'}
-            </h2>
-            <p className="mt-1 text-xs text-[var(--app-text-muted)]">
-              {step === 1
-                ? 'Datos de acceso y aceptación de términos.'
-                : 'Personalizamos alertas y contenido según tu perfil.'}
-            </p>
-          </div>
-
-          {error && (
-            <div className="rounded-lg border border-hot-fuchsia/40 bg-hot-fuchsia/10 px-3 py-2 text-sm text-hot-fuchsia">
-              {error}
-            </div>
-          )}
-
-          {step === 1 ? (
-            <>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => update('email', e.target.value)}
-                  className="app-input"
-                  placeholder="tu@email.com"
-                  autoComplete="email"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  Contraseña
-                </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={form.password}
-                  onChange={(e) => update('password', e.target.value)}
-                  className="app-input"
-                  placeholder="Mínimo 6 caracteres"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  Confirmar contraseña
-                </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={form.confirmPassword}
-                  onChange={(e) => update('confirmPassword', e.target.value)}
-                  className="app-input"
-                  placeholder="Repetí tu contraseña"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--app-border)] p-3">
-                <input
-                  type="checkbox"
-                  checked={form.acceptTerms}
-                  onChange={(e) => update('acceptTerms', e.target.checked)}
-                  className="mt-0.5 h-4 w-4 accent-[var(--app-accent)]"
-                />
-                <span className="text-xs leading-relaxed text-[var(--app-text-muted)]">
-                  Acepto los{' '}
-                  <span className="text-[var(--app-accent)]">términos de uso</span> y la{' '}
-                  <span className="text-[var(--app-accent)]">política de privacidad</span> de
-                  SafeLink.
-                </span>
-              </label>
-
-              <label className="flex cursor-pointer items-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={form.securityAlerts}
-                  onChange={(e) => update('securityAlerts', e.target.checked)}
-                  className="mt-0.5 h-4 w-4 accent-[var(--app-accent)]"
-                />
-                <span className="text-xs leading-relaxed text-[var(--app-text-muted)]">
-                  Quiero recibir alertas de seguridad y novedades de amenazas (opcional).
-                </span>
-              </label>
-
-              <button
-                type="submit"
-                className="app-btn-primary flex w-full items-center justify-center gap-2 py-2.5 hover:brightness-110 active:scale-[0.98]"
-              >
-                Continuar
-                <ArrowRight size={16} weight="bold" />
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={form.firstName}
-                    onChange={(e) => update('firstName', e.target.value)}
-                    className="app-input"
-                    placeholder="Tu nombre"
-                    autoComplete="given-name"
-                  />
+      <main className="auth-main">
+        <div className="landing-wrap">
+          <div className="auth-split">
+            <div className="auth-info">
+              <span className="auth-info-tag">Nueva cuenta</span>
+              <h1>
+                Unite a la red de defensa{' '}
+                <span className="text-gradient">SafeLink</span>
+              </h1>
+              <p>
+                Creá tu cuenta en dos pasos y accedé al semáforo de seguridad, análisis
+                de enlaces, mapa de amenazas y alertas personalizadas.
+              </p>
+              <div className="auth-benefits">
+                <div className="auth-benefit">
+                  <div className="auth-benefit-icon">
+                    <ShieldCheck size={16} weight="fill" />
+                  </div>
+                  Registro rápido y seguro
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={form.lastName}
-                    onChange={(e) => update('lastName', e.target.value)}
-                    className="app-input"
-                    placeholder="Tu apellido"
-                    autoComplete="family-name"
-                  />
+                <div className="auth-benefit">
+                  <div className="auth-benefit-icon">
+                    <LockKey size={16} weight="fill" />
+                  </div>
+                  Perfil personalizado según tu experiencia
+                </div>
+                <div className="auth-benefit">
+                  <div className="auth-benefit-icon">
+                    <CheckCircle size={16} weight="fill" />
+                  </div>
+                  Alertas de amenazas opcionales por email
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  Fecha de nacimiento
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={form.birthDate}
-                  onChange={(e) => update('birthDate', e.target.value)}
-                  className="app-input"
-                  max={new Date().toISOString().split('T')[0]}
-                />
-                <p className="mt-1 text-[10px] text-[var(--app-text-muted)]">
-                  Debés tener al menos 13 años.
-                </p>
-              </div>
+            <div className="auth-form-card">
+              <StepIndicator step={step} />
+              <h2>{step === 1 ? 'Paso 1 · Tu cuenta' : 'Paso 2 · Tu perfil'}</h2>
+              <p className="auth-form-subtitle">
+                {step === 1
+                  ? 'Datos de acceso y aceptación de términos.'
+                  : 'Personalizamos alertas y contenido según tu perfil.'}
+              </p>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  País
-                </label>
-                <select
-                  required
-                  value={form.country}
-                  onChange={(e) => update('country', e.target.value)}
-                  className="app-input"
-                >
-                  {COUNTRIES.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <form onSubmit={step === 1 ? handleNext : handleSubmit}>
+                {error && <div className="auth-error">{error}</div>}
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--app-text-muted)]">
-                  Experiencia en ciberseguridad{' '}
-                  <span className="font-normal">(opcional)</span>
-                </label>
-                <div className="space-y-2">
-                  {EXPERIENCE_LEVELS.map((level) => (
-                    <label
-                      key={level.id}
-                      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${
-                        form.experienceLevel === level.id
-                          ? 'border-[var(--app-accent)] bg-[var(--app-accent-muted)]'
-                          : 'border-[var(--app-border)] hover:border-[var(--app-accent)]/40'
-                      }`}
-                    >
+                {step === 1 ? (
+                  <>
+                    <div className="auth-field">
+                      <label htmlFor="email">Email</label>
                       <input
-                        type="radio"
-                        name="experienceLevel"
-                        value={level.id}
-                        checked={form.experienceLevel === level.id}
-                        onChange={(e) => update('experienceLevel', e.target.value)}
-                        className="mt-1 accent-[var(--app-accent)]"
+                        id="email"
+                        type="email"
+                        required
+                        value={form.email}
+                        onChange={(e) => update('email', e.target.value)}
+                        className="app-input"
+                        placeholder="tu@email.com"
+                        autoComplete="email"
+                      />
+                    </div>
+
+                    <div className="auth-field">
+                      <label htmlFor="password">Contraseña</label>
+                      <input
+                        id="password"
+                        type="password"
+                        required
+                        minLength={6}
+                        value={form.password}
+                        onChange={(e) => update('password', e.target.value)}
+                        className="app-input"
+                        placeholder="Mínimo 6 caracteres"
+                        autoComplete="new-password"
+                      />
+                    </div>
+
+                    <div className="auth-field">
+                      <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        required
+                        minLength={6}
+                        value={form.confirmPassword}
+                        onChange={(e) => update('confirmPassword', e.target.value)}
+                        className="app-input"
+                        placeholder="Repetí tu contraseña"
+                        autoComplete="new-password"
+                      />
+                    </div>
+
+                    <label className="auth-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={form.acceptTerms}
+                        onChange={(e) => update('acceptTerms', e.target.checked)}
                       />
                       <span>
-                        <span className="block text-xs font-medium text-[var(--app-text)]">
-                          {level.label}
-                        </span>
-                        <span className="mt-0.5 block text-[10px] text-[var(--app-text-muted)]">
-                          {level.hint}
-                        </span>
+                        Acepto los términos de uso y la política de privacidad de
+                        SafeLink.
                       </span>
                     </label>
-                  ))}
-                </div>
-              </div>
 
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="app-btn-ghost flex flex-1 items-center justify-center gap-2 py-2.5"
-                >
-                  <ArrowLeft size={16} />
-                  Volver
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="app-btn-primary flex flex-1 items-center justify-center gap-2 py-2.5 hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
-                >
-                  {loading ? 'Creando cuenta...' : 'Crear cuenta'}
-                </button>
-              </div>
-            </>
-          )}
+                    <label className="auth-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={form.securityAlerts}
+                        onChange={(e) => update('securityAlerts', e.target.checked)}
+                      />
+                      <span>
+                        Quiero recibir alertas de seguridad y novedades de amenazas
+                        (opcional).
+                      </span>
+                    </label>
 
-          <p className="text-center text-xs text-[var(--app-text-muted)]">
-            ¿Ya tenés cuenta?{' '}
-            <Link to="/login" className="app-link-accent hover:opacity-80">
-              Iniciá sesión
-            </Link>
-          </p>
-        </form>
+                    <button type="submit" className="btn-gradient w-full flex items-center justify-center gap-2">
+                      Continuar
+                      <ArrowRight size={16} weight="bold" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="auth-field">
+                        <label htmlFor="firstName">Nombre</label>
+                        <input
+                          id="firstName"
+                          type="text"
+                          required
+                          value={form.firstName}
+                          onChange={(e) => update('firstName', e.target.value)}
+                          className="app-input"
+                          placeholder="Tu nombre"
+                          autoComplete="given-name"
+                        />
+                      </div>
+                      <div className="auth-field">
+                        <label htmlFor="lastName">Apellido</label>
+                        <input
+                          id="lastName"
+                          type="text"
+                          required
+                          value={form.lastName}
+                          onChange={(e) => update('lastName', e.target.value)}
+                          className="app-input"
+                          placeholder="Tu apellido"
+                          autoComplete="family-name"
+                        />
+                      </div>
+                    </div>
 
-        <p className="mt-4 text-center text-xs text-[var(--app-text-muted)]">
-          <Link to="/extension" className="app-link-accent hover:opacity-80">
-            Instalar extensión para Chrome
-          </Link>
-        </p>
-      </div>
+                    <div className="auth-field">
+                      <label htmlFor="birthDate">Fecha de nacimiento</label>
+                      <input
+                        id="birthDate"
+                        type="date"
+                        required
+                        value={form.birthDate}
+                        onChange={(e) => update('birthDate', e.target.value)}
+                        className="app-input"
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+
+                    <div className="auth-field">
+                      <label htmlFor="country">País</label>
+                      <select
+                        id="country"
+                        required
+                        value={form.country}
+                        onChange={(e) => update('country', e.target.value)}
+                        className="app-input"
+                      >
+                        {COUNTRIES.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="auth-field">
+                      <label>
+                        Experiencia en ciberseguridad{' '}
+                        <span className="font-normal">(opcional)</span>
+                      </label>
+                      <div className="space-y-2">
+                        {EXPERIENCE_LEVELS.map((level) => (
+                          <label
+                            key={level.id}
+                            className={`auth-checkbox ${
+                              form.experienceLevel === level.id
+                                ? 'border-[var(--accent-green)] bg-[rgba(0,255,135,0.06)]'
+                                : ''
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="experienceLevel"
+                              value={level.id}
+                              checked={form.experienceLevel === level.id}
+                              onChange={(e) => update('experienceLevel', e.target.value)}
+                            />
+                            <span>
+                              <strong className="block text-[var(--text-main)]">
+                                {level.label}
+                              </strong>
+                              {level.hint}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="auth-form-actions">
+                      <button
+                        type="button"
+                        onClick={handleBack}
+                        className="btn-outline-gradient flex items-center justify-center gap-2"
+                      >
+                        <ArrowLeft size={16} />
+                        Volver
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn-gradient flex items-center justify-center gap-2"
+                      >
+                        {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                <p className="auth-switch">
+                  ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

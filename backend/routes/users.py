@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from auth.deps import require_admin
 from database.session import get_db
+from models.user import User
 from schemas.user import AdminUserCreate, UserCreate, UserOut, UserUpdate
 from services import user_service
 
@@ -39,3 +40,39 @@ def update_user(user_id: int, data: UserUpdate, db: Session = Depends(get_db)):
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     user_service.delete_user(db, user_id)
+
+
+@router.post("/{user_id}/suspend", response_model=UserOut)
+def suspend_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    return user_service.suspend_user(db, user_id, admin)
+
+
+@router.post("/{user_id}/reactivate", response_model=UserOut)
+def reactivate_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    return user_service.reactivate_user(db, user_id, admin)
+
+
+@router.post("/{user_id}/ban", response_model=UserOut)
+def ban_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    return user_service.ban_user(db, user_id, admin)
+
+
+@router.post("/{user_id}/unban", response_model=UserOut)
+def unban_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    return user_service.unban_user(db, user_id, admin)

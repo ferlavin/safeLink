@@ -5,6 +5,8 @@
   "description": "Te avisa con colores si un enlace es seguro antes de hacer clic.",
   "permissions": ["tabs", "storage"],
   "host_permissions": [
+    "https://safelink-api.onrender.com/*",
+    "https://*.onrender.com/*",
     "http://localhost:8000/*",
     "http://127.0.0.1:8000/*",
     "https://www.google.com/*",
@@ -31,16 +33,29 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["http://localhost:5173/*", "http://localhost:5174/*", "http://127.0.0.1:5173/*"],
+      "matches": [
+        "http://localhost:5173/*",
+        "http://localhost:5174/*",
+        "http://127.0.0.1:5173/*",
+        "https://*.vercel.app/*"
+      ],
       "js": ["content/site-bridge.js"],
       "run_at": "document_idle"
     }
   ],
   "action": {
     "default_title": "SafeLink — Analizando...",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   }

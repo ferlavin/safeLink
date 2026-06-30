@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
 import ToolHeader from '../components/ToolHeader'
+import AppShell from '../components/AppShell'
 import client from '../api/client'
 import { TOOLS } from '../constants/tools'
 
@@ -26,9 +26,7 @@ export default function ThreatMap() {
     client
       .get('/analysis/threat-map', { params: { hours: 24 } })
       .then((res) => setData(res.data))
-      .catch((err) =>
-        setError(err.response?.data?.detail || 'No se pudo cargar el mapa'),
-      )
+      .catch((err) => setError(err.response?.data?.detail || 'No se pudo cargar el mapa'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -39,85 +37,63 @@ export default function ThreatMap() {
   }, [loadMap])
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium uppercase text-rose-400">
-            {TOOLS.map.tag}
+    <AppShell>
+      <div className="mb-2 flex items-center gap-2">
+        <span className="section-tag">{TOOLS.map.tag}</span>
+        {data?.en_vivo && (
+          <span className="app-live-badge">
+            <span className="app-live-badge-dot" />
+            En vivo
           </span>
-          {data?.en_vivo && (
-            <span className="flex items-center gap-1 rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-300">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400" />
-              En vivo
+        )}
+      </div>
+      <ToolHeader name={TOOLS.map.name} description={TOOLS.map.longDesc} />
+
+      {loading && !data && <p className="text-muted">Cargando mapa...</p>}
+      {error && <div className="app-alert app-alert--error">{error}</div>}
+
+      {data && (
+        <>
+          <div className="app-map-stats">
+            <span>
+              Amenazas activas (24h): <strong>{data.amenazas_activas}</strong>
             </span>
-          )}
-        </div>
-        <ToolHeader name={TOOLS.map.name} description={TOOLS.map.longDesc} />
-
-        {loading && !data && (
-          <p className="text-slate-500">Cargando mapa...</p>
-        )}
-        {error && (
-          <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
-            {error}
+            <span>
+              Puntos en mapa: <strong>{data.total_puntos}</strong>
+            </span>
+            {data.actualizado && (
+              <span>Actualizado: {new Date(data.actualizado).toLocaleTimeString()}</span>
+            )}
           </div>
-        )}
 
-        {data && (
-          <>
-            <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-              <span>
-                Amenazas activas (24h):{' '}
-                <strong className="text-white">{data.amenazas_activas}</strong>
-              </span>
-              <span>
-                Puntos en mapa:{' '}
-                <strong className="text-white">{data.total_puntos}</strong>
-              </span>
-              {data.actualizado && (
-                <span className="text-slate-500">
-                  Actualizado: {new Date(data.actualizado).toLocaleTimeString()}
-                </span>
-              )}
-            </div>
+          <div className="app-map-viewport">
+            <div className="app-map-grid" />
+            {data.points.map((p, i) => {
+              const { x, y } = latLonToPercent(p.lat, p.lon)
+              const size = Math.min(32, 10 + p.weight * 5)
+              return (
+                <div
+                  key={`${p.lat}-${p.lon}-${i}`}
+                  title={`${p.country} — ${p.level} (${p.weight})`}
+                  className={`absolute rounded-full opacity-85 shadow-lg ${LEVEL_COLOR[p.level] || 'bg-slate-400'}`}
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    width: size,
+                    height: size,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                />
+              )
+            })}
+          </div>
 
-            <div className="relative mt-6 aspect-[2/1] overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950">
-              <div
-                className="absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px)',
-                  backgroundSize: '40px 40px',
-                }}
-              />
-              {data.points.map((p, i) => {
-                const { x, y } = latLonToPercent(p.lat, p.lon)
-                const size = Math.min(32, 10 + p.weight * 5)
-                return (
-                  <div
-                    key={`${p.lat}-${p.lon}-${i}`}
-                    title={`${p.country} — ${p.level} (${p.weight})`}
-                    className={`absolute rounded-full opacity-85 shadow-lg ${LEVEL_COLOR[p.level] || 'bg-slate-400'}`}
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      width: size,
-                      height: size,
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                  />
-                )
-              })}
-            </div>
-
-            <p className="mt-2 text-xs text-slate-500">
-              Se actualiza cada 15 segundos. Muestra sitios que otros usuarios marcaron como
-              sospechosos o peligrosos.
-            </p>
-          </>
-        )}
-      </main>
-    </div>
+          <p className="mt-3 text-xs text-muted">
+            Se actualiza cada 15 segundos. Muestra sitios que otros usuarios marcaron como
+            sospechosos o peligrosos.
+          </p>
+        </>
+      )}
+    </AppShell>
   )
 }

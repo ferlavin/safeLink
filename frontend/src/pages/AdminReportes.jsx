@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
+import AppShell from '../components/AppShell'
 import client from '../api/client'
 import { REPORTE_ESTADOS } from '../constants/labels'
 
@@ -12,10 +12,10 @@ function formatDate(value) {
 }
 
 const estadoStyle = (estado) => {
-  if (estado === 'Resuelto') return 'bg-emerald-500/15 text-emerald-400'
-  if (estado === 'Descartado') return 'bg-slate-500/15 text-slate-400'
-  if (estado === 'En revisión') return 'bg-amber-500/15 text-amber-400'
-  return 'bg-rose-500/15 text-rose-400'
+  if (estado === 'Resuelto') return 'text-neon-ice'
+  if (estado === 'Descartado') return 'text-muted'
+  if (estado === 'En revisión') return 'text-amber-400'
+  return 'text-hot-fuchsia'
 }
 
 export default function AdminReportes() {
@@ -55,85 +55,68 @@ export default function AdminReportes() {
   }
 
   return (
-    <div className="app-page relative">
-      <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
-      <Navbar />
+    <AppShell>
+      <div className="app-page-header">
+        <span className="section-tag">Admin</span>
+        <h1>Gestión de reportes</h1>
+        <p>Revisá los enlaces reportados por la comunidad y actualizá su estado.</p>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-6">
-          <h1 className="landing-section-title font-semibold text-white">
-            Gestión de reportes
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-white/45">
-            Revisá los enlaces reportados por la comunidad y actualizá su estado.
-          </p>
-        </div>
+      {error && <div className="app-alert app-alert--error">{error}</div>}
 
-        {error && (
-          <div className="mb-4 rounded-lg border border-hot-fuchsia/40 bg-hot-fuchsia/10 px-3 py-2 text-sm text-hot-fuchsia">
-            {error}
-          </div>
-        )}
-
-        <div className="app-card overflow-x-auto rounded-2xl">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-[var(--app-border)] text-white/45">
+      <div className="app-table-wrap">
+        <table className="app-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Enlace</th>
+              <th>Motivo</th>
+              <th>Usuario</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
               <tr>
-                <th className="px-4 py-3">ID</th>
-                <th className="px-4 py-3">Enlace</th>
-                <th className="px-4 py-3">Motivo</th>
-                <th className="px-4 py-3">Usuario</th>
-                <th className="px-4 py-3">Fecha</th>
-                <th className="px-4 py-3">Estado</th>
+                <td colSpan={6} className="app-table-empty">
+                  Cargando...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-white/40">
-                    Cargando...
+            ) : reportes.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="app-table-empty">
+                  No hay reportes
+                </td>
+              </tr>
+            ) : (
+              reportes.map((reporte) => (
+                <tr key={reporte.id}>
+                  <td>#{reporte.id}</td>
+                  <td className="cell-main">#{reporte.enlace_id}</td>
+                  <td className="max-w-xs">{reporte.motivo}</td>
+                  <td>#{reporte.usuario_id}</td>
+                  <td>{formatDate(reporte.fecha_reporte)}</td>
+                  <td>
+                    <select
+                      value={reporte.estado || 'Pendiente'}
+                      disabled={updatingId === reporte.id}
+                      onChange={(e) => handleEstadoChange(reporte.id, e.target.value)}
+                      className={`app-input w-auto px-2 py-1 text-xs font-medium ${estadoStyle(reporte.estado)}`}
+                    >
+                      {REPORTE_ESTADOS.map((estado) => (
+                        <option key={estado} value={estado}>
+                          {estado}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                 </tr>
-              ) : reportes.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-white/40">
-                    No hay reportes
-                  </td>
-                </tr>
-              ) : (
-                reportes.map((reporte) => (
-                  <tr
-                    key={reporte.id}
-                    className="border-b border-[var(--app-border)] last:border-0"
-                  >
-                    <td className="px-4 py-3 text-white/70">#{reporte.id}</td>
-                    <td className="px-4 py-3 text-white">#{reporte.enlace_id}</td>
-                    <td className="max-w-xs px-4 py-3 text-white/70">{reporte.motivo}</td>
-                    <td className="px-4 py-3 text-white/70">#{reporte.usuario_id}</td>
-                    <td className="px-4 py-3 text-white/45">
-                      {formatDate(reporte.fecha_reporte)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={reporte.estado || 'Pendiente'}
-                        disabled={updatingId === reporte.id}
-                        onChange={(e) => handleEstadoChange(reporte.id, e.target.value)}
-                        className={`rounded-lg border border-[var(--app-border)] bg-[var(--app-input-bg)] px-2 py-1 text-xs font-medium outline-none focus:border-neon-ice/50 ${estadoStyle(reporte.estado)}`}
-                      >
-                        {REPORTE_ESTADOS.map((estado) => (
-                          <option key={estado} value={estado}>
-                            {estado}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </AppShell>
   )
 }

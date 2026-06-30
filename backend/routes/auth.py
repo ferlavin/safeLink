@@ -34,11 +34,13 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
         )
     if user.is_banned:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Cuenta suspendida"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tu cuenta fue bloqueada por incumplimiento de las normas.",
         )
     if not user.is_active_bool:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Cuenta desactivada"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tu cuenta fue suspendida. Contacta soporte.",
         )
     user.last_login = datetime.now(timezone.utc)
     db.commit()

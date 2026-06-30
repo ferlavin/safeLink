@@ -1,0 +1,4 @@
+# Dependencias opcionales para entrenar el modelo NLP en local.
+# No se instalan en Render (el API usa fallback lexico si torch no esta).
+-r requirements.txt
+torch==2.5.1

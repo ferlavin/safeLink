@@ -1,15 +1,12 @@
-const DEFAULT_API = 'http://localhost:8000'
+importScripts('config.js')
+
+const DEFAULT_API = typeof PRODUCTION_API_URL !== 'undefined'
+  ? PRODUCTION_API_URL
+  : 'https://safelink-api.onrender.com'
 const CACHE_TTL_MS = 5 * 60 * 1000
 
 /** @type {Map<string, { data: object, ts: number }>} */
 const cache = new Map()
-
-const COLORS = {
-  seguro: '#22c55e',
-  precaucion: '#eab308',
-  peligro: '#ef4444',
-  unknown: '#64748b',
-}
 
 const LABELS = {
   seguro: 'Seguro',
@@ -58,24 +55,36 @@ async function getToken() {
   return token || null
 }
 
-function drawSemaphoreIcon(color) {
-  const size = 16
-  const canvas = new OffscreenCanvas(size, size)
-  const ctx = canvas.getContext('2d')
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(0,0,0,0.25)'
-  ctx.lineWidth = 1
-  ctx.stroke()
-  return ctx.getImageData(0, 0, size, size)
+const ICONS = {
+  seguro: {
+    16: 'icons/icon-seguro-16.png',
+    32: 'icons/icon-seguro-32.png',
+    48: 'icons/icon-seguro-48.png',
+    128: 'icons/icon-seguro-128.png',
+  },
+  precaucion: {
+    16: 'icons/icon-precaucion-16.png',
+    32: 'icons/icon-precaucion-32.png',
+    48: 'icons/icon-precaucion-48.png',
+    128: 'icons/icon-precaucion-128.png',
+  },
+  peligro: {
+    16: 'icons/icon-peligro-16.png',
+    32: 'icons/icon-peligro-32.png',
+    48: 'icons/icon-peligro-48.png',
+    128: 'icons/icon-peligro-128.png',
+  },
+  unknown: {
+    16: 'icons/icon-unknown-16.png',
+    32: 'icons/icon-unknown-32.png',
+    48: 'icons/icon-unknown-48.png',
+    128: 'icons/icon-unknown-128.png',
+  },
 }
 
 async function setSemaphore(estado, tooltip) {
-  const color = COLORS[estado] || COLORS.unknown
-  const imageData = drawSemaphoreIcon(color)
-  await chrome.action.setIcon({ imageData })
+  const iconPath = ICONS[estado] || ICONS.unknown
+  await chrome.action.setIcon({ path: iconPath })
   await chrome.action.setTitle({ title: tooltip })
   await chrome.action.setBadgeText({ text: '' })
 }

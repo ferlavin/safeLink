@@ -32,8 +32,11 @@ app = FastAPI(title="SafeLink API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    # Vite puede usar 5173, 5174, etc. si el puerto esta ocupado
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+|chrome-extension://.*",
+    allow_origin_regex=(
+        r"http://(localhost|127\.0\.0\.1):\d+|"
+        r"https://([a-z0-9-]+\.)*vercel\.app|"
+        r"chrome-extension://.*"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

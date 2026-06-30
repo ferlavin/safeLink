@@ -117,3 +117,93 @@ def delete_user(db: Session, user_id: int) -> None:
         )
     db.delete(user)
     db.commit()
+
+
+def _get_user_or_404(db: Session, user_id: int) -> User:
+    user = get_user(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+        )
+    return user
+
+
+def _ensure_moderatable(target: User, actor: User) -> None:
+    if target.id == actor.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No podes moderar tu propia cuenta",
+        )
+    if target.role == UserRole.admin.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No podes moderar a otro administrador",
+        )
+
+
+def suspend_user(db: Session, user_id: int, actor: User) -> User:
+    user = _get_user_or_404(db, user_id)
+    _ensure_moderatable(user, actor)
+    if user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario esta baneado. Quita el ban antes de suspender.",
+        )
+    if not user.is_active_bool:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario ya esta suspendido",
+        )
+    user.is_active = False
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def reactivate_user(db: Session, user_id: int, actor: User) -> User:
+    user = _get_user_or_404(db, user_id)
+    _ensure_moderatable(user, actor)
+    if user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario esta baneado. Usa quitar ban para restaurar el acceso.",
+        )
+    if user.is_active_bool:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario ya esta activo",
+        )
+    user.is_active = True
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def ban_user(db: Session, user_id: int, actor: User) -> User:
+    user = _get_user_or_404(db, user_id)
+    _ensure_moderatable(user, actor)
+    if user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario ya esta baneado",
+        )
+    user.is_banned = True
+    user.is_active = False
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def unban_user(db: Session, user_id: int, actor: User) -> User:
+    user = _get_user_or_404(db, user_id)
+    _ensure_moderatable(user, actor)
+    if not user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario no esta baneado",
+        )
+    user.is_banned = False
+    user.is_active = True
+    db.commit()
+    db.refresh(user)
+    return user

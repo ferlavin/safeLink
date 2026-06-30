@@ -26,7 +26,10 @@ let activeRiskTab = 'bajo'
 
 async function getApiBase() {
   const { apiUrl } = await chrome.storage.sync.get(['apiUrl'])
-  return (apiUrl || 'http://localhost:8000').replace(/\/$/, '')
+  const fallback = typeof PRODUCTION_API_URL !== 'undefined'
+    ? PRODUCTION_API_URL
+    : 'https://safelink-api.onrender.com'
+  return (apiUrl || fallback).replace(/\/$/, '')
 }
 
 async function apiFetch(path, options = {}) {
@@ -133,7 +136,10 @@ async function init() {
   const sem = document.getElementById('semaphore')
 
   document.getElementById('url').textContent = tab?.url || '—'
-  document.getElementById('apiUrl').value = apiUrl || 'http://localhost:8000'
+  const apiDefault = typeof PRODUCTION_API_URL !== 'undefined'
+    ? PRODUCTION_API_URL
+    : 'https://safelink-api.onrender.com'
+  document.getElementById('apiUrl').value = apiUrl || apiDefault
 
   if (onGoogleSerp) {
     serpHint.classList.remove('hidden')
