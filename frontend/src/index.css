@@ -3262,4 +3262,129 @@
       padding: 1.25rem;
     }
   }
+
+  /* Modo simple */
+  [data-simple-mode='true'] .app-main {
+    font-size: 1.05rem;
+  }
+
+  [data-simple-mode='true'] .app-nav-link {
+    font-size: 0.95rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  [data-simple-mode='true'] .btn-gradient,
+  [data-simple-mode='true'] .btn-outline-gradient {
+    font-size: 0.95rem;
+    padding: 0.65rem 1.1rem;
+  }
+
+  /* Tutorial overlay */
+  .app-tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(5, 8, 17, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+  }
+
+  .app-tour-card {
+    position: relative;
+    width: min(100%, 28rem);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  }
+
+  .app-tour-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .app-tour-progress {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0.5rem 0;
+  }
+
+  .app-tour-card h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+
+  .app-tour-body {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+
+  .app-tour-dots {
+    display: flex;
+    gap: 0.35rem;
+    margin: 1.25rem 0;
+  }
+
+  .app-tour-dots span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--border-color);
+  }
+
+  .app-tour-dots span.active {
+    background: var(--accent-green);
+    box-shadow: 0 0 8px rgba(0, 255, 135, 0.5);
+  }
+
+  .app-tour-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  /* Ayuda */
+  .app-help-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .app-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .app-help-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .app-help-card h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .app-help-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
 }

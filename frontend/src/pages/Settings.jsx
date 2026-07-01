@@ -4,6 +4,7 @@ import ThemeToggle from '../components/ThemeToggle'
 import AvatarPhotoControls from '../components/AvatarPhotoControls'
 import UserAvatar from '../components/UserAvatar'
 import { useAuth } from '../context/AuthContext'
+import { usePreferences } from '../context/PreferencesContext'
 import { useTheme } from '../context/ThemeContext'
 import { AVATAR_COLORS, AVATAR_STYLES, useAvatarPrefs } from '../hooks/useAvatarPrefs'
 import { useAvatarUpload } from '../hooks/useAvatarUpload'
@@ -39,6 +40,7 @@ function roleLabel(role) {
 export default function Settings() {
   const { user } = useAuth()
   const { prefs, setFontScale, setLayout, setHighContrast, resetPrefs } = useTheme()
+  const { prefs: userPrefs, updatePreferences } = usePreferences()
   const { avatar, setAvatarColor, setAvatarStyle, resetAvatar } = useAvatarPrefs()
   const { removeAvatar } = useAvatarUpload()
   const [loginHistory, setLoginHistory] = useState([])
@@ -263,6 +265,42 @@ export default function Settings() {
                   {option.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="border-t border-[var(--app-border)] pt-5">
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">Modo simple</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">
+              Menú más corto, textos más grandes y lenguaje fácil de entender. Ideal para adultos
+              mayores o quienes recién empiezan.
+            </p>
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={userPrefs.modo_simple}
+                onChange={(e) => updatePreferences({ modo_simple: e.target.checked })}
+                className="h-4 w-4 accent-[var(--app-accent)]"
+              />
+              <span className="text-sm text-[var(--app-text)]">Activar modo simple</span>
+            </label>
+          </div>
+
+          <div className="border-t border-[var(--app-border)] pt-5">
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">Guía de uso</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">
+              Volvé a ver el tutorial interactivo o consultá la ayuda paso a paso.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="btn-outline-gradient text-xs px-3 py-1.5"
+                onClick={() => updatePreferences({ tutorial_completado: false })}
+              >
+                Repetir tutorial
+              </button>
+              <a href="/ayuda" className="btn-outline-gradient text-xs px-3 py-1.5">
+                Ver ayuda completa
+              </a>
             </div>
           </div>
 

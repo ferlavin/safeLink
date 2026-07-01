@@ -207,3 +207,31 @@ def unban_user(db: Session, user_id: int, actor: User) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def get_preferences(user: User):
+    from schemas.user_preferences import UserPreferencesOut
+
+    return UserPreferencesOut(
+        tutorial_completado=bool(user.tutorial_completado),
+        modo_simple=bool(user.modo_simple),
+        idioma=user.idioma or "es",
+    )
+
+
+def update_preferences(db: Session, user: User, data):
+    from schemas.user_preferences import UserPreferencesOut
+
+    if data.tutorial_completado is not None:
+        user.tutorial_completado = data.tutorial_completado
+    if data.modo_simple is not None:
+        user.modo_simple = data.modo_simple
+    if data.idioma is not None:
+        user.idioma = data.idioma
+    db.commit()
+    db.refresh(user)
+    return UserPreferencesOut(
+        tutorial_completado=bool(user.tutorial_completado),
+        modo_simple=bool(user.modo_simple),
+        idioma=user.idioma or "es",
+    )

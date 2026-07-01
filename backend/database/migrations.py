@@ -9,6 +9,9 @@ _SCHEMA_STATEMENTS = (
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS nivel_experiencia VARCHAR(20)",
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS alertas_seguridad BOOLEAN DEFAULT FALSE",
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS terminos_aceptados_en TIMESTAMP",
+    "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS tutorial_completado BOOLEAN DEFAULT FALSE",
+    "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS modo_simple BOOLEAN DEFAULT FALSE",
+    "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS idioma VARCHAR(5) DEFAULT 'es'",
     """
     CREATE TABLE IF NOT EXISTS reporte_mensajes (
         id SERIAL PRIMARY KEY,

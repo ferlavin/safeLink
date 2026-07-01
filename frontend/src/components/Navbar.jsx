@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
-import { ShieldCheck } from '@phosphor-icons/react'
+import { ShieldCheck, Question } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
+import { usePreferences } from '../context/PreferencesContext'
 import { useUnreadReportes } from '../hooks/useUnreadReportes'
 import UserOptionsMenu from './UserOptionsMenu'
 
@@ -9,7 +10,9 @@ const linkClass = ({ isActive }) =>
 
 export default function Navbar() {
   const { isAdmin } = useAuth()
+  const { prefs } = usePreferences()
   const unread = useUnreadReportes()
+  const simple = prefs.modo_simple
 
   return (
     <header className="app-navbar">
@@ -29,7 +32,7 @@ export default function Navbar() {
             Extensión
           </NavLink>
           <NavLink to="/analyze" className={linkClass}>
-            URL
+            {simple ? 'Analizar' : 'URL'}
           </NavLink>
           <NavLink to="/enlaces" className={linkClass}>
             Enlaces
@@ -40,11 +43,19 @@ export default function Navbar() {
               {unread > 0 && <span className="app-nav-badge">{unread > 9 ? '9+' : unread}</span>}
             </NavLink>
           )}
-          <NavLink to="/threat-map" className={linkClass}>
-            Mapa
-          </NavLink>
-          <NavLink to="/analyze/security" className={linkClass}>
-            Avanzado
+          {!simple && (
+            <NavLink to="/threat-map" className={linkClass}>
+              Mapa
+            </NavLink>
+          )}
+          {!simple && (
+            <NavLink to="/analyze/security" className={`${linkClass} app-nav-advanced`}>
+              Avanzado
+            </NavLink>
+          )}
+          <NavLink to="/ayuda" className={linkClass}>
+            <Question size={14} weight="fill" className="inline mr-0.5" />
+            Ayuda
           </NavLink>
           {isAdmin && (
             <NavLink to="/admin/reportes" className={linkClass}>

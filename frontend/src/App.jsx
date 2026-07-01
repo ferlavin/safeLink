@@ -14,6 +14,7 @@ import AdminUsers from './pages/AdminUsers'
 import AdminReportes from './pages/AdminReportes'
 import Enlaces from './pages/Enlaces'
 import MisMensajes from './pages/MisMensajes'
+import Ayuda from './pages/Ayuda'
 import ExtensionInstall from './pages/ExtensionInstall'
 import Settings from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -94,6 +95,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <MisMensajes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ayuda"
+        element={
+          <ProtectedRoute>
+            <Ayuda />
           </ProtectedRoute>
         }
       />

@@ -76,6 +76,9 @@ class UserOut(UserBase):
     birth_date: date | None = None
     experience_level: ExperienceLevel | None = None
     security_alerts: bool = False
+    tutorial_completado: bool = False
+    modo_simple: bool = False
+    idioma: str = "es"
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -105,6 +108,13 @@ class UserOut(UserBase):
     @field_validator("is_banned", mode="before")
     @classmethod
     def coerce_banned(cls, v):
+        if v is None:
+            return False
+        return bool(v)
+
+    @field_validator("tutorial_completado", "modo_simple", "security_alerts", mode="before")
+    @classmethod
+    def coerce_bool_fields(cls, v):
         if v is None:
             return False
         return bool(v)

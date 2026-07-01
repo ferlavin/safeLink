@@ -46,6 +46,11 @@ class User(Base):
     terms_accepted_at: Mapped[datetime | None] = mapped_column(
         "terminos_aceptados_en", DateTime, nullable=True
     )
+    tutorial_completado: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
+    modo_simple: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    idioma: Mapped[str] = mapped_column(String(5), default="es", nullable=False)
 
     @property
     def is_active_bool(self) -> bool:

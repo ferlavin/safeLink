@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import time
 
-from fastapi import APIRouter, Depends, File, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from auth.deps import get_current_user
@@ -11,6 +11,7 @@ from models.user import User, UserRole
 from schemas.auth import LoginRequest, Token
 from schemas.historial_login import HistorialLoginOut
 from schemas.user import UserCreate, UserOut
+from schemas.user_preferences import UserPreferencesOut, UserPreferencesUpdate
 from services import avatar_service, historial_login_service, user_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -56,6 +57,20 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/me/preferences", response_model=UserPreferencesOut)
+def get_my_preferences(current_user: User = Depends(get_current_user)):
+    return user_service.get_preferences(current_user)
+
+
+@router.patch("/me/preferences", response_model=UserPreferencesOut)
+def update_my_preferences(
+    data: UserPreferencesUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return user_service.update_preferences(db, current_user, data)
 
 
 @router.get("/login-history", response_model=list[HistorialLoginOut])
