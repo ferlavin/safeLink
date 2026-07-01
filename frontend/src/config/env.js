@@ -3,7 +3,7 @@ const rawApi = import.meta.env.VITE_API_URL?.trim()
 /** URL directa del backend (Render). Opcional si usás proxy /api en Vercel. */
 export function getBackendOrigin() {
   if (rawApi) return rawApi.replace(/\/$/, '')
-  return 'https://safelink-api.onrender.com'
+  return 'https://safelink-api-csqe.onrender.com'
 }
 
 /**

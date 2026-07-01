@@ -5,7 +5,7 @@
   "description": "Te avisa con colores si un enlace es seguro antes de hacer clic.",
   "permissions": ["tabs", "storage"],
   "host_permissions": [
-    "https://safelink-api.onrender.com/*",
+    "https://safelink-api-csqe.onrender.com/*",
     "https://*.onrender.com/*",
     "http://localhost:8000/*",
     "http://127.0.0.1:8000/*",

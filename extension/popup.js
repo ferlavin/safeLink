@@ -28,7 +28,7 @@ async function getApiBase() {
   const { apiUrl } = await chrome.storage.sync.get(['apiUrl'])
   const fallback = typeof PRODUCTION_API_URL !== 'undefined'
     ? PRODUCTION_API_URL
-    : 'https://safelink-api.onrender.com'
+    : 'https://safelink-api-csqe.onrender.com'
   return (apiUrl || fallback).replace(/\/$/, '')
 }
 
@@ -138,7 +138,7 @@ async function init() {
   document.getElementById('url').textContent = tab?.url || '—'
   const apiDefault = typeof PRODUCTION_API_URL !== 'undefined'
     ? PRODUCTION_API_URL
-    : 'https://safelink-api.onrender.com'
+    : 'https://safelink-api-csqe.onrender.com'
   document.getElementById('apiUrl').value = apiUrl || apiDefault
 
   if (onGoogleSerp) {

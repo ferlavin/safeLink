@@ -119,7 +119,7 @@ export default function ExtensionInstall() {
         )}
         <p className="mt-4 text-xs">
           Requisito: API SafeLink en la nube (por defecto{' '}
-          <code className="text-neon-ice">https://safelink-api.onrender.com</code>). En desarrollo
+          <code className="text-neon-ice">https://safelink-api-csqe.onrender.com</code>). En desarrollo
           local podés usar <code className="text-neon-ice">http://localhost:8000</code> desde el
           popup de la extensión.
         </p>

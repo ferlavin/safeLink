@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://safelink-api.onrender.com/:path*"
+      "destination": "https://safelink-api-csqe.onrender.com/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://safelink-api.onrender.com/uploads/:path*"
+      "destination": "https://safelink-api-csqe.onrender.com/uploads/:path*"
     },
     {
       "source": "/(.*)",

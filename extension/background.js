@@ -2,7 +2,7 @@ importScripts('config.js')
 
 const DEFAULT_API = typeof PRODUCTION_API_URL !== 'undefined'
   ? PRODUCTION_API_URL
-  : 'https://safelink-api.onrender.com'
+  : 'https://safelink-api-csqe.onrender.com'
 const CACHE_TTL_MS = 5 * 60 * 1000
 
 /** @type {Map<string, { data: object, ts: number }>} */
