@@ -27,7 +27,7 @@ export default function Login() {
         setError(detail)
       } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
         setError(
-          'No se puede conectar al servidor. La API en Render puede estar caída o VITE_API_URL no está bien configurada en Vercel. Probá abrir /health de tu API y redeploy en ambos servicios.',
+          'No se puede conectar al servidor. Probá https://safe-link-two.vercel.app/api/health — si falla, la API en Render no está activa (revisá el deploy en render.com).',
         )
       } else {
         setError('No se pudo iniciar sesion')
