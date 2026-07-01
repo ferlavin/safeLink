@@ -71,12 +71,12 @@ export default function Enlaces() {
         enlace_id: reportTarget.id,
         motivo: motivo.trim(),
       })
-      setReportMsg('Reporte enviado correctamente')
+      setReportMsg('Reporte enviado. Podés seguirlo en Mensajes.')
       setMotivo('')
       setTimeout(() => {
         setReportTarget(null)
         setReportMsg('')
-      }, 1500)
+      }, 2000)
     } catch (err) {
       setReportMsg(err.response?.data?.detail || 'No se pudo enviar el reporte')
     } finally {

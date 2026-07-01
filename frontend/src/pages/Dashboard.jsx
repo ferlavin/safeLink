@@ -61,6 +61,9 @@ export default function Dashboard() {
         <Link to="/enlaces" className="btn-gradient mt-4 inline-block text-sm px-4 py-2">
           Ver mis enlaces
         </Link>
+        <Link to="/mensajes" className="btn-outline-gradient mt-4 ml-0 inline-block text-sm px-4 py-2 sm:ml-3">
+          Bandeja de mensajes
+        </Link>
       </section>
 
       {TOOL_CATEGORIES.map((cat) => (

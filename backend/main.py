@@ -13,6 +13,7 @@ from models import enlace as _enlace_models  # noqa: F401
 from models import escaneo as _escaneo_models  # noqa: F401
 from models import historial_login as _historial_login_models  # noqa: F401
 from models import reporte as _reporte_models  # noqa: F401
+from models import reporte_mensaje as _reporte_mensaje_models  # noqa: F401
 from models import search_event as _search_event_models  # noqa: F401
 from models import user as _user_models  # noqa: F401
 from routes import analysis, auth, enlaces, reportes, users

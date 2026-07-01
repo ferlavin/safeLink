@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { ShieldCheck } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
+import { useUnreadReportes } from '../hooks/useUnreadReportes'
 import UserOptionsMenu from './UserOptionsMenu'
 
 const linkClass = ({ isActive }) =>
@@ -8,6 +9,7 @@ const linkClass = ({ isActive }) =>
 
 export default function Navbar() {
   const { isAdmin } = useAuth()
+  const unread = useUnreadReportes()
 
   return (
     <header className="app-navbar">
@@ -32,6 +34,12 @@ export default function Navbar() {
           <NavLink to="/enlaces" className={linkClass}>
             Enlaces
           </NavLink>
+          {!isAdmin && (
+            <NavLink to="/mensajes" className={linkClass}>
+              Mensajes
+              {unread > 0 && <span className="app-nav-badge">{unread > 9 ? '9+' : unread}</span>}
+            </NavLink>
+          )}
           <NavLink to="/threat-map" className={linkClass}>
             Mapa
           </NavLink>
@@ -41,6 +49,7 @@ export default function Navbar() {
           {isAdmin && (
             <NavLink to="/admin/reportes" className={linkClass}>
               Reportes
+              {unread > 0 && <span className="app-nav-badge">{unread > 9 ? '9+' : unread}</span>}
             </NavLink>
           )}
           {isAdmin && (

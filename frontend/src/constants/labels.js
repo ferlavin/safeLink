@@ -12,4 +12,4 @@ export const ESTADO_LABELS = {
   Pendiente: 'Pendiente',
 }
 
-export const REPORTE_ESTADOS = ['Pendiente', 'En revisión', 'Resuelto', 'Descartado']
+export const REPORTE_ESTADOS = ['Pendiente', 'En revisión', 'Respondido', 'Resuelto', 'Descartado']

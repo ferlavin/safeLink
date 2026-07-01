@@ -13,6 +13,7 @@ import ThreatMap from './pages/ThreatMap'
 import AdminUsers from './pages/AdminUsers'
 import AdminReportes from './pages/AdminReportes'
 import Enlaces from './pages/Enlaces'
+import MisMensajes from './pages/MisMensajes'
 import ExtensionInstall from './pages/ExtensionInstall'
 import Settings from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -85,6 +86,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Enlaces />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mensajes"
+        element={
+          <ProtectedRoute>
+            <MisMensajes />
           </ProtectedRoute>
         }
       />

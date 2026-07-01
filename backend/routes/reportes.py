@@ -4,7 +4,15 @@ from sqlalchemy.orm import Session
 from auth.deps import get_current_user, require_admin
 from database.session import get_db
 from models.user import User
-from schemas.reporte import ReporteCreate, ReporteOut, ReporteUpdate
+from schemas.reporte import (
+    ReporteCreate,
+    ReporteDetailOut,
+    ReporteMensajeCreate,
+    ReporteMensajeOut,
+    ReporteOut,
+    ReporteUpdate,
+    UnreadCountOut,
+)
 from services import reporte_service
 
 router = APIRouter(prefix="/reportes", tags=["reportes"])
@@ -29,9 +37,51 @@ def list_my_reportes(
     return reporte_service.list_user_reportes(db, current_user.id)
 
 
+@router.get("/unread-count", response_model=UnreadCountOut)
+def get_unread_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    is_admin = current_user.role == "admin"
+    return UnreadCountOut(count=reporte_service.unread_count(db, current_user, is_admin))
+
+
 @router.get("", response_model=list[ReporteOut], dependencies=[Depends(require_admin)])
 def list_reportes(db: Session = Depends(get_db)):
     return reporte_service.list_all_reportes(db)
+
+
+@router.get("/{reporte_id}", response_model=ReporteDetailOut)
+def get_reporte(
+    reporte_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    is_admin = current_user.role == "admin"
+    return reporte_service.get_reporte_detail(db, reporte_id, current_user, is_admin)
+
+
+@router.post("/{reporte_id}/mensajes", response_model=ReporteMensajeOut)
+def post_mensaje(
+    reporte_id: int,
+    data: ReporteMensajeCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    is_admin = current_user.role == "admin"
+    return reporte_service.add_mensaje(
+        db, reporte_id, current_user, data.cuerpo, is_admin
+    )
+
+
+@router.post("/{reporte_id}/leer", status_code=status.HTTP_204_NO_CONTENT)
+def mark_leido(
+    reporte_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    is_admin = current_user.role == "admin"
+    reporte_service.mark_reporte_leido(db, reporte_id, current_user, is_admin)
 
 
 @router.put(
