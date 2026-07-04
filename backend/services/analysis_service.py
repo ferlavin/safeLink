@@ -72,7 +72,8 @@ def persist_result(
     user: User,
     result: dict,
     request: Request | None = None,
-    log_event: bool = True,
+    log_search: bool = True,
+    usage_event: str = "analyze_url",
 ) -> dict:
     row = save_analysis(db, user, result)
     enlace_service.persist_scan(
@@ -82,8 +83,11 @@ def persist_result(
         result["nivel_riesgo"],
         result["puntuacion_riesgo"],
     )
-    if log_event:
+    if log_search:
         log_search_event(db, user, result["url"], result["nivel_riesgo"], request)
+    from services import usage_service
+
+    usage_service.log_event(db, usage_event, user.id)
     detalle = result.get("detalle")
     if detalle is None and isinstance(result.get("explicacion"), str):
         try:

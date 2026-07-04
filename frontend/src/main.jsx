@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { PreferencesProvider } from './context/PreferencesContext'
+import { I18nProvider } from './i18n/I18nContext.jsx'
 import { ThemeProvider } from './context/ThemeContext'
 
 createRoot(document.getElementById('root')).render(
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <AuthProvider>
           <PreferencesProvider>
-            <App />
+            <I18nProvider>
+              <App />
+            </I18nProvider>
           </PreferencesProvider>
         </AuthProvider>
       </ThemeProvider>

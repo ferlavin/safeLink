@@ -6,6 +6,8 @@ import UserAvatar from '../components/UserAvatar'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
 import { useTheme } from '../context/ThemeContext'
+import LanguageSelect from '../components/LanguageSelect'
+import { useT } from '../i18n/I18nContext.jsx'
 import { AVATAR_COLORS, AVATAR_STYLES, useAvatarPrefs } from '../hooks/useAvatarPrefs'
 import { useAvatarUpload } from '../hooks/useAvatarUpload'
 import { calcAge, countryLabel, experienceLabel } from '../constants/registration'
@@ -41,6 +43,7 @@ export default function Settings() {
   const { user } = useAuth()
   const { prefs, setFontScale, setLayout, setHighContrast, resetPrefs } = useTheme()
   const { prefs: userPrefs, updatePreferences } = usePreferences()
+  const { t } = useT()
   const { avatar, setAvatarColor, setAvatarStyle, resetAvatar } = useAvatarPrefs()
   const { removeAvatar } = useAvatarUpload()
   const [loginHistory, setLoginHistory] = useState([])
@@ -106,10 +109,10 @@ export default function Settings() {
 
       <main className="relative z-10 mx-auto max-w-[var(--app-content-max)] px-4 py-8">
         <h1 className="landing-section-title font-semibold text-[var(--app-text)]">
-          Opciones de usuario
+          {t('settings.title')}
         </h1>
         <p className="mt-2 text-sm text-[var(--app-text-muted)]">
-          Tu perfil, preferencias de visualización y actividad reciente. Abrí el menú rápido con{' '}
+          {t('settings.subtitle')}{' '}
           <kbd className="rounded border border-[var(--app-border)] px-1.5 py-0.5 text-xs font-medium">
             Alt + Shift + U
           </kbd>
@@ -269,11 +272,14 @@ export default function Settings() {
           </div>
 
           <div className="border-t border-[var(--app-border)] pt-5">
-            <h2 className="text-sm font-semibold text-[var(--app-text)]">Modo simple</h2>
-            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">
-              Menú más corto, textos más grandes y lenguaje fácil de entender. Ideal para adultos
-              mayores o quienes recién empiezan.
-            </p>
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">{t('settings.languageTitle')}</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">{t('settings.languageBody')}</p>
+            <LanguageSelect />
+          </div>
+
+          <div className="border-t border-[var(--app-border)] pt-5">
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">{t('settings.simpleModeTitle')}</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">{t('settings.simpleModeBody')}</p>
             <label className="flex cursor-pointer items-center gap-3">
               <input
                 type="checkbox"
@@ -281,25 +287,23 @@ export default function Settings() {
                 onChange={(e) => updatePreferences({ modo_simple: e.target.checked })}
                 className="h-4 w-4 accent-[var(--app-accent)]"
               />
-              <span className="text-sm text-[var(--app-text)]">Activar modo simple</span>
+              <span className="text-sm text-[var(--app-text)]">{t('settings.simpleModeEnable')}</span>
             </label>
           </div>
 
           <div className="border-t border-[var(--app-border)] pt-5">
-            <h2 className="text-sm font-semibold text-[var(--app-text)]">Guía de uso</h2>
-            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">
-              Volvé a ver el tutorial interactivo o consultá la ayuda paso a paso.
-            </p>
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">{t('settings.guideTitle')}</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">{t('settings.guideBody')}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 className="btn-outline-gradient text-xs px-3 py-1.5"
                 onClick={() => updatePreferences({ tutorial_completado: false })}
               >
-                Repetir tutorial
+                {t('settings.repeatTutorial')}
               </button>
               <a href="/ayuda" className="btn-outline-gradient text-xs px-3 py-1.5">
-                Ver ayuda completa
+                {t('settings.viewHelp')}
               </a>
             </div>
           </div>

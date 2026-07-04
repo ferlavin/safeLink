@@ -59,7 +59,6 @@ def analyze_url_endpoint(
         db, current_user, data.url.strip(), request
     )
 
-
 @router.post(
     "/check",
     response_model=UrlCheckResponse,
@@ -74,7 +73,9 @@ def check_url_extension(
 ):
     result = analyze_url(data.url.strip())
     if current_user:
-        analysis_service.persist_result(db, current_user, result, request)
+        analysis_service.persist_result(
+            db, current_user, result, request, usage_event="analyze_check"
+        )
     detalle = humanize_detalle(result.get("detalle") or {}) or {}
     resumen = humanize_resumen(detalle.get("resumen", []))[:5]
     return UrlCheckResponse(
@@ -123,7 +124,7 @@ async def analyze_pdf_endpoint(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"No se pudo procesar el PDF: {exc}",
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_pdf")
 
 
 @router.post(
@@ -144,7 +145,7 @@ async def analyze_page_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_page")
 
 
 @router.post(
@@ -165,7 +166,7 @@ def analyze_typosquatting_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_typosquatting")
 
 
 @router.post(
@@ -186,7 +187,7 @@ async def analyze_web3_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_web3")
 
 
 @router.post(
@@ -207,7 +208,7 @@ def analyze_dns_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_dns")
 
 
 @router.post(
@@ -223,7 +224,7 @@ def analyze_nlp_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     result = classify_url_transformer(data.url.strip())
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_nlp")
 
 
 @router.post(
@@ -244,7 +245,7 @@ async def analyze_headers_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_headers")
 
 
 @router.post(
@@ -260,7 +261,7 @@ async def analyze_oauth_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     result = await analyze_oauth_phishing(data.url.strip())
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_oauth")
 
 
 @router.post(
@@ -281,7 +282,7 @@ async def analyze_forms_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return analysis_service.persist_result(db, current_user, result, request)
+    return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_forms")
 
 
 @router.get(
@@ -295,6 +296,9 @@ def threat_map(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    from services import usage_service
+
+    usage_service.log_event(db, "threat_map_view", current_user.id)
     return build_threat_map(db, hours=min(max(hours, 1), 168))
 
 

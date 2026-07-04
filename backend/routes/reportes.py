@@ -13,7 +13,7 @@ from schemas.reporte import (
     ReporteUpdate,
     UnreadCountOut,
 )
-from services import reporte_service
+from services import reporte_service, usage_service
 
 router = APIRouter(prefix="/reportes", tags=["reportes"])
 
@@ -24,9 +24,11 @@ def create_reporte(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return reporte_service.create_reporte(
+    reporte = reporte_service.create_reporte(
         db, current_user.id, data.enlace_id, data.motivo
     )
+    usage_service.log_event(db, "reporte_created", current_user.id)
+    return reporte
 
 
 @router.get("/mine", response_model=list[ReporteOut])

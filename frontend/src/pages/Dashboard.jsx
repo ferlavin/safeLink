@@ -6,11 +6,17 @@ import OnboardingTour from '../components/OnboardingTour'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
 import { TOOL_CATEGORIES } from '../constants/tools'
+import usePageView from '../hooks/usePageView'
+import { useT } from '../i18n/I18nContext.jsx'
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth()
   const { prefs, loaded } = usePreferences()
+  const { t } = useT()
   const [showTour, setShowTour] = useState(false)
+  const displayName = user?.full_name || user?.email?.split('@')[0] || ''
+
+  usePageView('dashboard_view')
 
   useEffect(() => {
     if (!loaded || !user || isAdmin) return
@@ -23,26 +29,32 @@ export default function Dashboard() {
     ? TOOL_CATEGORIES.filter((cat) => cat.id === 'tecnico')
     : TOOL_CATEGORIES
 
+  const catDescription = (id) => {
+    if (id === 'amenazas') return t('dashboard.catAmenazas')
+    if (id === 'intel') return t('dashboard.catIntel')
+    if (id === 'tecnico') return t('dashboard.catTecnico')
+    if (id === 'avanzado') return t('dashboard.catAvanzado')
+    return ''
+  }
+
   return (
     <AppShell>
       <OnboardingTour open={showTour} onClose={() => setShowTour(false)} />
 
       <div className="app-page-top">
         <div className="app-page-header">
-          <span className="section-tag">Dashboard</span>
-          <h1>Hola, {user?.full_name || user?.email?.split('@')[0]}</h1>
-          <p>Tu centro de control para analizar enlaces, revisar amenazas y gestionar tu seguridad.</p>
+          <span className="section-tag">{t('dashboard.tag')}</span>
+          <h1>{t('dashboard.hello', { name: displayName })}</h1>
+          <p>{t('dashboard.subtitle')}</p>
         </div>
         <Link to="/ayuda" className="btn-outline-gradient shrink-0 text-sm px-4 py-2">
           <Question size={16} className="inline mr-1" />
-          Ayuda
+          {t('common.help')}
         </Link>
       </div>
 
       {prefs.modo_simple && (
-        <div className="app-alert app-alert--info mb-6">
-          Modo simple activo: men? reducido y textos m?s claros. Cambialo en Opciones de usuario.
-        </div>
+        <div className="app-alert app-alert--info mb-6">{t('dashboard.simpleMode')}</div>
       )}
 
       <section className="app-highlight-card mb-6 rounded-xl p-5 sm:p-6">
@@ -50,62 +62,53 @@ export default function Dashboard() {
           <div className="max-w-lg">
             <div className="mb-2 inline-flex items-center gap-2 text-neon-ice">
               <PuzzlePiece size={18} weight="fill" />
-              <span className="text-xs font-medium">Extensi?n Chrome</span>
+              <span className="text-xs font-medium">{t('dashboard.extensionTag')}</span>
             </div>
-            <h2 className="text-base font-semibold sm:text-lg">Extensi?n SafeLink para Chrome</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              Un punto de color te avisa si un enlace es seguro: en la barra de Chrome y al
-              lado de cada resultado en Google.
-            </p>
+            <h2 className="text-base font-semibold sm:text-lg">{t('dashboard.extensionTitle')}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t('dashboard.extensionBody')}</p>
           </div>
           <Link to="/extension" className="btn-gradient shrink-0 text-sm">
-            Instalar extensi?n
+            {t('dashboard.installExtension')}
           </Link>
         </div>
       </section>
 
       {isAdmin && (
         <section className="app-card mb-6 p-5 sm:p-6">
-          <h2 className="text-base font-semibold sm:text-lg">Administraci?n</h2>
-          <p className="mt-1 text-sm text-muted">
-            Gesti?n de usuarios, reportes y cuentas de la plataforma.
-          </p>
+          <h2 className="text-base font-semibold sm:text-lg">{t('dashboard.adminTitle')}</h2>
+          <p className="mt-1 text-sm text-muted">{t('dashboard.adminBody')}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link to="/admin/users" className="btn-gradient text-sm px-4 py-2">
-              Gestionar usuarios
+              {t('dashboard.manageUsers')}
             </Link>
             <Link to="/admin/reportes" className="btn-outline-gradient text-sm px-4 py-2">
-              Ver reportes
+              {t('dashboard.viewReports')}
+            </Link>
+            <Link to="/admin/estadisticas" className="btn-outline-gradient text-sm px-4 py-2">
+              {t('dashboard.statistics')}
+            </Link>
+            <Link to="/admin/encuestas" className="btn-outline-gradient text-sm px-4 py-2">
+              {t('nav.surveys')}
             </Link>
           </div>
         </section>
       )}
 
       <section className="app-card mb-6 p-5 sm:p-6">
-        <h2 className="text-base font-semibold sm:text-lg">Tus enlaces escaneados</h2>
-        <p className="mt-1 text-sm text-muted">
-          Revis? el historial de URLs analizadas, sus escaneos y report? sitios sospechosos.
-        </p>
+        <h2 className="text-base font-semibold sm:text-lg">{t('dashboard.linksTitle')}</h2>
+        <p className="mt-1 text-sm text-muted">{t('dashboard.linksBody')}</p>
         <Link to="/enlaces" className="btn-gradient mt-4 inline-block text-sm px-4 py-2">
-          Ver mis enlaces
+          {t('dashboard.viewLinks')}
         </Link>
         <Link to="/mensajes" className="btn-outline-gradient mt-4 ml-0 inline-block text-sm px-4 py-2 sm:ml-3">
-          Bandeja de mensajes
+          {t('dashboard.messageInbox')}
         </Link>
       </section>
 
       {visibleCategories.map((cat) => (
         <section key={cat.id} className="mb-8 sm:mb-10">
           <h2 className="mb-1 text-base font-semibold sm:text-lg">{cat.title}</h2>
-          <p className="mb-4 text-sm text-muted">
-            {cat.id === 'amenazas' &&
-              'Protecci?n para billeteras crypto, PDFs de correo y sitios con nombres falsos.'}
-            {cat.id === 'intel' &&
-              'M?s informaci?n sobre un dominio sospechoso y mapa de alertas de la comunidad.'}
-            {cat.id === 'tecnico' && 'Revisi?n r?pida de cualquier enlace antes de hacer clic.'}
-            {cat.id === 'avanzado' &&
-              'NLP, cabeceras HTTP, OAuth falso y formularios con doble env?o.'}
-          </p>
+          <p className="mb-4 text-sm text-muted">{catDescription(cat.id)}</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {cat.tools.map((tool) => (
               <Link
@@ -119,7 +122,7 @@ export default function Dashboard() {
                 <h3 className="mt-1 text-sm font-semibold sm:text-base">{tool.name}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-muted sm:text-sm">{tool.shortDesc}</p>
                 <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-neon-ice group-hover:gap-2 transition-all">
-                  Abrir
+                  {t('common.open')}
                   <ArrowRight size={14} weight="bold" />
                 </span>
               </Link>

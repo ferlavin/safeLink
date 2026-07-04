@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import { useAuth } from '../context/AuthContext'
+import usePageView from '../hooks/usePageView'
 
 const CHROME_STORE_URL = import.meta.env.VITE_CHROME_WEB_STORE_URL?.trim() || ''
 
@@ -16,6 +17,8 @@ const DEV_STEPS = [
 export default function ExtensionInstall() {
   const { user } = useAuth()
   const [installed, setInstalled] = useState(false)
+
+  usePageView('extension_page_view')
 
   useEffect(() => {
     const check = () => {

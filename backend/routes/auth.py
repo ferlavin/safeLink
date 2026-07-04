@@ -12,7 +12,7 @@ from schemas.auth import LoginRequest, Token
 from schemas.historial_login import HistorialLoginOut
 from schemas.user import UserCreate, UserOut
 from schemas.user_preferences import UserPreferencesOut, UserPreferencesUpdate
-from services import avatar_service, historial_login_service, user_service
+from services import avatar_service, historial_login_service, usage_service, user_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -21,6 +21,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def register(data: UserCreate, db: Session = Depends(get_db)):
     data.role = UserRole.usuario
     user = user_service.create_user(db, data)
+    usage_service.log_event(db, "register", user.id)
     token = create_access_token(str(user.id))
     return Token(access_token=token, user=UserOut.model_validate(user))
 
@@ -50,6 +51,7 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
         historial_login_service.log_login(db, user.id, request)
     except Exception:
         db.rollback()
+    usage_service.log_event(db, "login", user.id)
     token = create_access_token(str(user.id))
     return Token(access_token=token, user=UserOut.model_validate(user))
 

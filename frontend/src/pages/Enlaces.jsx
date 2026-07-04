@@ -4,6 +4,7 @@ import { CaretDown, CaretRight, Flag, LinkSimple } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
 import EstadoBadge from '../components/EstadoBadge'
 import client from '../api/client'
+import usePageView from '../hooks/usePageView'
 
 function formatDate(value) {
   if (!value) return '—'
@@ -15,6 +16,7 @@ function formatDate(value) {
 
 export default function Enlaces() {
   const [enlaces, setEnlaces] = useState([])
+  usePageView('enlaces_view')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedId, setExpandedId] = useState(null)

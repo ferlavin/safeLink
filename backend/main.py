@@ -16,7 +16,11 @@ from models import reporte as _reporte_models  # noqa: F401
 from models import reporte_mensaje as _reporte_mensaje_models  # noqa: F401
 from models import search_event as _search_event_models  # noqa: F401
 from models import user as _user_models  # noqa: F401
-from routes import analysis, auth, enlaces, reportes, users
+from models import usage_event as _usage_event_models  # noqa: F401
+from models import encuesta as _encuesta_models  # noqa: F401
+from models import encuesta_pregunta as _encuesta_pregunta_models  # noqa: F401
+from models import encuesta_respuesta as _encuesta_respuesta_models  # noqa: F401
+from routes import analysis, auth, encuestas, enlaces, reportes, stats, users
 from services.avatar_service import ensure_avatar_dir
 
 
@@ -47,7 +51,10 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(enlaces.router)
 app.include_router(reportes.router)
+app.include_router(encuestas.router)
 app.include_router(analysis.router)
+app.include_router(stats.router)
+app.include_router(stats.admin_router)
 
 uploads_dir = Path(__file__).resolve().parent / "uploads"
 uploads_dir.mkdir(exist_ok=True)

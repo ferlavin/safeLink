@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle, LockKey, ShieldCheck } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
 import LandingHeader from '../components/LandingHeader'
+import LanguageSelect from '../components/LanguageSelect'
+import { useT } from '../i18n/I18nContext.jsx'
 
 export default function Login() {
   const { login } = useAuth()
+  const { t } = useT()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -30,7 +33,7 @@ export default function Login() {
           'No se puede conectar al servidor. Probá https://safe-link-two.vercel.app/api/health — si falla, la API en Render no está activa (revisá el deploy en render.com).',
         )
       } else {
-        setError('No se pudo iniciar sesion')
+        setError(t('auth.loginFailed'))
       }
     } finally {
       setLoading(false)
@@ -77,14 +80,17 @@ export default function Login() {
             </div>
 
             <div className="auth-form-card">
-              <h2>Iniciar sesión</h2>
-              <p className="auth-form-subtitle">Ingresá con tu email y contraseña</p>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className="mb-0">{t('auth.loginTitle')}</h2>
+                <LanguageSelect compact />
+              </div>
+              <p className="auth-form-subtitle">{t('auth.loginSubtitle')}</p>
 
               <form onSubmit={handleSubmit}>
                 {error && <div className="auth-error">{error}</div>}
 
                 <div className="auth-field">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="email">{t('auth.email')}</label>
                   <input
                     id="email"
                     type="email"
@@ -98,7 +104,7 @@ export default function Login() {
                 </div>
 
                 <div className="auth-field">
-                  <label htmlFor="password">Contraseña</label>
+                  <label htmlFor="password">{t('auth.password')}</label>
                   <input
                     id="password"
                     type="password"
@@ -112,11 +118,12 @@ export default function Login() {
                 </div>
 
                 <button type="submit" disabled={loading} className="btn-gradient w-full">
-                  {loading ? 'Ingresando...' : 'Ingresar'}
+                  {loading ? t('auth.signingIn') : t('auth.signIn')}
                 </button>
 
                 <p className="auth-switch">
-                  ¿No tenés cuenta? <Link to="/register">Registrate gratis</Link>
+                  {t('auth.noAccount')}{' '}
+                  <Link to="/register">{t('auth.registerFree')}</Link>
                 </p>
               </form>
             </div>

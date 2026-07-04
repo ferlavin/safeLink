@@ -1,11 +1,18 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import client from '../api/client'
 import { useAuth } from './AuthContext'
+import { normalizeLocale } from '../i18n/index.js'
+
+const LOCALE_KEY = 'safelink_locale'
+
+function readStoredLocale() {
+  return normalizeLocale(localStorage.getItem(LOCALE_KEY))
+}
 
 const defaultPrefs = {
   tutorial_completado: false,
   modo_simple: false,
-  idioma: 'es',
+  idioma: readStoredLocale(),
 }
 
 const PreferencesContext = createContext(null)
@@ -14,23 +21,32 @@ export function PreferencesProvider({ children }) {
   const { user } = useAuth()
   const [prefs, setPrefs] = useState(defaultPrefs)
   const [loaded, setLoaded] = useState(false)
+  const [savingLocale, setSavingLocale] = useState(false)
+
+  const applyLocale = useCallback((idioma) => {
+    const normalized = normalizeLocale(idioma)
+    localStorage.setItem(LOCALE_KEY, normalized)
+    setPrefs((prev) => ({ ...prev, idioma: normalized }))
+    return normalized
+  }, [])
 
   const load = useCallback(async () => {
     if (!user) {
-      setPrefs(defaultPrefs)
+      setPrefs({ ...defaultPrefs, idioma: readStoredLocale() })
       setLoaded(false)
       document.documentElement.dataset.simpleMode = 'false'
       return
     }
     try {
       const { data } = await client.get('/auth/me/preferences')
-      setPrefs(data)
+      const idioma = applyLocale(data.idioma || 'es')
+      setPrefs({ ...data, idioma })
       setLoaded(true)
     } catch {
-      setPrefs(defaultPrefs)
+      setPrefs({ ...defaultPrefs, idioma: readStoredLocale() })
       setLoaded(true)
     }
-  }, [user])
+  }, [user, applyLocale])
 
   useEffect(() => {
     load()
@@ -43,9 +59,26 @@ export function PreferencesProvider({ children }) {
 
   const updatePreferences = useCallback(async (patch) => {
     const { data } = await client.patch('/auth/me/preferences', patch)
+    if (data.idioma) applyLocale(data.idioma)
     setPrefs(data)
     return data
-  }, [])
+  }, [applyLocale])
+
+  const setLocale = useCallback(
+    async (idioma) => {
+      const normalized = applyLocale(idioma)
+      if (!user) return normalized
+      setSavingLocale(true)
+      try {
+        const { data } = await client.patch('/auth/me/preferences', { idioma: normalized })
+        setPrefs(data)
+        return data.idioma
+      } finally {
+        setSavingLocale(false)
+      }
+    },
+    [user, applyLocale],
+  )
 
   const completeTutorial = useCallback(async () => {
     return updatePreferences({ tutorial_completado: true })
@@ -55,11 +88,13 @@ export function PreferencesProvider({ children }) {
     () => ({
       prefs,
       loaded,
+      savingLocale,
       updatePreferences,
+      setLocale,
       completeTutorial,
       reloadPreferences: load,
     }),
-    [prefs, loaded, updatePreferences, completeTutorial, load],
+    [prefs, loaded, savingLocale, updatePreferences, setLocale, completeTutorial, load],
   )
 
   return (

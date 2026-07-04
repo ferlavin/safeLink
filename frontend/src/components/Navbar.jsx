@@ -3,6 +3,7 @@ import { ShieldCheck, Question } from '@phosphor-icons/react'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
 import { useUnreadReportes } from '../hooks/useUnreadReportes'
+import { useT } from '../i18n/I18nContext.jsx'
 import UserOptionsMenu from './UserOptionsMenu'
 
 const linkClass = ({ isActive }) =>
@@ -11,6 +12,7 @@ const linkClass = ({ isActive }) =>
 export default function Navbar() {
   const { isAdmin } = useAuth()
   const { prefs } = usePreferences()
+  const { t } = useT()
   const unread = useUnreadReportes()
   const simple = prefs.modo_simple
 
@@ -26,46 +28,61 @@ export default function Navbar() {
 
         <nav className="app-navbar-nav">
           <NavLink to="/dashboard" className={linkClass} end>
-            Dashboard
+            {t('nav.dashboard')}
           </NavLink>
           <NavLink to="/extension" className={linkClass}>
-            Extensión
+            {t('nav.extension')}
           </NavLink>
           <NavLink to="/analyze" className={linkClass}>
-            {simple ? 'Analizar' : 'URL'}
+            {simple ? t('nav.analyze') : t('nav.url')}
           </NavLink>
           <NavLink to="/enlaces" className={linkClass}>
-            Enlaces
+            {t('nav.links')}
           </NavLink>
           {!isAdmin && (
+            <NavLink to="/encuestas" className={linkClass}>
+              {t('nav.surveys')}
+            </NavLink>
+          )}
+          {!isAdmin && (
             <NavLink to="/mensajes" className={linkClass}>
-              Mensajes
+              {t('nav.messages')}
               {unread > 0 && <span className="app-nav-badge">{unread > 9 ? '9+' : unread}</span>}
             </NavLink>
           )}
           {!simple && (
             <NavLink to="/threat-map" className={linkClass}>
-              Mapa
+              {t('nav.map')}
             </NavLink>
           )}
           {!simple && (
             <NavLink to="/analyze/security" className={`${linkClass} app-nav-advanced`}>
-              Avanzado
+              {t('nav.advanced')}
             </NavLink>
           )}
           <NavLink to="/ayuda" className={linkClass}>
             <Question size={14} weight="fill" className="inline mr-0.5" />
-            Ayuda
+            {t('nav.help')}
           </NavLink>
           {isAdmin && (
             <NavLink to="/admin/reportes" className={linkClass}>
-              Reportes
+              {t('nav.reports')}
               {unread > 0 && <span className="app-nav-badge">{unread > 9 ? '9+' : unread}</span>}
             </NavLink>
           )}
           {isAdmin && (
+            <NavLink to="/admin/encuestas" className={linkClass}>
+              {t('nav.surveys')}
+            </NavLink>
+          )}
+          {isAdmin && (
+            <NavLink to="/admin/estadisticas" className={linkClass}>
+              {t('nav.stats')}
+            </NavLink>
+          )}
+          {isAdmin && (
             <NavLink to="/admin/users" className={linkClass}>
-              Usuarios
+              {t('nav.users')}
             </NavLink>
           )}
         </nav>

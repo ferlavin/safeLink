@@ -13,6 +13,18 @@ _SCHEMA_STATEMENTS = (
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS modo_simple BOOLEAN DEFAULT FALSE",
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS idioma VARCHAR(5) DEFAULT 'es'",
     """
+    CREATE TABLE IF NOT EXISTS usage_events (
+        id SERIAL PRIMARY KEY,
+        usuario_id INTEGER REFERENCES usuarios(id),
+        evento VARCHAR(50) NOT NULL,
+        metadata TEXT,
+        fecha TIMESTAMP
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS ix_usage_events_evento ON usage_events (evento)",
+    "CREATE INDEX IF NOT EXISTS ix_usage_events_fecha ON usage_events (fecha)",
+    "CREATE INDEX IF NOT EXISTS ix_usage_events_usuario_id ON usage_events (usuario_id)",
+    """
     CREATE TABLE IF NOT EXISTS reporte_mensajes (
         id SERIAL PRIMARY KEY,
         reporte_id INTEGER NOT NULL REFERENCES reportes(id) ON DELETE CASCADE,
@@ -24,6 +36,38 @@ _SCHEMA_STATEMENTS = (
     )
     """,
     "CREATE INDEX IF NOT EXISTS ix_reporte_mensajes_reporte_id ON reporte_mensajes (reporte_id)",
+    """
+    CREATE TABLE IF NOT EXISTS encuestas (
+        id SERIAL PRIMARY KEY,
+        titulo VARCHAR(200) NOT NULL,
+        activa BOOLEAN NOT NULL DEFAULT FALSE,
+        creado_por INTEGER REFERENCES usuarios(id),
+        fecha_creacion TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS encuesta_preguntas (
+        id SERIAL PRIMARY KEY,
+        encuesta_id INTEGER NOT NULL REFERENCES encuestas(id) ON DELETE CASCADE,
+        texto TEXT NOT NULL,
+        tipo VARCHAR(20) NOT NULL DEFAULT 'texto',
+        opciones TEXT,
+        orden INTEGER NOT NULL DEFAULT 0
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS encuesta_respuestas (
+        id SERIAL PRIMARY KEY,
+        encuesta_id INTEGER NOT NULL REFERENCES encuestas(id) ON DELETE CASCADE,
+        usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+        respuestas TEXT NOT NULL,
+        fecha TIMESTAMP,
+        UNIQUE (encuesta_id, usuario_id)
+    )
+    """,
+    "CREATE INDEX IF NOT EXISTS ix_encuesta_preguntas_encuesta_id ON encuesta_preguntas (encuesta_id)",
+    "CREATE INDEX IF NOT EXISTS ix_encuesta_respuestas_encuesta_id ON encuesta_respuestas (encuesta_id)",
+    "CREATE INDEX IF NOT EXISTS ix_encuesta_respuestas_usuario_id ON encuesta_respuestas (usuario_id)",
     """
     INSERT INTO reporte_mensajes (reporte_id, autor_id, es_admin, cuerpo, fecha, leido)
     SELECT r.id, r.usuario_id, FALSE, r.motivo, r.fecha_reporte, TRUE

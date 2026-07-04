@@ -12,8 +12,11 @@ import AnalyzeSecurity from './pages/AnalyzeSecurity'
 import ThreatMap from './pages/ThreatMap'
 import AdminUsers from './pages/AdminUsers'
 import AdminReportes from './pages/AdminReportes'
+import AdminEstadisticas from './pages/AdminEstadisticas'
+import AdminEncuestas from './pages/AdminEncuestas'
 import Enlaces from './pages/Enlaces'
 import MisMensajes from './pages/MisMensajes'
+import Encuestas from './pages/Encuestas'
 import Ayuda from './pages/Ayuda'
 import ExtensionInstall from './pages/ExtensionInstall'
 import Settings from './pages/Settings'
@@ -99,6 +102,14 @@ export default function App() {
         }
       />
       <Route
+        path="/encuestas"
+        element={
+          <ProtectedRoute>
+            <Encuestas />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/ayuda"
         element={
           <ProtectedRoute>
@@ -135,6 +146,22 @@ export default function App() {
         element={
           <AdminRoute>
             <AdminUsers />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/estadisticas"
+        element={
+          <AdminRoute>
+            <AdminEstadisticas />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/encuestas"
+        element={
+          <AdminRoute>
+            <AdminEncuestas />
           </AdminRoute>
         }
       />
