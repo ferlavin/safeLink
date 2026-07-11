@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, PuzzlePiece, Question } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import AdminDashboard from '../components/AdminDashboard'
 import OnboardingTour from '../components/OnboardingTour'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
@@ -24,6 +25,10 @@ export default function Dashboard() {
       setShowTour(true)
     }
   }, [loaded, user, isAdmin, prefs.tutorial_completado])
+
+  if (isAdmin) {
+    return <AdminDashboard />
+  }
 
   const visibleCategories = prefs.modo_simple
     ? TOOL_CATEGORIES.filter((cat) => cat.id === 'tecnico')
@@ -72,27 +77,6 @@ export default function Dashboard() {
           </Link>
         </div>
       </section>
-
-      {isAdmin && (
-        <section className="app-card mb-6 p-5 sm:p-6">
-          <h2 className="text-base font-semibold sm:text-lg">{t('dashboard.adminTitle')}</h2>
-          <p className="mt-1 text-sm text-muted">{t('dashboard.adminBody')}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link to="/admin/users" className="btn-gradient text-sm px-4 py-2">
-              {t('dashboard.manageUsers')}
-            </Link>
-            <Link to="/admin/reportes" className="btn-outline-gradient text-sm px-4 py-2">
-              {t('dashboard.viewReports')}
-            </Link>
-            <Link to="/admin/estadisticas" className="btn-outline-gradient text-sm px-4 py-2">
-              {t('dashboard.statistics')}
-            </Link>
-            <Link to="/admin/encuestas" className="btn-outline-gradient text-sm px-4 py-2">
-              {t('nav.surveys')}
-            </Link>
-          </div>
-        </section>
-      )}
 
       <section className="app-card mb-6 p-5 sm:p-6">
         <h2 className="text-base font-semibold sm:text-lg">{t('dashboard.linksTitle')}</h2>

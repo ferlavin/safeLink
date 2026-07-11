@@ -1,12 +1,23 @@
+from collections import Counter
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from models.enlace import Enlace
 from models.reporte import Reporte
 from models.usage_event import UsageEvent
 from models.user import User
-from schemas.stats import DailyStat, FeatureStat, StatsFeaturesResponse, StatsOverview
+from schemas.stats import (
+    ActivityItem,
+    AdminDashboardResponse,
+    DailyStat,
+    DomainStat,
+    FeatureStat,
+    StatsFeaturesResponse,
+    StatsOverview,
+)
 
 EVENT_LABELS: dict[str, str] = {
     "analyze_url": "Análisis de URL",
@@ -134,3 +145,72 @@ def get_features(db: Session, days: int = 30) -> StatsFeaturesResponse:
     ]
 
     return StatsFeaturesResponse(days=days, features=features, daily=daily)
+
+
+def _domain_of(url: str | None) -> str | None:
+    if not url:
+        return None
+    raw = url.strip()
+    if "://" not in raw:
+        raw = "//" + raw
+    try:
+        host = urlparse(raw).hostname
+    except ValueError:
+        return None
+    if not host:
+        return None
+    return host[4:] if host.startswith("www.") else host
+
+
+def get_most_analysed_domains(db: Session, limit: int = 6) -> list[DomainStat]:
+    rows = db.query(Enlace.url).all()
+    counter: Counter[str] = Counter()
+    for (url,) in rows:
+        domain = _domain_of(url)
+        if domain:
+            counter[domain] += 1
+    return [DomainStat(domain=domain, count=count) for domain, count in counter.most_common(limit)]
+
+
+def get_recent_activity(db: Session, limit: int = 8) -> list[ActivityItem]:
+    rows = (
+        db.query(UsageEvent, User)
+        .outerjoin(User, UsageEvent.usuario_id == User.id)
+        .order_by(UsageEvent.fecha.desc().nullslast())
+        .limit(limit)
+        .all()
+    )
+    items: list[ActivityItem] = []
+    for event, user in rows:
+        nombre = None
+        if user:
+            nombre = user.full_name or user.email
+        items.append(
+            ActivityItem(
+                usuario=nombre or "Anónimo",
+                evento=event.evento,
+                label=EVENT_LABELS.get(
+                    event.evento, event.evento.replace("_", " ").title()
+                ),
+                fecha=event.fecha,
+            )
+        )
+    return items
+
+
+def get_admin_dashboard(db: Session, days: int = 30) -> AdminDashboardResponse:
+    overview = get_overview(db, days)
+    total_users = db.query(func.count(User.id)).scalar() or 0
+    features = get_features(db, days)
+    return AdminDashboardResponse(
+        days=overview.days,
+        total_users=total_users,
+        active_users=overview.active_users,
+        new_users=overview.new_users,
+        open_reportes=overview.open_reportes,
+        total_events=overview.total_events,
+        total_reportes=overview.total_reportes,
+        domains=get_most_analysed_domains(db, limit=6),
+        activity=get_recent_activity(db, limit=8),
+        daily=features.daily,
+    )

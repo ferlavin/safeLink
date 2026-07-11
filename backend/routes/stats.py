@@ -4,7 +4,12 @@ from sqlalchemy.orm import Session
 from auth.deps import get_current_user, require_admin
 from database.session import get_db
 from models.user import User
-from schemas.stats import StatsFeaturesResponse, StatsOverview, TrackEventRequest
+from schemas.stats import (
+    AdminDashboardResponse,
+    StatsFeaturesResponse,
+    StatsOverview,
+    TrackEventRequest,
+)
 from schemas.encuesta import EncuestaStatsDetail, EncuestasStatsSummary
 from services import encuesta_service, usage_service
 
@@ -40,6 +45,11 @@ def stats_overview(days: int = 30, db: Session = Depends(get_db)):
 @admin_router.get("/features", response_model=StatsFeaturesResponse)
 def stats_features(days: int = 30, db: Session = Depends(get_db)):
     return usage_service.get_features(db, days)
+
+
+@admin_router.get("/dashboard", response_model=AdminDashboardResponse)
+def admin_dashboard(days: int = 30, db: Session = Depends(get_db)):
+    return usage_service.get_admin_dashboard(db, days)
 
 
 @admin_router.get("/encuestas", response_model=EncuestasStatsSummary)
