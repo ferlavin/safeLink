@@ -1906,6 +1906,13 @@
     color: var(--text-muted);
   }
 
+  .landing-img-fallback {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: linear-gradient(135deg, rgba(18, 26, 45, 0.95), rgba(5, 8, 17, 0.98));
+  }
+
   .landing-split {
     display: grid;
     grid-template-columns: 1fr 1fr;

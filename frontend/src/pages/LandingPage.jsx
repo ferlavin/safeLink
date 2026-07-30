@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   ShieldCheck,
   Globe,
@@ -52,7 +53,7 @@ const HIGH_COMPLEXITY = [
     title: 'Detección heurística avanzada',
     desc: 'Evaluamos entropía, typosquatting y señales sospechosas en milisegundos antes de que hagas clic.',
     visual: 'Motor de análisis SafeLink',
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c5f58b?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=900&q=80',
     to: '/analyze',
     reverse: false,
   },
@@ -61,7 +62,7 @@ const HIGH_COMPLEXITY = [
     title: 'Sentinela para billeteras digitales',
     desc: 'Detectamos sitios que imitan wallets, contratos maliciosos y firmas sospechosas en transacciones.',
     visual: 'Guardia Web3 activa',
-    image: 'https://images.unsplash.com/photo-1639762681485-074b7be93b8a?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=900&q=80',
     to: '/analyze/web3',
     reverse: true,
   },
@@ -146,7 +147,7 @@ const GALLERY = [
   {
     label: 'Extensión',
     desc: 'Semáforo de seguridad en cada resultado de Google y sitio que visitás.',
-    image: 'https://images.unsplash.com/photo-1614064641938-3bbee52964cd?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=600&q=80',
     to: '/extension',
   },
   {
@@ -212,7 +213,7 @@ const PHOTO_TOUR = [
     title: 'La extensión te avisa en el navegador',
     desc: 'Instalás la extensión una vez y SafeLink marca enlaces peligrosos directamente en Google, redes sociales y cualquier página que visites.',
     caption: 'Semáforo integrado al navegador',
-    image: 'https://images.unsplash.com/photo-1614064641938-3bbee52964cd?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=900&q=80',
     bullets: ['Icono verde, amarillo o rojo en cada link', 'Alertas antes de ingresar credenciales', 'Compatible con Chrome y derivados'],
     to: '/extension',
     reverse: true,
@@ -244,9 +245,23 @@ const PHOTO_MOSAIC = {
     {
       title: 'Guardia Web3',
       desc: 'Contratos y sitios de wallets bajo vigilancia constante.',
-      image: 'https://images.unsplash.com/photo-1639762681485-074b7be93b8a?w=600&q=80',
+      image: 'https://images.unsplash.com/photo-1516245834210-c4c142787335?w=600&q=80',
     },
   ],
+}
+
+const WEB3_HIGHLIGHT_IMAGE = 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=900&q=80'
+
+/* Las fotos se sirven desde un CDN externo: si alguna deja de existir mostramos el
+   contenedor vacío en vez del icono de imagen rota y su texto alternativo. */
+function LandingImage({ src, alt }) {
+  const [failed, setFailed] = useState(false)
+
+  if (failed) {
+    return <span className="landing-img-fallback" aria-hidden="true" />
+  }
+
+  return <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} />
 }
 
 export default function LandingPage() {
@@ -375,7 +390,7 @@ export default function LandingPage() {
             {PHOTO_FEATURES.map(({ badge, title, desc, image, to, linkLabel }) => (
               <article key={title} className="landing-photo-card">
                 <div className="landing-photo-card__img">
-                  <img src={image} alt={title} loading="lazy" />
+                  <LandingImage src={image} alt={title} />
                   <span className="landing-photo-card__badge">{badge}</span>
                 </div>
                 <div className="landing-photo-card__body">
@@ -409,7 +424,7 @@ export default function LandingPage() {
                 className={`landing-photo-tour-item${reverse ? ' landing-photo-tour-item--reverse' : ''}`}
               >
                 <figure className="landing-photo-tour__media">
-                  <img src={image} alt={title} loading="lazy" />
+                  <LandingImage src={image} alt={title} />
                   <figcaption>{caption}</figcaption>
                 </figure>
                 <div className="landing-photo-tour__content">
@@ -443,7 +458,7 @@ export default function LandingPage() {
           </div>
           <div className="landing-photo-mosaic">
             <div className="landing-photo-mosaic__main">
-              <img src={PHOTO_MOSAIC.main.image} alt={PHOTO_MOSAIC.main.title} loading="lazy" />
+              <LandingImage src={PHOTO_MOSAIC.main.image} alt={PHOTO_MOSAIC.main.title} />
               <div className="landing-photo-mosaic__caption">
                 <strong>{PHOTO_MOSAIC.main.title}</strong>
                 <span>{PHOTO_MOSAIC.main.desc}</span>
@@ -451,7 +466,7 @@ export default function LandingPage() {
             </div>
             {PHOTO_MOSAIC.side.map(({ title, desc, image }) => (
               <div key={title} className="landing-photo-mosaic__side">
-                <img src={image} alt={title} loading="lazy" />
+                <LandingImage src={image} alt={title} />
                 <div className="landing-photo-mosaic__caption">
                   <strong>{title}</strong>
                   <span>{desc}</span>
@@ -488,7 +503,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
                 <div className="landing-split-visual">
-                  <img src={image} alt={title} loading="lazy" />
+                  <LandingImage src={image} alt={title} />
                   <span className="landing-split-visual-label">{visual}</span>
                 </div>
               </div>
@@ -525,11 +540,7 @@ export default function LandingPage() {
         <div className="landing-wrap">
           <div className="landing-split">
             <div className="landing-split-visual">
-              <img
-                src="https://images.unsplash.com/photo-1639762681485-074b7be93b8a?w=900&q=80"
-                alt="Sentinela Web3 SafeLink"
-                loading="lazy"
-              />
+              <LandingImage src={WEB3_HIGHLIGHT_IMAGE} alt="Sentinela Web3 SafeLink" />
               <span className="landing-split-visual-label">Sentinela Web3 · Activo</span>
             </div>
             <div>
@@ -671,7 +682,7 @@ export default function LandingPage() {
           <div className="landing-gallery">
             {GALLERY.map(({ label, desc, image, to }) => (
               <Link key={label} to={to} className="landing-gallery-item">
-                <img src={image} alt={label} loading="lazy" />
+                <LandingImage src={image} alt={label} />
                 <div className="landing-gallery-item__overlay">
                   <strong>{label}</strong>
                   <p>{desc}</p>
