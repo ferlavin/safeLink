@@ -1,11 +1,23 @@
 from datetime import datetime, timezone
 
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from auth.security import hash_password
+from models.analysis import AnalisisUrl
+from models.encuesta import Encuesta
+from models.encuesta_respuesta import EncuestaRespuesta
+from models.enlace import Enlace
+from models.escaneo import Escaneo
+from models.historial_login import HistorialLogin
+from models.reporte import Reporte
+from models.reporte_mensaje import ReporteMensaje
+from models.search_event import SearchEvent
+from models.usage_event import UsageEvent
 from models.user import User, UserRole
 from schemas.user import AdminUserCreate, UserCreate, UserUpdate
+from services import avatar_service
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
@@ -109,14 +121,57 @@ def update_user(db: Session, user_id: int, data: UserUpdate) -> User:
     return user
 
 
-def delete_user(db: Session, user_id: int) -> None:
-    user = get_user(db, user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+# Datos que solo tienen sentido junto a la cuenta: se van con ella.
+_OWNED_BY_USER = (
+    (AnalisisUrl, AnalisisUrl.usuario_id),
+    (EncuestaRespuesta, EncuestaRespuesta.usuario_id),
+    (HistorialLogin, HistorialLogin.usuario_id),
+)
+
+# Datos que siguen valiendo sin la cuenta (inteligencia de amenazas compartida y
+# metricas del panel admin): se conservan pero quedan sin autor.
+_ANONYMISED_ON_DELETE = (
+    (Enlace, Enlace.usuario_id),
+    (Escaneo, Escaneo.usuario_id),
+    (Reporte, Reporte.usuario_id),
+    (ReporteMensaje, ReporteMensaje.autor_id),
+    (UsageEvent, UsageEvent.usuario_id),
+    (Encuesta, Encuesta.creado_por),
+    (SearchEvent, SearchEvent.user_id),
+)
+
+
+def _release_user_references(db: Session, user_id: int) -> None:
+    """Ninguna FK hacia `usuarios` declara ON DELETE, asi que Postgres rechaza el
+    DELETE mientras quede una fila apuntando al usuario."""
+    for model, column in _OWNED_BY_USER:
+        db.query(model).filter(column == user_id).delete(synchronize_session=False)
+    for model, column in _ANONYMISED_ON_DELETE:
+        db.query(model).filter(column == user_id).update(
+            {column: None}, synchronize_session=False
         )
-    db.delete(user)
-    db.commit()
+
+
+def delete_user(db: Session, user_id: int, actor: User) -> None:
+    user = _get_user_or_404(db, user_id)
+    _ensure_moderatable(user, actor)
+    try:
+        _release_user_references(db, user_id)
+        db.delete(user)
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El usuario tiene datos asociados que no se pudieron desvincular",
+        ) from exc
+
+    # La cuenta ya no existe: un avatar que quede en disco seria un archivo
+    # publico huerfano, pero tampoco justifica reportar la baja como fallida.
+    try:
+        avatar_service.delete_avatar_file(user_id)
+    except OSError:
+        pass
 
 
 def _get_user_or_404(db: Session, user_id: int) -> User:

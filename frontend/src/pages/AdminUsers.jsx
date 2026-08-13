@@ -241,11 +241,16 @@ export default function AdminUsers() {
 
   const handleDelete = async (user) => {
     if (!window.confirm(`Eliminar al usuario ${user.email}?`)) return
+
+    setActionLoading(`${user.id}-delete`)
+    setError('')
     try {
       await client.delete(`/users/${user.id}`)
       await loadUsers()
     } catch (err) {
       setError(err.response?.data?.detail || 'No se pudo eliminar el usuario')
+    } finally {
+      setActionLoading(null)
     }
   }
 
