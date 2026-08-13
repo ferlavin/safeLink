@@ -130,20 +130,26 @@ export default function AdminDashboard() {
           ) : !activity.length ? (
             <p className="mt-3 text-sm text-muted">{t('common.noActivity')}</p>
           ) : (
-            <ul className="mt-3">
-              {activity.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] py-2 last:border-0"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{item.label}</p>
-                    <p className="truncate text-xs text-muted">{item.usuario}</p>
-                  </div>
-                  <span className="shrink-0 text-xs text-muted">{formatTime(item.fecha)}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="app-table-wrap mt-3">
+              <table className="app-table">
+                <thead>
+                  <tr>
+                    <th>{t('dashboard.activityColumn')}</th>
+                    <th>{t('dashboard.userColumn')}</th>
+                    <th>{t('dashboard.dateColumn')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activity.map((item, index) => (
+                    <tr key={index}>
+                      <td className="cell-main">{item.label}</td>
+                      <td>{item.usuario}</td>
+                      <td className="whitespace-nowrap">{formatTime(item.fecha)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
       </div>

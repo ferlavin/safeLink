@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
+import AppShell from '../components/AppShell'
 import ThemeToggle from '../components/ThemeToggle'
 import AvatarPhotoControls from '../components/AvatarPhotoControls'
 import UserAvatar from '../components/UserAvatar'
@@ -103,11 +103,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="app-page relative">
-      <div className="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none" />
-      <Navbar />
-
-      <main className="relative z-10 mx-auto max-w-[var(--app-content-max)] px-4 py-8">
+    <AppShell>
         <h1 className="landing-section-title font-semibold text-[var(--app-text)]">
           {t('settings.title')}
         </h1>
@@ -428,7 +424,6 @@ export default function Settings() {
             </div>
           )}
         </section>
-      </main>
-    </div>
+    </AppShell>
   )
 }

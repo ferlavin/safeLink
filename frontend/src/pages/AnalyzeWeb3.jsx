@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Navbar from '../components/Navbar'
+import AppShell from '../components/AppShell'
 import RiskBadge from '../components/RiskBadge'
 import ToolHeader from '../components/ToolHeader'
 import client from '../api/client'
@@ -27,9 +27,7 @@ export default function AnalyzeWeb3() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+    <AppShell>
         <span className="text-xs font-medium uppercase tracking-wide text-violet-400">
           {TOOLS.web3.tag}
         </span>
@@ -86,7 +84,6 @@ export default function AnalyzeWeb3() {
             )}
           </section>
         )}
-      </main>
-    </div>
+    </AppShell>
   )
 }

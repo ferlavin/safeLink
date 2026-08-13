@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import AppShell from '../components/AppShell'
 import RiskBadge from '../components/RiskBadge'
 import ToolHeader from '../components/ToolHeader'
 import client from '../api/client'
@@ -41,9 +41,7 @@ export default function AnalyzeDns() {
   const ficha = d?.ficha_dominio
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+    <AppShell>
         <ToolHeader
           name="Informacion del dominio"
           description="Comprueba si un sitio esta donde deberia y que antiguedad tiene."
@@ -139,7 +137,6 @@ export default function AnalyzeDns() {
             </div>
           </section>
         )}
-      </main>
-    </div>
+    </AppShell>
   )
 }

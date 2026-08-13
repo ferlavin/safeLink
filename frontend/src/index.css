@@ -114,6 +114,9 @@
     --sl-glow-green: 0 0 20px rgba(0, 255, 135, 0.15);
     --sl-glow-featured: 0 0 20px rgba(0, 255, 135, 0.4);
     --app-content-max: var(--max-width);
+    --app-topbar-h: 3.75rem;
+    --app-sidebar-w: 14rem;
+    --app-sidebar-w-rail: 4rem;
   }
 
   :root,
@@ -2551,52 +2554,87 @@
     opacity: 0.025;
   }
 
-  .app-main {
-    position: relative;
-    z-index: 1;
-    max-width: var(--app-content-max);
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  .app-navbar {
+  .app-topbar {
     position: sticky;
     top: 0;
     z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: var(--app-topbar-h);
+    padding: 0 1.25rem;
     background: rgba(5, 8, 17, 0.88);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-color);
   }
 
-  .app-navbar-inner {
-    max-width: var(--app-content-max);
-    margin: 0 auto;
-    padding: 0.75rem 2rem;
+  .app-topbar-actions {
+    margin-left: auto;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
-  .app-navbar-nav {
-    display: flex;
-    flex-wrap: wrap;
+  .app-nav-toggle {
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    flex: 1;
     justify-content: center;
+    flex: 0 0 auto;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .app-nav-toggle:hover {
+    color: var(--text-main);
+    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .app-layout {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .app-sidebar {
+    position: sticky;
+    top: var(--app-topbar-h);
+    flex: 0 0 auto;
+    width: var(--app-sidebar-w);
+    height: calc(100vh - var(--app-topbar-h));
+    padding: 1rem 0.7rem;
+    border-right: 1px solid var(--border-color);
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: width 0.22s ease;
+  }
+
+  .app-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
   }
 
   .app-nav-link {
-    padding: 0.45rem 0.75rem;
-    border-radius: 6px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 8px;
     font-size: 0.8125rem;
     font-weight: 500;
     color: var(--text-muted);
     text-decoration: none;
-    transition: all 0.2s ease;
     white-space: nowrap;
+    transition: color 0.2s ease, background 0.2s ease;
   }
 
   .app-nav-link:hover {
@@ -2607,13 +2645,48 @@
   .app-nav-link--active {
     color: var(--accent-green);
     background: rgba(0, 255, 135, 0.1);
-    box-shadow: inset 0 0 0 1px rgba(0, 255, 135, 0.2);
   }
 
-  .app-navbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .app-nav-link--active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 3px;
+    height: 1.15rem;
+    transform: translateY(-50%);
+    border-radius: 0 3px 3px 0;
+    background: var(--accent-green);
+  }
+
+  .app-nav-link__icon {
+    flex: 0 0 auto;
+  }
+
+  .app-nav-link__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+    max-width: var(--app-content-max);
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .app-nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 44;
+    border: 0;
+    background: rgba(2, 4, 10, 0.6);
+    backdrop-filter: blur(2px);
   }
 
   .app-page-header {
@@ -3262,15 +3335,58 @@
     }
   }
 
-  @media (max-width: 1024px) {
-    .app-navbar-nav {
-      order: 3;
-      width: 100%;
-      justify-content: flex-start;
+  /* Riel de iconos: solo donde hay ancho para una barra fija. */
+  @media (min-width: 901px) {
+    [data-nav-collapsed='true'] .app-sidebar {
+      width: var(--app-sidebar-w-rail);
+    }
+
+    [data-nav-collapsed='true'] .app-nav-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    [data-nav-collapsed='true'] .app-nav-link__label {
+      display: none;
+    }
+
+    [data-nav-collapsed='true'] .app-nav-badge {
+      position: absolute;
+      top: 0.2rem;
+      right: 0.45rem;
+      margin-left: 0;
+    }
+  }
+
+  /* Pantallas chicas: la barra sale del flujo y se abre sobre el contenido. */
+  @media (max-width: 900px) {
+    .app-sidebar {
+      position: fixed;
+      top: var(--app-topbar-h);
+      left: 0;
+      z-index: 45;
+      background: var(--bg-secondary);
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+    }
+
+    [data-nav-open='true'] .app-sidebar {
+      transform: translateX(0);
+    }
+
+    [data-nav-open='true'] .app-nav-backdrop {
+      display: block;
     }
 
     .app-main {
       padding: 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-sidebar {
+      transition: none;
     }
   }
 
