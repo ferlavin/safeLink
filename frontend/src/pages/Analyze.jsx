@@ -124,6 +124,22 @@ export default function Analyze() {
             <ModuleCard title="Enlace raro o confuso" description={TOOLS.url.modules.entropia} data={modulos?.entropia} />
             <ModuleCard title="Nombre parecido a otra marca" description={TOOLS.url.modules.typosquatting} data={modulos?.typosquatting} />
             <ModuleCard title="Trucos en la dirección" description={TOOLS.url.modules.heuristicas} data={modulos?.heuristicas} />
+            <ModuleCard title="Patrones de lenguaje" data={modulos?.nlp} />
+            <ModuleCard title="Web3" data={modulos?.web3} />
+            {(modulos?.headers?.alerts?.length
+              || modulos?.oauth?.alerts?.length
+              || modulos?.formularios?.alerts?.length) ? (
+              <ModuleCard
+                title="Cabeceras / OAuth / formularios"
+                data={{
+                  alerts: [
+                    ...(modulos?.headers?.alerts || []),
+                    ...(modulos?.oauth?.alerts || []),
+                    ...(modulos?.formularios?.alerts || []),
+                  ],
+                }}
+              />
+            ) : null}
           </div>
         </section>
       )}

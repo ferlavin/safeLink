@@ -31,6 +31,7 @@ def check_safe_browsing(url: str) -> dict:
             "amenazas": [],
             "score": 0,
             "alertas": [],
+            "motivo": "sin_clave",
         }
 
     payload = {
@@ -44,18 +45,19 @@ def check_safe_browsing(url: str) -> dict:
     }
 
     try:
-        with httpx.Client(timeout=8.0) as client:
+        with httpx.Client(timeout=4.0) as client:
             response = client.post(SB_API, params={"key": api_key}, json=payload)
             response.raise_for_status()
             data = response.json()
     except Exception as exc:
         return {
-            "disponible": True,
+            "disponible": False,
             "en_lista": False,
             "amenazas": [],
             "score": 0,
-            "alertas": [f"Error consultando Safe Browsing: {exc}"],
+            "alertas": [],
             "error": str(exc),
+            "motivo": "timeout" if "timeout" in str(exc).lower() else "error",
         }
 
     matches = data.get("matches") or []

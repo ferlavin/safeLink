@@ -37,6 +37,10 @@ _ALERT_REPLACEMENTS: list[tuple[str, str]] = [
         "No encontramos senales claras de peligro.",
     ),
     ("Fuzzy match:", "Nombre parecido a una marca conocida:"),
+    (
+        "transformer entrenado",
+        "patrones de lenguaje en la URL",
+    ),
 ]
 
 

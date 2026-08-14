@@ -80,7 +80,7 @@ def classify_url_transformer(url: str) -> dict:
         from services.nlp_url_classifier import classify_url_nlp
 
         result = classify_url_nlp(url)
-        result["detalle"]["modelo"] = "lexico (fallback, transformer no disponible)"
+        result["detalle"]["modelo"] = "patrones de lenguaje en la URL"
         result["explicacion"] = json.dumps(result["detalle"], ensure_ascii=False)
         return result
 

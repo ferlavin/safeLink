@@ -215,7 +215,7 @@ def analyze_dns_endpoint(
     "/nlp",
     response_model=UrlAnalysisResult,
     summary="Clasificador NLP de URLs",
-    description="Transformer char-level entrenado solo con URLs; aprende patrones de phishing sin consultar APIs.",
+    description="Clasifica la URL por patrones de lenguaje. Si el modelo no carga, usa el lexico (senal debil).",
 )
 def analyze_nlp_endpoint(
     data: UrlAnalysisRequest,

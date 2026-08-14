@@ -36,7 +36,7 @@ def analyze_pdf(content: bytes, filename: str) -> dict:
     max_score = 0
 
     for url in urls[:30]:
-        r = analyze_url(url)
+        r = analyze_url(url, slow_signals=False)
         max_score = max(max_score, r["puntuacion_riesgo"])
         link_results.append(
             {
