@@ -32,29 +32,33 @@ const PILLARS = [
     icon: MagnifyingGlass,
     title: 'Análisis integral',
     desc: 'Más de 10 módulos de detección para cubrir cada tipo de amenaza en la web.',
+    to: '/info/analisis-integral',
   },
   {
     icon: Globe,
     title: 'Infraestructura',
     desc: 'Motor liviano, mapa de alertas de la comunidad y panel con historial de enlaces analizados.',
+    to: '/info/infraestructura',
   },
   {
     icon: Users,
     title: 'El equipo',
     desc: 'Comunidad activa de usuarios que comparte detecciones para proteger a todos.',
+    to: '/info/equipo',
   },
   {
     icon: ShieldCheck,
     title: 'Protección 24/7',
     desc: 'La extensión vigila cada clic y Google Search antes de que entres a un sitio.',
+    to: '/info/proteccion',
   },
 ]
 
 const QUICK_SERVICES = [
-  { icon: MagnifyingGlass, title: 'Analizar URL', hint: 'Revisión instantánea', to: '/analyze' },
-  { icon: PuzzlePiece, title: 'Extensión Chrome', hint: 'Semáforo en el navegador', to: '/extension' },
-  { icon: SignIn, title: 'Portal SafeLink', hint: 'Dashboard y historial', to: '/login' },
-  { icon: Globe, title: 'Mapa de alertas', hint: 'Detecciones de la comunidad', to: '/threat-map' },
+  { icon: MagnifyingGlass, title: 'Analizar URL', hint: 'Revisión instantánea', to: '/info/analisis-url' },
+  { icon: PuzzlePiece, title: 'Extensión Chrome', hint: 'Semáforo en el navegador', to: '/info/extension' },
+  { icon: SignIn, title: 'Portal SafeLink', hint: 'Dashboard y historial', to: '/info/portal' },
+  { icon: Globe, title: 'Mapa de alertas', hint: 'Detecciones de la comunidad', to: '/info/mapa-alertas' },
 ]
 
 const STEPS = [
@@ -62,26 +66,29 @@ const STEPS = [
     n: '01',
     title: 'Pegá el enlace',
     desc: 'SafeLink evalúa dominio, reputación y patrones sospechosos. El veredicto llega en segundos.',
+    to: '/info/analisis-url',
   },
   {
     n: '02',
     title: 'Leé el semáforo',
     desc: 'Verde, amarillo o rojo: el mismo lenguaje en la extensión, el historial y el mapa.',
+    to: '/info/semaforo',
   },
   {
     n: '03',
     title: 'Seguí el rastro',
     desc: 'Todo queda en tu portal: historial, reportes a la comunidad y alertas del equipo.',
+    to: '/info/portal',
   },
 ]
 
 const TOOLS = [
-  { title: 'Análisis de URLs', desc: 'Heurísticas, entropía y typosquatting en un solo escaneo.', to: '/analyze' },
-  { title: 'Revisión de PDF', desc: 'Extrae y analiza enlaces ocultos dentro de archivos adjuntos.', to: '/analyze/pdf' },
-  { title: 'Guardia DNS', desc: 'Comprueba si el dominio apunta a servidores de confianza.', to: '/analyze/dns' },
-  { title: 'Sentinela Web3', desc: 'Detecta páginas sospechosas que piden conectar tu billetera.', to: '/analyze/web3' },
-  { title: 'Typosquatting', desc: 'Identifica dominios que imitan marcas conocidas.', to: '/analyze/typosquatting' },
-  { title: 'Seguridad avanzada', desc: 'NLP, headers HTTP, OAuth falso y formularios maliciosos.', to: '/analyze/security' },
+  { title: 'Análisis de URLs', desc: 'Heurísticas, entropía y typosquatting en un solo escaneo.', to: '/info/analisis-url' },
+  { title: 'Revisión de PDF', desc: 'Extrae y analiza enlaces ocultos dentro de archivos adjuntos.', to: '/info/pdf' },
+  { title: 'Guardia DNS', desc: 'Comprueba si el dominio apunta a servidores de confianza.', to: '/info/dns' },
+  { title: 'Sentinela Web3', desc: 'Detecta páginas sospechosas que piden conectar tu billetera.', to: '/info/web3' },
+  { title: 'Typosquatting', desc: 'Identifica dominios que imitan marcas conocidas.', to: '/info/typosquatting' },
+  { title: 'Seguridad avanzada', desc: 'NLP, headers HTTP, OAuth falso y formularios maliciosos.', to: '/info/seguridad-avanzada' },
 ]
 
 const TESTIMONIALS = [
@@ -91,9 +98,9 @@ const TESTIMONIALS = [
 ]
 
 const PLANS = [
-  { name: 'Standard', price: 'Gratis', period: 'Para uso personal', desc: 'Extensión, análisis básico y semáforo de seguridad.', featured: false, to: '/extension' },
-  { name: 'Enterprise', price: 'Pro', period: 'Equipos y empresas', desc: 'Panel admin, mapa de alertas de la comunidad y reportes avanzados.', featured: true, to: '/login' },
-  { name: 'SafeLink Prime', price: 'Custom', period: 'Infraestructura crítica', desc: 'API, SLA dedicado y despliegue on-premise.', featured: false, to: '/login' },
+  { name: 'Standard', price: 'Gratis', period: 'Para uso personal', desc: 'Extensión, análisis básico y semáforo de seguridad.', featured: false, to: '/info/plan-standard' },
+  { name: 'Enterprise', price: 'Pro', period: 'Equipos y empresas', desc: 'Panel admin, mapa de alertas de la comunidad y reportes avanzados.', featured: true, to: '/info/plan-enterprise' },
+  { name: 'SafeLink Prime', price: 'Custom', period: 'Infraestructura crítica', desc: 'API, SLA dedicado y despliegue on-premise.', featured: false, to: '/info/plan-prime' },
 ]
 
 const FAQS = [
@@ -110,23 +117,23 @@ const FOOTER_LINKS = {
   Plataforma: [
     { label: 'Iniciar sesión', to: '/login' },
     { label: 'Registrarse', to: '/register' },
-    { label: 'Extensión', to: '/extension' },
-    { label: 'Dashboard', to: '/login' },
+    { label: 'Extensión', to: '/info/extension' },
+    { label: 'Portal SafeLink', to: '/info/portal' },
   ],
   Servicios: [
-    { label: 'Análisis de URLs', to: '/analyze' },
-    { label: 'Revisión PDF', to: '/analyze/pdf' },
-    { label: 'Seguridad Web3', to: '/analyze/web3' },
+    { label: 'Análisis de URLs', to: '/info/analisis-url' },
+    { label: 'Revisión PDF', to: '/info/pdf' },
+    { label: 'Seguridad Web3', to: '/info/web3' },
   ],
   Recursos: [
-    { label: 'Mapa de alertas', to: '/threat-map' },
-    { label: 'Mis enlaces', to: '/enlaces' },
-    { label: 'Soporte', to: '#' },
+    { label: 'Mapa de alertas', to: '/info/mapa-alertas' },
+    { label: 'Reportar amenaza', to: '/info/reportes' },
+    { label: 'El semáforo', to: '/info/semaforo' },
   ],
   Legal: [
-    { label: 'Privacidad', to: '#' },
-    { label: 'Términos', to: '#' },
-    { label: 'Cookies', to: '#' },
+    { label: 'Privacidad', to: '/info/privacidad' },
+    { label: 'Términos', to: '/info/terminos' },
+    { label: 'Cookies', to: '/info/cookies' },
   ],
 }
 
@@ -195,7 +202,7 @@ export default function LandingPage() {
                   <MapPin size={14} weight="fill" />
                   Vista ilustrativa
                 </span>
-                <Link to="/threat-map">Ver mapa de la comunidad</Link>
+                <Link to="/info/mapa-alertas">Ver mapa de la comunidad</Link>
               </div>
             </div>
           </div>
@@ -209,14 +216,14 @@ export default function LandingPage() {
             <h2>Hecho para decidir rápido, no para decorar un dashboard</h2>
           </div>
           <div className="landing-pillars">
-            {PILLARS.map(({ icon: Icon, title, desc }) => (
-              <article key={title} className="landing-pillar">
+            {PILLARS.map(({ icon: Icon, title, desc, to }) => (
+              <Link key={title} to={to} className="landing-pillar">
                 <span className="sl-icon sl-icon--sm sl-icon--accent">
                   <Icon size={16} weight="bold" />
                 </span>
                 <h3>{title}</h3>
                 <p>{desc}</p>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -249,14 +256,14 @@ export default function LandingPage() {
             <h2>Tres pasos. El mismo semáforo en todos lados.</h2>
           </div>
           <div className="landing-steps">
-            {STEPS.map(({ n, title, desc }) => (
-              <article key={n} className="landing-step">
+            {STEPS.map(({ n, title, desc, to }) => (
+              <Link key={n} to={to} className="landing-step">
                 <span className="landing-step__n" data-numeric>
                   {n}
                 </span>
                 <h3>{title}</h3>
                 <p>{desc}</p>
-              </article>
+              </Link>
             ))}
           </div>
           <div className="landing-semaphore">
@@ -381,7 +388,7 @@ export default function LandingPage() {
                 <ChatCircle size={16} weight="bold" />
               </span>
               <p>Reportar amenaza</p>
-              <Link to="/enlaces">Desde el dashboard</Link>
+              <Link to="/info/reportes">Cómo reportar</Link>
             </div>
             <div className="landing-contact-item">
               <span className="sl-icon sl-icon--sm sl-icon--accent">

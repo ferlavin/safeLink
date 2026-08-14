@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
+import LandingInfo from './pages/LandingInfo'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -175,6 +176,7 @@ export default function App() {
         }
       />
       <Route path="/" element={<LandingPage />} />
+      <Route path="/info/:slug" element={<LandingInfo />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
