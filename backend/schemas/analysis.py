@@ -24,15 +24,18 @@ class ThreatMapPoint(BaseModel):
     weight: int = 1
     urls: list[str] = []
     ultimo_evento: str | None = None
+    aproximado: bool = True
 
 
 class ThreatMapResponse(BaseModel):
     points: list[ThreatMapPoint]
     total_puntos: int
     amenazas_activas: int = 0
+    sin_ubicacion: int = 0
     ventana_horas: int = 24
     actualizado: str | None = None
-    en_vivo: bool = True
+    en_vivo: bool = False
+    ubicacion_aproximada: bool = True
     resumen_niveles: dict[str, int]
     total_analisis: int
 

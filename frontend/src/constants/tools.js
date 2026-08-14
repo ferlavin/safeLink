@@ -59,9 +59,9 @@ export const TOOLS = {
     href: '/threat-map',
     category: 'Informacion de amenazas',
     shortDesc:
-      'Mapa con sitios que otros usuarios marcaron como sospechosos.',
+      'Mapa con detecciones reales de la comunidad. Las ubicaciones son aproximadas.',
     longDesc:
-      'Muestra en un mapa las detecciones recientes de la comunidad SafeLink. Se actualiza solo cada pocos segundos.',
+      'Reúne los análisis de riesgo medio, alto o crítico de las últimas 24 horas. Cada punto es una zona aproximada (geolocalización por IP), no la dirección exacta del sitio.',
   },
   nlp: {
     name: 'Clasificador NLP',

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import {
   BookOpen,
   ChatCircle,
+  Globe,
   LinkSimple,
   MagnifyingGlass,
   PlayCircle,
@@ -20,6 +21,7 @@ const SECTIONS = [
   { key: 's4', icon: ChatCircle },
   { key: 's5', icon: PuzzlePiece },
   { key: 's6', icon: Question },
+  { key: 's7', icon: Globe },
 ]
 
 export default function Ayuda() {

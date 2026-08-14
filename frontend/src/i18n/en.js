@@ -86,7 +86,7 @@ export default {
     viewLinks: 'View my links',
     messageInbox: 'Message inbox',
     catAmenazas: 'Protection for crypto wallets, email PDFs, and look-alike site names.',
-    catIntel: 'More info on suspicious domains and the community threat map.',
+    catIntel: 'More info on suspicious domains and the community alert map.',
     catTecnico: 'Quick review of any link before you click.',
     catAvanzado: 'NLP, HTTP headers, fake OAuth, and double-submit forms.',
     metricThreats: 'Active threats',
@@ -160,6 +160,9 @@ export default {
     s6Title: '6. Simple mode',
     s6Body:
       'In User options, enable Simple mode: larger text, fewer menus, and clearer language.',
+    s7Title: '7. Alert map',
+    s7Body:
+      'The map shows real community detections, not a global cyber-attack radar. Each point is an approximate zone (by IP), as is common in cybersecurity: it shows a trend, not an exact street address.',
   },
   onboarding: {
     tag: 'Quick guide',
@@ -229,6 +232,40 @@ export default {
     period7: '7 days',
     period30: '30 days',
     period90: '90 days',
+  },
+  threatMap: {
+    badgeData: 'Real data',
+    badgeWatching: 'No alerts right now',
+    introTitle: 'How to read this map',
+    introLead:
+      'This tool gathers SafeLink community analyses. It is not a global cyber-attack radar or a GPS location of the website.',
+    whatTitle: 'What you see',
+    whatBody:
+      'Real detections from the last 24 hours with medium, high, or critical risk. Each point comes from an analysis run by a SafeLink user.',
+    notTitle: 'What it is not',
+    notBody:
+      'We do not invent points or simulate a global intelligence feed. If there are no detections, the map stays empty on purpose.',
+    geoTitle: 'Approximate location',
+    geoBody:
+      'In cybersecurity, IP geolocation gives a region or country, not a street. Points are rounded on purpose: they show a trend, not an exact address.',
+    detections: 'Detections (24 h)',
+    detectionsFoot: 'Community analyses with medium risk or worse.',
+    mapPoints: 'Zones on the map',
+    mapPointsFoot: 'Grouped by approximate region and risk level.',
+    unknown: 'No location',
+    unknownFoot: 'Real detections that could not be placed reliably.',
+    updatedAt: 'Updated {{time}}',
+    refreshHint: 'Refreshes every 15 seconds.',
+    emptyTitle: 'No alerts in the last 24 hours',
+    emptyBody:
+      'When someone in the community analyzes a medium-or-worse site, it will show up here. Until then the map stays empty: we do not fill it with sample data.',
+    emptyGeoTitle: 'There are detections, but no zone to show',
+    emptyGeoBody:
+      'The analyses exist, but their IP could not be geolocated (for example a local or private network). We do not place invented points.',
+    legendNote: 'Approximate positions by IP. Only medium, high, and critical risk are shown.',
+    tooltipApprox: '{{country}} — {{level}} ({{weight}}) · approximate location',
+    loading: 'Loading map...',
+    loadError: 'Could not load the map',
   },
   inspect: {
     tag: 'Admin',

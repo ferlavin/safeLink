@@ -4201,6 +4201,14 @@
     line-height: 1.6;
   }
 
+  .app-section-card .app-help-grid {
+    margin-top: 1rem;
+  }
+
+  .app-section-card .app-help-card {
+    background: var(--bg-primary);
+  }
+
   .app-stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

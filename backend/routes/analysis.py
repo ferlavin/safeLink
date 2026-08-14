@@ -288,8 +288,11 @@ async def analyze_forms_endpoint(
 @router.get(
     "/threat-map",
     response_model=ThreatMapResponse,
-    summary="Mapa de amenazas",
-    description="Agrega analisis y busquedas con geolocalizacion para el heatmap de actividad.",
+    summary="Mapa de alertas de la comunidad",
+    description=(
+        "Agrega detecciones reales (riesgo medio o superior) de las ultimas horas. "
+        "Las coordenadas son aproximaciones por IP del analista, no la ubicacion del sitio."
+    ),
 )
 def threat_map(
     hours: int = 24,

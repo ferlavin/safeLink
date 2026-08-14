@@ -36,7 +36,7 @@ const PILLARS = [
   {
     icon: Globe,
     title: 'Infraestructura',
-    desc: 'Motor liviano, mapa global de amenazas y panel con historial de enlaces analizados.',
+    desc: 'Motor liviano, mapa de alertas de la comunidad y panel con historial de enlaces analizados.',
   },
   {
     icon: Users,
@@ -54,7 +54,7 @@ const QUICK_SERVICES = [
   { icon: MagnifyingGlass, title: 'Analizar URL', hint: 'Revisión instantánea', to: '/analyze' },
   { icon: PuzzlePiece, title: 'Extensión Chrome', hint: 'Semáforo en el navegador', to: '/extension' },
   { icon: SignIn, title: 'Portal SafeLink', hint: 'Dashboard y historial', to: '/login' },
-  { icon: Globe, title: 'Mapa de amenazas', hint: 'Inteligencia en vivo', to: '/threat-map' },
+  { icon: Globe, title: 'Mapa de alertas', hint: 'Detecciones de la comunidad', to: '/threat-map' },
 ]
 
 const STEPS = [
@@ -87,17 +87,18 @@ const TOOLS = [
 const TESTIMONIALS = [
   { initials: 'MR', name: 'María R.', role: 'CISO, fintech', quote: 'SafeLink nos da visibilidad inmediata sobre enlaces sospechosos sin fricción para el equipo.' },
   { initials: 'JL', name: 'Julián L.', role: 'DevOps Lead', quote: 'La extensión detectó un sitio de phishing antes de que alguien ingresara credenciales.' },
-  { initials: 'AP', name: 'Ana P.', role: 'Security Analyst', quote: 'El mapa de amenazas y los reportes comunitarios son herramientas que usamos a diario.' },
+  { initials: 'AP', name: 'Ana P.', role: 'Security Analyst', quote: 'El mapa de alertas de la comunidad y los reportes nos ayudan a ver tendencias, con ubicaciones aproximadas.' },
 ]
 
 const PLANS = [
   { name: 'Standard', price: 'Gratis', period: 'Para uso personal', desc: 'Extensión, análisis básico y semáforo de seguridad.', featured: false, to: '/extension' },
-  { name: 'Enterprise', price: 'Pro', period: 'Equipos y empresas', desc: 'Panel admin, mapa de amenazas y reportes avanzados.', featured: true, to: '/login' },
+  { name: 'Enterprise', price: 'Pro', period: 'Equipos y empresas', desc: 'Panel admin, mapa de alertas de la comunidad y reportes avanzados.', featured: true, to: '/login' },
   { name: 'SafeLink Prime', price: 'Custom', period: 'Infraestructura crítica', desc: 'API, SLA dedicado y despliegue on-premise.', featured: false, to: '/login' },
 ]
 
 const FAQS = [
   { q: '¿Cómo funciona el análisis de enlaces?', a: 'SafeLink evalúa la URL con heurísticas, reputación DNS y señales de la comunidad en milisegundos.' },
+  { q: '¿El mapa de alertas es un radar mundial de ataques?', a: 'No. Muestra detecciones reales de usuarios de SafeLink. Las ubicaciones son aproximadas por IP (país o región), como suele ser en ciberseguridad.' },
   { q: '¿Protege transacciones Web3?', a: 'Sí. Detectamos sitios que imitan wallets, contratos maliciosos y firmas sospechosas.' },
   { q: '¿Mis datos de navegación se comparten?', a: 'No enviamos historial completo. Solo analizamos el enlace que revisás.' },
   { q: '¿Puedo usar SafeLink en equipo?', a: 'El plan Enterprise incluye panel admin y gestión de usuarios.' },
@@ -118,7 +119,7 @@ const FOOTER_LINKS = {
     { label: 'Seguridad Web3', to: '/analyze/web3' },
   ],
   Recursos: [
-    { label: 'Mapa de amenazas', to: '/threat-map' },
+    { label: 'Mapa de alertas', to: '/threat-map' },
     { label: 'Mis enlaces', to: '/enlaces' },
     { label: 'Soporte', to: '#' },
   ],
@@ -192,9 +193,9 @@ export default function LandingPage() {
               <div className="landing-map-caption">
                 <span>
                   <MapPin size={14} weight="fill" />
-                  Radar en vivo
+                  Vista ilustrativa
                 </span>
-                <Link to="/threat-map">Ver mapa completo</Link>
+                <Link to="/threat-map">Ver mapa de la comunidad</Link>
               </div>
             </div>
           </div>

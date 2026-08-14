@@ -87,7 +87,7 @@ export default {
     viewLinks: 'Ver mis enlaces',
     messageInbox: 'Bandeja de mensajes',
     catAmenazas: 'Protección para billeteras crypto, PDFs de correo y sitios con nombres falsos.',
-    catIntel: 'Más información sobre un dominio sospechoso y mapa de alertas de la comunidad.',
+    catIntel: 'Más información sobre un dominio sospechoso y el mapa de alertas de la comunidad.',
     catTecnico: 'Revisión rápida de cualquier enlace antes de hacer clic.',
     catAvanzado: 'NLP, cabeceras HTTP, OAuth falso y formularios con doble envío.',
     metricThreats: 'Amenazas activas',
@@ -163,6 +163,9 @@ export default {
     s6Title: '6. Modo simple',
     s6Body:
       'En Opciones de usuario activá Modo simple: textos más grandes, menos menús y lenguaje más claro.',
+    s7Title: '7. Mapa de alertas',
+    s7Body:
+      'El mapa muestra detecciones reales de la comunidad, no un radar mundial de ciberataques. Cada punto es una zona aproximada (por IP), como suele ser en ciberseguridad: sirve para ver tendencia, no una dirección exacta.',
   },
   onboarding: {
     tag: 'Guía rápida',
@@ -232,6 +235,40 @@ export default {
     period7: '7 días',
     period30: '30 días',
     period90: '90 días',
+  },
+  threatMap: {
+    badgeData: 'Datos reales',
+    badgeWatching: 'Sin alertas ahora',
+    introTitle: 'Cómo leer este mapa',
+    introLead:
+      'Esta herramienta reúne análisis de la comunidad SafeLink. No es un radar mundial de ciberataques ni una ubicación GPS del sitio.',
+    whatTitle: 'Qué ves',
+    whatBody:
+      'Detecciones reales de las últimas 24 horas con riesgo medio, alto o crítico. Cada punto sale de un análisis hecho por un usuario de SafeLink.',
+    notTitle: 'Qué no es',
+    notBody:
+      'No inventamos puntos ni simulamos un feed de inteligencia global. Si no hay detecciones, el mapa queda vacío a propósito.',
+    geoTitle: 'Ubicación aproximada',
+    geoBody:
+      'En ciberseguridad, geolocalizar por IP da una región o un país, no una calle. Los puntos están redondeados a propósito: son una tendencia, no una dirección exacta.',
+    detections: 'Detecciones (24 h)',
+    detectionsFoot: 'Análisis de la comunidad con riesgo medio o peor.',
+    mapPoints: 'Zonas en el mapa',
+    mapPointsFoot: 'Agrupadas por región aproximada y nivel de riesgo.',
+    unknown: 'Sin ubicación',
+    unknownFoot: 'Detecciones reales que no se pudieron ubicar de forma confiable.',
+    updatedAt: 'Actualizado {{time}}',
+    refreshHint: 'Se refresca cada 15 segundos.',
+    emptyTitle: 'Sin alertas en las últimas 24 horas',
+    emptyBody:
+      'Cuando alguien de la comunidad analice un sitio de riesgo medio o peor, va a aparecer acá. Hasta entonces el mapa permanece vacío: no rellenamos con datos de ejemplo.',
+    emptyGeoTitle: 'Hay detecciones, pero sin zona para mostrar',
+    emptyGeoBody:
+      'Los análisis existen, pero su IP no se pudo geolocalizar (por ejemplo, red local o IP privada). No colocamos puntos inventados.',
+    legendNote: 'Posiciones aproximadas por IP. Solo se muestran riesgo medio, alto y crítico.',
+    tooltipApprox: '{{country}} — {{level}} ({{weight}}) · ubicación aproximada',
+    loading: 'Cargando mapa...',
+    loadError: 'No se pudo cargar el mapa',
   },
   inspect: {
     tag: 'Admin',

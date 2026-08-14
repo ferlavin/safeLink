@@ -1,3 +1,4 @@
+import ipaddress
 import json
 from datetime import datetime, timezone
 
@@ -29,6 +30,28 @@ def save_analysis(db: Session, user: User, result: dict) -> AnalisisUrl:
     return row
 
 
+def _client_ip(request: Request | None) -> str | None:
+    """IP pública del analista. Usa X-Forwarded-For detrás de un proxy."""
+    if not request:
+        return None
+    candidates: list[str] = []
+    forwarded = request.headers.get("x-forwarded-for") or ""
+    candidates.extend(part.strip() for part in forwarded.split(",") if part.strip())
+    if request.client and request.client.host:
+        candidates.append(request.client.host)
+
+    public = None
+    for raw in candidates:
+        try:
+            addr = ipaddress.ip_address(raw)
+        except ValueError:
+            continue
+        if addr.is_global:
+            public = str(addr)
+            break
+    return public or (candidates[0] if candidates else None)
+
+
 def log_search_event(
     db: Session,
     user: User,
@@ -39,7 +62,7 @@ def log_search_event(
     ip = None
     user_agent = None
     if request:
-        ip = request.client.host if request.client else None
+        ip = _client_ip(request)
         user_agent = request.headers.get("user-agent")
 
     event = SearchEvent(
