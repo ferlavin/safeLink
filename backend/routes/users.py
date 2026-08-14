@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from auth.deps import require_admin
 from database.session import get_db
 from models.user import User
-from schemas.user import AdminUserCreate, UserCreate, UserOut, UserUpdate
-from services import user_service
+from schemas.user import AdminUserCreate, UserOut, UserUpdate
+from schemas.user_inspect import UserInspectResponse
+from services import user_inspect_service, user_service
 
 router = APIRouter(
     prefix="/users", tags=["users"], dependencies=[Depends(require_admin)]
@@ -20,6 +21,15 @@ def list_users(db: Session = Depends(get_db)):
 @router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def create_user(data: AdminUserCreate, db: Session = Depends(get_db)):
     return user_service.create_admin_user(db, data)
+
+
+@router.get("/{user_id}/inspect", response_model=UserInspectResponse)
+def inspect_user(
+    user_id: int,
+    days: int = Query(30, ge=1, le=365),
+    db: Session = Depends(get_db),
+):
+    return user_inspect_service.inspect_user(db, user_id, days)
 
 
 @router.get("/{user_id}", response_model=UserOut)

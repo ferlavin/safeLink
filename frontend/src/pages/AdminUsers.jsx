@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { CaretDown } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
 import StatusBadge from '../components/StatusBadge'
@@ -27,7 +28,10 @@ function canModerate(user, currentUser) {
 }
 
 function buildMenuItems(user, moderatable) {
-  const items = [{ id: 'edit', label: 'Editar', tone: 'default' }]
+  const items = [
+    { id: 'inspect', label: 'Inspeccionar usuario', tone: 'default' },
+    { id: 'edit', label: 'Editar', tone: 'default' },
+  ]
 
   if (moderatable) {
     if (!user.is_banned && user.is_active) {
@@ -60,6 +64,7 @@ function UserActionsMenu({
   user,
   currentUser,
   actionLoading,
+  onInspect,
   onEdit,
   onAction,
   onDelete,
@@ -92,6 +97,10 @@ function UserActionsMenu({
 
   const handleSelect = (itemId) => {
     onClose()
+    if (itemId === 'inspect') {
+      onInspect(user)
+      return
+    }
     if (itemId === 'edit') {
       onEdit(user)
       return
@@ -141,6 +150,7 @@ function UserActionsMenu({
 
 export default function AdminUsers() {
   const { user: currentUser } = useAuth()
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -186,6 +196,10 @@ export default function AdminUsers() {
     } finally {
       setActionLoading(null)
     }
+  }
+
+  const openInspect = (user) => {
+    navigate(`/admin/users/${user.id}`)
   }
 
   const openCreate = () => {
@@ -261,7 +275,7 @@ export default function AdminUsers() {
       {error && <div className="app-alert app-alert--error">{error}</div>}
 
       <div className="app-table-wrap">
-        <table className="app-table min-w-[640px]">
+        <table className="app-table min-w-[860px]">
           <thead>
             <tr>
               <th>Email</th>
@@ -290,7 +304,14 @@ export default function AdminUsers() {
 
                 return (
                   <tr key={user.id}>
-                    <td className="cell-main">{user.email}</td>
+                    <td className="cell-main">
+                      <Link
+                        to={`/admin/users/${user.id}`}
+                        className="hover:text-[var(--accent-green)] transition"
+                      >
+                        {user.email}
+                      </Link>
+                    </td>
                     <td>{user.full_name || '—'}</td>
                     <td>
                       <StatusBadge tone={user.role === 'admin' ? 'info' : 'neutral'}>
@@ -301,21 +322,30 @@ export default function AdminUsers() {
                       <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                     </td>
                     <td className="text-right">
-                        <UserActionsMenu
-                          user={user}
-                          currentUser={currentUser}
-                          actionLoading={actionLoading}
-                          isOpen={openMenuUserId === user.id}
-                          onToggle={() =>
-                            setOpenMenuUserId((prev) =>
-                              prev === user.id ? null : user.id,
-                            )
-                          }
-                          onClose={() => setOpenMenuUserId(null)}
-                          onEdit={openEdit}
-                          onAction={runAction}
-                          onDelete={handleDelete}
-                        />
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <Link
+                            to={`/admin/users/${user.id}`}
+                            className="btn-outline-gradient text-xs px-3 py-1.5"
+                          >
+                            Inspeccionar usuario
+                          </Link>
+                          <UserActionsMenu
+                            user={user}
+                            currentUser={currentUser}
+                            actionLoading={actionLoading}
+                            isOpen={openMenuUserId === user.id}
+                            onToggle={() =>
+                              setOpenMenuUserId((prev) =>
+                                prev === user.id ? null : user.id,
+                              )
+                            }
+                            onClose={() => setOpenMenuUserId(null)}
+                            onInspect={openInspect}
+                            onEdit={openEdit}
+                            onAction={runAction}
+                            onDelete={handleDelete}
+                          />
+                        </div>
                       </td>
                     </tr>
                   )

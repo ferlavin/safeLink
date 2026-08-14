@@ -11,6 +11,7 @@ import AnalyzeDns from './pages/AnalyzeDns'
 import AnalyzeSecurity from './pages/AnalyzeSecurity'
 import ThreatMap from './pages/ThreatMap'
 import AdminUsers from './pages/AdminUsers'
+import AdminUserInspect from './pages/AdminUserInspect'
 import AdminReportes from './pages/AdminReportes'
 import AdminEstadisticas from './pages/AdminEstadisticas'
 import AdminEncuestas from './pages/AdminEncuestas'
@@ -146,6 +147,14 @@ export default function App() {
         element={
           <AdminRoute>
             <AdminUsers />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users/:userId"
+        element={
+          <AdminRoute>
+            <AdminUserInspect />
           </AdminRoute>
         }
       />
