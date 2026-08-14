@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import RiskBadge from '../components/RiskBadge'
+import StatusBadge from '../components/StatusBadge'
 import ToolHeader from '../components/ToolHeader'
 import AppShell from '../components/AppShell'
 import client from '../api/client'
+import { SCORE_CLASS } from '../constants/labels'
 import { TOOLS } from '../constants/tools'
 
 const TABS = [
@@ -67,17 +69,13 @@ function ResultExtra({ tab, detalle }) {
                   <tr key={h.header}>
                     <td className="cell-main">{h.header}</td>
                     <td>
-                      <span
-                        className={
-                          h.estado === 'ok'
-                            ? 'text-neon-ice'
-                            : h.estado === 'debil'
-                              ? 'text-amber-400'
-                              : 'text-hot-fuchsia'
+                      <StatusBadge
+                        tone={
+                          h.estado === 'ok' ? 'safe' : h.estado === 'debil' ? 'warn' : 'danger'
                         }
                       >
                         {h.estado}
-                      </span>
+                      </StatusBadge>
                     </td>
                   </tr>
                 ))}
@@ -211,7 +209,9 @@ export default function AnalyzeSecurity() {
       {result && (
         <section className="mt-8 space-y-4">
           <div className="app-score-card">
-            <span className="app-score-value app-score-value--low">{result.puntuacion_riesgo}</span>
+            <span className={`app-score-value ${SCORE_CLASS[result.nivel_riesgo] || ''}`}>
+              {result.puntuacion_riesgo}
+            </span>
             <div className="flex-1">
               <p className="break-all text-sm text-muted">{result.url}</p>
               <div className="mt-2">

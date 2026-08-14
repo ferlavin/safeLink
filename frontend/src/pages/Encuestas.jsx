@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle, ClipboardText } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import EmptyState from '../components/EmptyState'
+import StatusBadge from '../components/StatusBadge'
 import client from '../api/client'
 import usePageView from '../hooks/usePageView'
 import { useT } from '../i18n/I18nContext.jsx'
@@ -92,10 +94,7 @@ export default function Encuestas() {
     <AppShell>
       <div className="app-page-header">
         <span className="section-tag">{t('encuestas.tag')}</span>
-        <h1>
-          <ClipboardText size={28} weight="fill" className="inline mr-2 text-[var(--accent-green)]" />
-          {t('encuestas.title')}
-        </h1>
+        <h1>{t('encuestas.title')}</h1>
         <p>{t('encuestas.subtitle')}</p>
       </div>
 
@@ -110,8 +109,12 @@ export default function Encuestas() {
       {loading ? (
         <p className="text-muted">{t('encuestas.loading')}</p>
       ) : list.length === 0 ? (
-        <div className="app-section-card p-6">
-          <p>{t('encuestas.empty')}</p>
+        <div className="app-section-card">
+          <EmptyState
+            icon={ClipboardText}
+            title={t('encuestas.emptyTitle')}
+            description={t('encuestas.emptyBody')}
+          />
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_1fr]">
@@ -132,20 +135,28 @@ export default function Encuestas() {
                   {encuesta.fecha_creacion ? ` · ${formatDate(encuesta.fecha_creacion, dateLocale)}` : ''}
                 </p>
                 {encuesta.ya_respondida && (
-                  <span className="mt-2 inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-                    {t('common.yesAnswered')}
+                  <span className="mt-2 inline-block">
+                    <StatusBadge tone="safe">{t('common.yesAnswered')}</StatusBadge>
                   </span>
                 )}
               </button>
             ))}
           </div>
 
-          <div className="app-section-card p-5 sm:p-6">
+          <div className={`app-section-card ${selectedId ? 'p-5 sm:p-6' : ''}`}>
             {!selectedId ? (
-              <p className="text-muted">{t('common.selectSurvey')}</p>
+              <EmptyState
+                compact
+                icon={ClipboardText}
+                title={t('encuestas.selectTitle')}
+                description={t('encuestas.selectBody')}
+              />
             ) : selectedMeta?.ya_respondida ? (
               <div>
-                <h2 className="text-base font-semibold">{selectedMeta.titulo}</h2>
+                <span className="sl-icon sl-icon--sm sl-icon--safe mb-4">
+                  <CheckCircle size={16} weight="bold" />
+                </span>
+                <h2>{selectedMeta.titulo}</h2>
                 <p className="mt-3 text-sm text-muted">{t('encuestas.alreadyAnsweredTitle')}</p>
               </div>
             ) : detail ? (
@@ -192,7 +203,7 @@ export default function Encuestas() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="btn-gradient mt-6 text-sm px-4 py-2"
+                  className="btn-gradient mt-6"
                 >
                   {submitting ? t('common.sending') : t('encuestas.submit')}
                 </button>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CaretDown } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import StatusBadge from '../components/StatusBadge'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 
@@ -13,22 +14,9 @@ const emptyForm = {
 }
 
 function getAccountStatus(user) {
-  if (user.is_banned) {
-    return {
-      label: 'Baneado',
-      className: 'bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/30',
-    }
-  }
-  if (!user.is_active) {
-    return {
-      label: 'Suspendido',
-      className: 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30',
-    }
-  }
-  return {
-    label: 'Activo',
-    className: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30',
-  }
+  if (user.is_banned) return { label: 'Baneado', tone: 'danger' }
+  if (!user.is_active) return { label: 'Suspendido', tone: 'warn' }
+  return { label: 'Activo', tone: 'safe' }
 }
 
 function canModerate(user, currentUser) {
@@ -305,20 +293,12 @@ export default function AdminUsers() {
                     <td className="cell-main">{user.email}</td>
                     <td>{user.full_name || '—'}</td>
                     <td>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          user.role === 'admin'
-                            ? 'bg-[rgba(0,255,135,0.12)] text-neon-ice'
-                            : 'bg-[rgba(0,229,255,0.1)] text-ocean-twilight'
-                        }`}
-                      >
+                      <StatusBadge tone={user.role === 'admin' ? 'info' : 'neutral'}>
                         {user.role}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td>
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>
-                        {status.label}
-                      </span>
+                      <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                     </td>
                     <td className="text-right">
                         <UserActionsMenu

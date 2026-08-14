@@ -1,10 +1,26 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, PlayCircle } from '@phosphor-icons/react'
+import {
+  BookOpen,
+  ChatCircle,
+  LinkSimple,
+  MagnifyingGlass,
+  PlayCircle,
+  PuzzlePiece,
+  Question,
+  ShieldCheck,
+} from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
 import { usePreferences } from '../context/PreferencesContext'
 import { useT } from '../i18n/I18nContext.jsx'
 
-const SECTION_KEYS = ['s1', 's2', 's3', 's4', 's5', 's6']
+const SECTIONS = [
+  { key: 's1', icon: ShieldCheck },
+  { key: 's2', icon: LinkSimple },
+  { key: 's3', icon: MagnifyingGlass },
+  { key: 's4', icon: ChatCircle },
+  { key: 's5', icon: PuzzlePiece },
+  { key: 's6', icon: Question },
+]
 
 export default function Ayuda() {
   const { updatePreferences } = usePreferences()
@@ -24,19 +40,21 @@ export default function Ayuda() {
       </div>
 
       <div className="app-help-actions">
-        <button type="button" className="btn-gradient text-sm" onClick={restartTutorial}>
-          <PlayCircle size={18} weight="fill" className="inline mr-1" />
+        <button type="button" className="btn-gradient" onClick={restartTutorial}>
+          <PlayCircle size={18} weight="fill" />
           {t('ayuda.interactiveGuide')}
         </button>
-        <Link to="/dashboard" className="btn-outline-gradient text-sm">
+        <Link to="/dashboard" className="btn-outline-gradient">
           {t('ayuda.backHome')}
         </Link>
       </div>
 
       <div className="app-help-grid">
-        {SECTION_KEYS.map((key) => (
+        {SECTIONS.map(({ key, icon: Icon }) => (
           <article key={key} className="app-help-card">
-            <BookOpen size={22} weight="fill" className="text-neon-ice mb-3" />
+            <span className="sl-icon sl-icon--sm sl-icon--accent">
+              <Icon size={16} weight="bold" />
+            </span>
             <h2>{t(`ayuda.${key}Title`)}</h2>
             <p>{t(`ayuda.${key}Body`)}</p>
           </article>

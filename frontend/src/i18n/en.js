@@ -235,5 +235,11 @@ export default {
     title: 'Report inbox',
     subtitle:
       'Track your reports and chat with the SafeLink team when you need more help.',
+    emptyTitle: 'No reports yet',
+    emptyUser:
+      'When you report a suspicious link from My links, the conversation with the team shows up here.',
+    emptyAdmin: 'When a user reports a site, the thread will appear in this inbox.',
+    pickTitle: 'Pick a report',
+    pickBody: 'Choose a thread from the list to see its status and continue the conversation.',
   },
 }

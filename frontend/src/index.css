@@ -1513,31 +1513,69 @@
 
   /* Hero */
   .landing-hero {
-    padding-top: 3rem;
-    padding-bottom: 2rem;
+    padding-top: 4.5rem;
+    padding-bottom: 3.5rem;
   }
 
   .landing-hero-grid {
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 3rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .landing-hero-copy .section-tag {
+    margin-bottom: 1.15rem;
+  }
+
+  .landing-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.25rem;
+  }
+
+  .landing-hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    padding-top: 0.25rem;
+  }
+
+  .landing-hero-metrics strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.65rem, 1.2rem + 1.4vw, 2.15rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--mint-400);
+    text-shadow: 0 0 24px rgba(0, 255, 135, 0.28);
+  }
+
+  .landing-hero-metrics span {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
   }
 
   .landing-hero-title {
-    font-size: clamp(2rem, 3.5vw + 0.5rem, 3.25rem);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    margin-bottom: 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 2rem + 3.2vw, 4.25rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    margin-bottom: 1.35rem;
+    text-wrap: balance;
   }
 
   .landing-hero-desc {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    line-height: 1.7;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.65;
     max-width: 34rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
   }
 
   .landing-hero-stats {
@@ -1594,14 +1632,12 @@
   }
 
   .landing-map-card {
-    margin-top: 2.5rem;
-    background: var(--bg-card);
-    border: 1px solid rgba(0, 229, 255, 0.15);
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow:
-      0 0 40px rgba(0, 229, 255, 0.08),
-      inset 0 0 60px rgba(0, 255, 135, 0.03);
+    margin-top: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 0.75rem;
+    box-shadow: var(--edge-top), var(--shadow-lg);
     position: relative;
     overflow: hidden;
   }
@@ -1628,9 +1664,46 @@
 
   .landing-map-inner {
     position: relative;
-    height: clamp(180px, 28vw, 260px);
-    border-radius: 10px;
+    height: clamp(280px, 42vw, 420px);
+    border-radius: var(--radius-lg);
     overflow: hidden;
+    aspect-ratio: auto;
+  }
+
+  .landing-map-caption {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background: linear-gradient(transparent, rgba(5, 8, 15, 0.88));
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+  }
+
+  .landing-map-caption span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .landing-map-caption svg {
+    color: var(--mint-400);
+  }
+
+  .landing-map-caption a {
+    font-weight: 600;
+    color: var(--mint-400);
+    text-decoration: none;
+  }
+
+  .landing-map-caption a:hover {
+    text-decoration: underline;
   }
 
   .landing-map-inner .absolute {
@@ -1643,8 +1716,17 @@
   }
 
   .landing-section-head h2 {
-    font-size: clamp(1.5rem, 2vw + 0.5rem, 2rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.35rem);
     font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+
+  .landing-section-head.text-center h2 {
+    margin-inline: auto;
   }
 
   .landing-cap-grid {
@@ -2256,15 +2338,14 @@
     cursor: not-allowed;
   }
 
-  /* Layout tipo institucional (estructura Sanatorio, mismos tokens) */
-  .landing-hero-welcome {
-    text-align: center;
-    max-width: 40rem;
-    margin: 0 auto 2.5rem;
+  /* Copy del hero: alineado a la izquierda, números como protagonistas */
+  .landing-hero-copy {
+    max-width: 38rem;
   }
 
-  .landing-hero-welcome .landing-hero-title {
-    margin-bottom: 0.75rem;
+  .landing-hero-title em {
+    font-style: normal;
+    color: var(--mint-400);
   }
 
   .landing-hero-sub {
@@ -2286,38 +2367,36 @@
   }
 
   .landing-pillar {
-    text-align: center;
-    padding: 1.75rem 1.25rem;
+    text-align: left;
+    padding: 1.75rem 1.35rem;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    transition: border-color 0.3s ease;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--edge-top), var(--shadow-md);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
   }
 
   .landing-pillar:hover {
-    border-color: var(--border-hover);
+    border-color: var(--border-strong);
+    transform: translateY(-3px);
+    box-shadow: var(--edge-top), var(--shadow-lg);
   }
 
-  .landing-pillar-icon {
-    width: 2.75rem;
-    height: 2.75rem;
-    margin: 0 auto 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 255, 135, 0.2);
-    background: rgba(0, 255, 135, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent-green);
+  .landing-pillar .sl-icon {
+    margin-bottom: 1.1rem;
   }
 
   .landing-pillar h3 {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin-bottom: 0.65rem;
-    color: var(--accent-green);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    margin-bottom: 0.55rem;
+    color: var(--text-main);
   }
 
   .landing-pillar p {
@@ -2349,35 +2428,98 @@
   .landing-quick-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem 1rem;
-    text-align: center;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.15rem;
+    text-align: left;
     text-decoration: none;
     color: inherit;
-    transition: all 0.3s ease;
+    box-shadow: var(--edge-top), var(--shadow-md);
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
   }
 
   .landing-quick-card:hover {
-    border-color: var(--border-hover);
+    border-color: var(--border-strong);
     transform: translateY(-3px);
+    box-shadow: var(--edge-top), var(--shadow-lg);
   }
 
-  .landing-quick-card svg {
-    color: var(--accent-green);
-    margin-bottom: 0.75rem;
+  .landing-quick-card .sl-icon {
+    margin-bottom: 1rem;
   }
 
   .landing-quick-card h3 {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     margin-bottom: 0.35rem;
   }
 
-  .landing-quick-card span {
-    font-size: 0.72rem;
-    color: var(--text-muted);
+  .landing-quick-card span:not(.sl-icon) {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .landing-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .landing-step {
+    padding: 1.75rem 1.35rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--edge-top), var(--shadow-md);
+  }
+
+  .landing-step__n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    color: var(--mint-400);
+    text-shadow: 0 0 24px rgba(0, 255, 135, 0.28);
+    margin-bottom: 1rem;
+  }
+
+  .landing-step h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.5rem;
+  }
+
+  .landing-step p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .landing-semaphore {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 2rem;
+    padding: 1.15rem 1.35rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--edge-top), var(--shadow-md);
+  }
+
+  .landing-semaphore p {
+    margin-left: auto;
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
   }
 
   .landing-img-fallback {
@@ -2877,14 +3019,14 @@
   .landing-contact-item {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.25rem;
-    text-align: center;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.25rem;
+    text-align: left;
+    box-shadow: var(--edge-top), var(--shadow-md);
   }
 
-  .landing-contact-item svg {
-    color: var(--accent-green);
-    margin-bottom: 0.5rem;
+  .landing-contact-item .sl-icon {
+    margin-bottom: 0.85rem;
   }
 
   .landing-contact-item p {
@@ -2909,7 +3051,16 @@
       display: none;
     }
 
-    .landing-hero-grid,
+    .landing-hero-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .landing-hero-metrics {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .landing-steps,
     .landing-cap-grid,
     .landing-pricing-grid,
     .landing-testimonial-grid,
@@ -2960,12 +3111,19 @@
     }
 
     .landing-hero-grid,
+    .landing-hero-metrics,
+    .landing-steps,
     .landing-cap-grid,
     .landing-pricing-grid,
     .landing-testimonial-grid,
     .landing-faq-grid,
     .landing-footer-grid {
       grid-template-columns: 1fr;
+    }
+
+    .landing-semaphore p {
+      margin-left: 0;
+      width: 100%;
     }
 
     .landing-hero-stats {
@@ -5135,6 +5293,10 @@
     transform: translateY(-3px);
   }
 
+  .app-help-card .sl-icon {
+    margin-bottom: 0.9rem;
+  }
+
   .app-stat-card__value {
     font-family: var(--font-display);
     font-size: 2rem;
@@ -5233,7 +5395,8 @@
 
   /* El empty state ya trae su propio padding; el contenedor no debe sumar */
   .app-inbox-placeholder:has(.sl-empty),
-  .app-table-empty:has(.sl-empty) {
+  .app-table-empty:has(.sl-empty),
+  .app-section-card:has(> .sl-empty) {
     padding: 0;
   }
 

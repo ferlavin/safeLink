@@ -26,7 +26,7 @@ export default function LandingHeader({ showNav = true }) {
           <Link to="/analyze" className="landing-header-link">
             Analizar
           </Link>
-          <Link to="/extension" className="btn-outline-gradient">
+          <Link to="/extension" className="btn-gradient">
             Extensión
           </Link>
         </div>

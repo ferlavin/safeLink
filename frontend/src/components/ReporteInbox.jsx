@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChatCircle, PaperPlaneTilt } from '@phosphor-icons/react'
 import client from '../api/client'
 import { REPORTE_ESTADOS } from '../constants/labels'
+import EmptyState from './EmptyState'
+import StatusBadge from './StatusBadge'
+import { useT } from '../i18n/I18nContext.jsx'
 
 function formatDate(value) {
   if (!value) return '—'
@@ -11,15 +14,16 @@ function formatDate(value) {
   })
 }
 
-const estadoStyle = (estado) => {
-  if (estado === 'Resuelto') return 'text-neon-ice'
-  if (estado === 'Respondido') return 'text-neon-ice'
-  if (estado === 'Descartado') return 'text-muted'
-  if (estado === 'En revisión') return 'text-amber-400'
-  return 'text-hot-fuchsia'
+const ESTADO_TONE = {
+  Resuelto: 'safe',
+  Respondido: 'info',
+  Descartado: 'neutral',
+  'En revisión': 'warn',
+  Pendiente: 'high',
 }
 
 export default function ReporteInbox({ mode = 'user' }) {
+  const { t } = useT()
   const isAdmin = mode === 'admin'
   const listUrl = isAdmin ? '/reportes' : '/reportes/mine'
 
@@ -130,11 +134,12 @@ export default function ReporteInbox({ mode = 'user' }) {
         {loadingList ? (
           <p className="app-inbox-empty">Cargando...</p>
         ) : reportes.length === 0 ? (
-          <p className="app-inbox-empty">
-            {isAdmin
-              ? 'No hay reportes todavía.'
-              : 'Todavía no enviaste reportes. Podés hacerlo desde Mis enlaces.'}
-          </p>
+          <EmptyState
+            compact
+            icon={ChatCircle}
+            title={t('mensajes.emptyTitle')}
+            description={isAdmin ? t('mensajes.emptyAdmin') : t('mensajes.emptyUser')}
+          />
         ) : (
           <ul>
             {reportes.map((reporte) => (
@@ -146,7 +151,9 @@ export default function ReporteInbox({ mode = 'user' }) {
                 >
                   <div className="app-inbox-item-top">
                     <strong>#{reporte.id}</strong>
-                    <span className={estadoStyle(reporte.estado)}>{reporte.estado}</span>
+                    <StatusBadge tone={ESTADO_TONE[reporte.estado] || 'neutral'}>
+                      {reporte.estado}
+                    </StatusBadge>
                     {reporte.unread_count > 0 && (
                       <span className="app-nav-badge">{reporte.unread_count}</span>
                     )}
@@ -166,8 +173,11 @@ export default function ReporteInbox({ mode = 'user' }) {
       <section className="app-inbox-thread">
         {!selectedId ? (
           <div className="app-inbox-placeholder">
-            <ChatCircle size={48} weight="duotone" className="text-muted opacity-40" />
-            <p>Elegí un reporte para ver la conversación</p>
+            <EmptyState
+              icon={ChatCircle}
+              title={t('mensajes.pickTitle')}
+              description={t('mensajes.pickBody')}
+            />
           </div>
         ) : loadingDetail ? (
           <p className="app-inbox-empty">Cargando conversación...</p>
@@ -183,7 +193,7 @@ export default function ReporteInbox({ mode = 'user' }) {
                   value={detail.estado || 'Pendiente'}
                   disabled={updatingEstado}
                   onChange={(e) => handleEstadoChange(e.target.value)}
-                  className={`app-input w-auto px-2 py-1 text-xs font-medium ${estadoStyle(detail.estado)}`}
+                  className="app-input w-auto px-2 py-1 text-xs font-medium"
                 >
                   {REPORTE_ESTADOS.map((estado) => (
                     <option key={estado} value={estado}>
@@ -192,9 +202,9 @@ export default function ReporteInbox({ mode = 'user' }) {
                   ))}
                 </select>
               ) : (
-                <span className={`text-sm font-semibold ${estadoStyle(detail.estado)}`}>
+                <StatusBadge tone={ESTADO_TONE[detail.estado] || 'neutral'} size="lg">
                   {detail.estado}
-                </span>
+                </StatusBadge>
               )}
             </header>
 
@@ -225,7 +235,7 @@ export default function ReporteInbox({ mode = 'user' }) {
                   onChange={(e) => setReply(e.target.value)}
                   maxLength={2000}
                 />
-                <button type="submit" className="btn-gradient text-sm" disabled={sending || !reply.trim()}>
+                <button type="submit" className="btn-gradient" disabled={sending || !reply.trim()}>
                   <PaperPlaneTilt size={16} weight="fill" className="inline mr-1" />
                   {sending ? 'Enviando...' : 'Enviar'}
                 </button>

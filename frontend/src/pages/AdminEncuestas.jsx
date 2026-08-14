@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ClipboardText, Plus, Trash } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import StatusBadge from '../components/StatusBadge'
 import client from '../api/client'
 
 const emptyQuestion = () => ({
@@ -213,15 +214,9 @@ export default function AdminEncuestas() {
                 <tr key={encuesta.id}>
                   <td className="cell-main">{encuesta.titulo}</td>
                   <td>
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        encuesta.activa
-                          ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30'
-                          : 'bg-[rgba(255,255,255,0.06)] text-muted'
-                      }`}
-                    >
+                    <StatusBadge tone={encuesta.activa ? 'safe' : 'neutral'}>
                       {encuesta.activa ? 'Activa' : 'Inactiva'}
-                    </span>
+                    </StatusBadge>
                   </td>
                   <td>{encuesta.preguntas_count}</td>
                   <td>{encuesta.respuestas_count}</td>

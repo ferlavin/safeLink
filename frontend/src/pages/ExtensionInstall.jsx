@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AppShell from '../components/AppShell'
+import StatusBadge from '../components/StatusBadge'
 import { useAuth } from '../context/AuthContext'
 import usePageView from '../hooks/usePageView'
 
@@ -67,21 +68,21 @@ export default function ExtensionInstall() {
       <section className="app-section-card app-section-card--accent">
         <h2>Qué hace la extensión</h2>
         <p className="mt-3">
-          SafeLink muestra un <strong className="text-neon-ice">punto de color</strong> en la barra
-          de Chrome y al lado de cada resultado en Google, antes de que hagas clic.
+          SafeLink muestra un punto de color en la barra de Chrome y al lado de cada resultado en
+          Google, antes de que hagas clic.
         </p>
-        <ul className="mt-4 space-y-2">
-          <li>
-            <span className="app-status-dot app-status-dot--green" />
-            <strong className="text-neon-ice">Verde</strong> — podés entrar con tranquilidad
+        <ul className="mt-4 space-y-3">
+          <li className="flex items-center gap-3">
+            <StatusBadge tone="safe">Verde</StatusBadge>
+            <span>podés entrar con tranquilidad</span>
           </li>
-          <li>
-            <span className="app-status-dot app-status-dot--amber" />
-            <strong className="text-amber-400">Amarillo</strong> — mejor revisar antes
+          <li className="flex items-center gap-3">
+            <StatusBadge tone="warn">Amarillo</StatusBadge>
+            <span>mejor revisar antes</span>
           </li>
-          <li>
-            <span className="app-status-dot app-status-dot--red" />
-            <strong className="text-hot-fuchsia">Rojo</strong> — no te recomendamos entrar
+          <li className="flex items-center gap-3">
+            <StatusBadge tone="danger">Rojo</StatusBadge>
+            <span>no te recomendamos entrar</span>
           </li>
         </ul>
       </section>
@@ -107,7 +108,7 @@ export default function ExtensionInstall() {
         <p className="mt-3 text-xs text-muted">
           Chrome no permite instalar extensiones con un solo clic desde una web sin publicarlas en
           Chrome Web Store. Usá la instalación de desarrollador abajo o configurá{' '}
-          <code className="text-neon-ice">VITE_CHROME_WEB_STORE_URL</code> en el frontend.
+          <code>VITE_CHROME_WEB_STORE_URL</code> en el frontend.
         </p>
       )}
 
@@ -122,8 +123,8 @@ export default function ExtensionInstall() {
         )}
         <p className="mt-4 text-xs">
           Requisito: API SafeLink en la nube (por defecto{' '}
-          <code className="text-neon-ice">https://safelink-api-csqe.onrender.com</code>). En desarrollo
-          local podés usar <code className="text-neon-ice">http://localhost:8000</code> desde el
+          <code>https://safelink-api-csqe.onrender.com</code>). En desarrollo
+          local podés usar <code>http://localhost:8000</code> desde el
           popup de la extensión.
         </p>
       </section>
@@ -134,8 +135,8 @@ export default function ExtensionInstall() {
           Solo si no tenés el código del proyecto: descargá el ZIP y cargalo descomprimido en
           chrome://extensions.
         </p>
-        <a href="/safelink-extension.zip" download="safelink-extension.zip" className="app-link-accent mt-3 inline-block text-sm">
-          Descargar ZIP de respaldo →
+        <a href="/safelink-extension.zip" download="safelink-extension.zip" className="btn-outline-gradient mt-3">
+          Descargar ZIP de respaldo
         </a>
       </section>
     </AppShell>

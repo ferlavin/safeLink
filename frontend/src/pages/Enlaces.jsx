@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CaretDown, CaretRight, Flag, LinkSimple } from '@phosphor-icons/react'
+import { CaretDown, CaretRight, Flag, LinkSimple, MagnifyingGlass } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import EmptyState from '../components/EmptyState'
 import EstadoBadge from '../components/EstadoBadge'
 import client from '../api/client'
 import usePageView from '../hooks/usePageView'
@@ -94,7 +95,8 @@ export default function Enlaces() {
           <h1>Mis enlaces</h1>
           <p>URLs que escaneaste, con historial de escaneos y opción de reportar sitios sospechosos.</p>
         </div>
-        <Link to="/analyze" className="btn-gradient shrink-0 text-sm px-4 py-2">
+        <Link to="/analyze" className="btn-gradient shrink-0">
+          <MagnifyingGlass size={16} weight="bold" />
           Analizar URL
         </Link>
       </div>
@@ -105,13 +107,22 @@ export default function Enlaces() {
         {loading ? (
           <p className="app-table-empty">Cargando...</p>
         ) : enlaces.length === 0 ? (
-          <div className="app-table-empty">
-            <LinkSimple size={32} className="mx-auto mb-3 opacity-40" />
-            <p>Todavía no escaneaste ningún enlace.</p>
-            <Link to="/analyze" className="app-link-accent mt-2 inline-block text-sm">
-              Analizar tu primer enlace →
-            </Link>
-          </div>
+          <EmptyState
+            icon={LinkSimple}
+            title="Tu historial todavía está vacío"
+            description="Cada URL que analices queda acá con su semáforo, el detalle de cada escaneo y la opción de reportarla. Empezá por el enlace que te haga dudar."
+            actions={
+              <>
+                <Link to="/analyze" className="btn-gradient">
+                  <MagnifyingGlass size={16} weight="bold" />
+                  Analizar mi primer enlace
+                </Link>
+                <Link to="/extension" className="btn-outline-gradient">
+                  Instalar la extensión
+                </Link>
+              </>
+            }
+          />
         ) : (
           <div className="divide-y divide-[var(--border-color)]">
             {enlaces.map((enlace) => (
@@ -204,7 +215,13 @@ export default function Enlaces() {
               />
             </div>
             {reportMsg && (
-              <p className={`text-xs ${reportMsg.includes('correctamente') ? 'text-neon-ice' : 'text-hot-fuchsia'}`}>
+              <p
+                className={`text-xs ${
+                  reportMsg.startsWith('Reporte enviado')
+                    ? 'text-[var(--safe-400)]'
+                    : 'text-[var(--danger-400)]'
+                }`}
+              >
                 {reportMsg}
               </p>
             )}

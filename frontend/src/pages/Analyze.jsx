@@ -3,15 +3,8 @@ import RiskBadge from '../components/RiskBadge'
 import ToolHeader from '../components/ToolHeader'
 import AppShell from '../components/AppShell'
 import client from '../api/client'
-import { RISK_LABELS } from '../constants/labels'
+import { RISK_LABELS, SCORE_CLASS } from '../constants/labels'
 import { TOOLS } from '../constants/tools'
-
-const SCORE_CLASS = {
-  bajo: 'app-score-value--low',
-  medio: 'app-score-value--med',
-  alto: 'app-score-value--high',
-  critico: 'app-score-value--crit',
-}
 
 function ModuleCard({ title, description, data }) {
   if (!data) return null

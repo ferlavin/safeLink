@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ChartBar, ClipboardText } from '@phosphor-icons/react'
 import AppShell from '../components/AppShell'
+import StatusBadge from '../components/StatusBadge'
 import client from '../api/client'
 import { useT } from '../i18n/I18nContext.jsx'
 
@@ -264,15 +265,12 @@ export default function AdminEstadisticas() {
                             >
                               {encuesta.titulo}
                             </button>
-                            <span
-                              className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                                encuesta.activa
-                                  ? 'bg-emerald-500/15 text-emerald-400'
-                                  : 'bg-[rgba(255,255,255,0.06)] text-muted'
-                              }`}
+                            <StatusBadge
+                              tone={encuesta.activa ? 'safe' : 'neutral'}
+                              className="ml-2"
                             >
                               {encuesta.activa ? t('common.active') : t('common.inactive')}
-                            </span>
+                            </StatusBadge>
                           </td>
                           <td>{encuesta.respuestas_periodo}</td>
                           <td>{encuesta.respuestas_count}</td>

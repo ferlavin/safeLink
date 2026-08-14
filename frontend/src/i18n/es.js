@@ -238,5 +238,11 @@ export default {
     title: 'Bandeja de reportes',
     subtitle:
       'Seguí el estado de tus reportes y chateá con el equipo SafeLink cuando necesites más ayuda.',
+    emptyTitle: 'Todavía no hay reportes',
+    emptyUser:
+      'Cuando reportes un enlace sospechoso desde Mis enlaces, la conversación con el equipo aparece acá.',
+    emptyAdmin: 'Cuando un usuario reporte un sitio, el hilo va a aparecer en esta bandeja.',
+    pickTitle: 'Elegí un reporte',
+    pickBody: 'Seleccioná un hilo de la lista para ver el estado y seguir la conversación.',
   },
 }
