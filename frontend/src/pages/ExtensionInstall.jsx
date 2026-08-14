@@ -46,15 +46,13 @@ export default function ExtensionInstall() {
     <AppShell guest={!user}>
       <div className="app-page-header">
         <span className="section-tag">Extensión</span>
-        <div className="flex items-center gap-3">
-          <img
-            src="/extension-icon.png"
-            alt="SafeLink"
-            className="h-10 w-10 rounded-lg shadow-[0_0_16px_rgba(0,255,135,0.25)]"
-          />
+        <div className="app-page-heading">
+          <span className="sl-icon sl-icon--lg sl-icon--accent">
+            <img src="/extension-icon.png" alt="" width="22" height="22" />
+          </span>
           <div>
             <h1>SafeLink para Chrome</h1>
-            <p className="!mt-1">Google Chrome · Manifest V3</p>
+            <p>Google Chrome · Manifest V3</p>
           </div>
         </div>
       </div>
