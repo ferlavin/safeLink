@@ -85,7 +85,8 @@ def _analyze_scopes(scopes: list[str]) -> tuple[int, list[str], list[dict]]:
     return score, alertas, detectados
 
 
-async def analyze_oauth_phishing(url: str) -> dict:
+def inspect_oauth_url(url: str) -> dict:
+    """Senales OAuth visibles en la URL (sin descargar la pagina)."""
     raw = normalize_url(url)
     parsed = urlparse(raw)
     host = parsed.netloc.lower()
@@ -154,6 +155,35 @@ async def analyze_oauth_phishing(url: str) -> dict:
             score += pts
             alertas.append(msg)
             indicadores.append({"tipo": "fake_provider", "detalle": msg})
+
+    return {
+        "score": score,
+        "alertas": alertas,
+        "indicadores": indicadores,
+        "host": host,
+        "es_proveedor_oficial": official,
+        "flujo_oauth_detectado": is_oauth_flow,
+        "parametros_oauth": list(params.keys()),
+        "scopes_solicitados": scopes_solicitados,
+        "scopes_peligrosos": scopes_detectados,
+        "tiene_senal": bool(alertas),
+    }
+
+
+async def analyze_oauth_phishing(url: str) -> dict:
+    raw = normalize_url(url)
+    url_part = inspect_oauth_url(raw)
+    parsed = urlparse(raw)
+    host = parsed.netloc.lower()
+
+    score = url_part["score"]
+    alertas = list(url_part["alertas"])
+    indicadores = list(url_part["indicadores"])
+    is_oauth_flow = url_part["flujo_oauth_detectado"]
+    params = parse_qs(parsed.query)
+    scopes_solicitados = list(url_part["scopes_solicitados"])
+    scopes_detectados = list(url_part["scopes_peligrosos"])
+    official = url_part["es_proveedor_oficial"]
 
     html = ""
     headers = None

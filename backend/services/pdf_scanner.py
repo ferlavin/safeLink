@@ -41,7 +41,7 @@ def analyze_pdf(content: bytes, filename: str) -> dict:
             assert_public_http_url(url)
         except UnsafeUrlError:
             continue
-        r = analyze_url(url)
+        r = analyze_url(url, slow_signals=False)
         max_score = max(max_score, r["puntuacion_riesgo"])
         link_results.append(
             {

@@ -1,4 +1,5 @@
 import json
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -24,12 +25,14 @@ def _normalize(s: str) -> str:
     return s.lower().replace("-", "").replace(".", "").replace("_", "")
 
 
+@lru_cache(maxsize=1)
 def _load_brands() -> list[str]:
     path = Path(__file__).resolve().parent.parent / "data" / "marcas_ar.json"
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
+@lru_cache(maxsize=1)
 def _load_official_domains() -> list[dict]:
     path = Path(__file__).resolve().parent.parent / "data" / "marcas_oficiales.json"
     with open(path, encoding="utf-8") as f:
@@ -41,10 +44,14 @@ def extract_domain(url: str) -> str | None:
     host = (parsed.netloc or parsed.path.split("/")[0]).lower()
     if host.startswith("www."):
         host = host[4:]
+    if ":" in host and host.count(":") == 1:
+        host = host.split(":", 1)[0]
     return host or None
 
 
-def _is_official_domain(domain: str) -> bool:
+def is_official_domain(domain: str | None) -> bool:
+    if not domain:
+        return False
     domain = domain.lower()
     if domain.startswith("www."):
         domain = domain[4:]
@@ -55,17 +62,30 @@ def _is_official_domain(domain: str) -> bool:
     return False
 
 
+def _is_official_domain(domain: str) -> bool:
+    return is_official_domain(domain)
+
+
 def analyze_typosquatting(url: str) -> dict:
     domain = extract_domain(url)
     if not domain:
-        return {"domain": None, "score": 0, "alerts": [], "matches": []}
+        return {
+            "domain": None,
+            "score": 0,
+            "alerts": [],
+            "matches": [],
+            "fuerte": False,
+            "oficial": False,
+        }
 
-    if _is_official_domain(domain):
+    if is_official_domain(domain):
         return {
             "domain": domain,
             "score": 0,
             "alerts": [],
             "matches": [],
+            "fuerte": False,
+            "oficial": True,
         }
 
     base = domain.split(".")[0]
@@ -81,7 +101,9 @@ def analyze_typosquatting(url: str) -> dict:
         if key in seen:
             return
         seen.add(key)
-        matches.append({"brand": marca, "distance": dist, "domain": domain, "reason": reason})
+        matches.append(
+            {"brand": marca, "distance": dist, "domain": domain, "reason": reason}
+        )
         score = max(score, pts)
         alerts.append(reason)
 
@@ -89,7 +111,7 @@ def analyze_typosquatting(url: str) -> dict:
     for brand in brands:
         norm_brand = _normalize(brand)
         if norm_brand == norm_base:
-            if not _is_official_domain(domain):
+            if not is_official_domain(domain):
                 _add_match(
                     brand,
                     0,
@@ -138,9 +160,14 @@ def analyze_typosquatting(url: str) -> dict:
                     35,
                 )
 
+    fuerte = score >= 25 or any(
+        m.get("distance", 99) <= 2 or m.get("distance") == 0 for m in matches
+    )
     return {
         "domain": domain,
         "score": min(score, 55),
         "alerts": alerts,
         "matches": matches,
+        "fuerte": fuerte,
+        "oficial": False,
     }

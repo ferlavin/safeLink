@@ -11,6 +11,9 @@ import httpx
 FETCH_TIMEOUT = 10.0
 MAX_REDIRECTS = 5
 MAX_HTML_BYTES = 1_000_000
+SAFE_FETCH_TIMEOUT = 4.0
+SAFE_MAX_REDIRECTS = 4
+SAFE_HTML_BYTES = 250_000
 
 BLOCKED_HOSTNAMES = frozenset(
     {
@@ -25,6 +28,7 @@ BLOCKED_HOSTNAMES = frozenset(
         "kubernetes.default",
         "kubernetes.default.svc",
         "kubernetes.default.svc.cluster.local",
+        "internal",
     }
 )
 
@@ -54,6 +58,8 @@ def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     if ip.is_multicast or ip.is_reserved or ip.is_unspecified:
         return True
     if ip.version == 4 and ip in ipaddress.ip_network("0.0.0.0/8"):
+        return True
+    if ip.version == 4 and ip in ipaddress.ip_network("100.64.0.0/10"):
         return True
     return False
 
@@ -133,6 +139,124 @@ def is_blocked_ip_str(ip: str) -> bool:
         return _is_blocked_ip(ipaddress.ip_address(ip))
     except ValueError:
         return True
+
+
+def url_fetch_allowed(url: str) -> tuple[bool, str]:
+    """True si el host se puede pedir sin riesgo de SSRF interno."""
+    try:
+        raw = (url or "").strip()
+        if "://" in raw:
+            scheme = urlparse(raw).scheme
+            if scheme not in ("http", "https"):
+                return False, "solo_http_https"
+        assert_public_http_url(url)
+        return True, ""
+    except UnsafeUrlError:
+        return False, "host_bloqueado"
+
+
+def fetch_page_safe(
+    url: str,
+    *,
+    timeout: float = SAFE_FETCH_TIMEOUT,
+    max_redirects: int = SAFE_MAX_REDIRECTS,
+    want_html: bool = True,
+) -> dict:
+    """GET con TLS verificado, tope de redirects y bloqueo de IPs privadas.
+
+    No lanza: si falla, devuelve ok=False y el motivo. Pensado para el motor
+    unificado (timeouts cortos; el analisis sigue con el resto de senales).
+    """
+    try:
+        current = normalize_url(url)
+    except UnsafeUrlError:
+        return {
+            "ok": False,
+            "motivo": "host_bloqueado",
+            "final_url": url,
+            "html": "",
+            "headers": {},
+            "hops": [],
+        }
+    hops: list[str] = [current]
+    try:
+        with httpx.Client(
+            follow_redirects=False,
+            timeout=timeout,
+            verify=True,
+            trust_env=False,
+            max_redirects=0,
+        ) as client:
+            for _ in range(max_redirects + 1):
+                allowed, reason = url_fetch_allowed(current)
+                if not allowed:
+                    return {
+                        "ok": False,
+                        "motivo": reason,
+                        "final_url": current,
+                        "html": "",
+                        "headers": {},
+                        "hops": hops,
+                    }
+                resp = client.get(current)
+                if resp.is_redirect or resp.has_redirect_location:
+                    loc = resp.headers.get("location")
+                    if not loc:
+                        return {
+                            "ok": True,
+                            "motivo": "",
+                            "final_url": str(resp.url),
+                            "html": "",
+                            "headers": dict(resp.headers),
+                            "hops": hops,
+                            "status": resp.status_code,
+                        }
+                    nxt = urljoin(current, loc)
+                    parsed = urlparse(nxt)
+                    if parsed.scheme not in ("http", "https"):
+                        return {
+                            "ok": False,
+                            "motivo": "redirect_esquema",
+                            "final_url": current,
+                            "html": "",
+                            "headers": dict(resp.headers),
+                            "hops": hops,
+                        }
+                    hops.append(nxt)
+                    current = nxt
+                    continue
+                html = ""
+                if want_html:
+                    html = resp.content[:SAFE_HTML_BYTES].decode(
+                        resp.encoding or "utf-8", errors="replace"
+                    )
+                return {
+                    "ok": True,
+                    "motivo": "",
+                    "final_url": str(resp.url),
+                    "html": html,
+                    "headers": dict(resp.headers),
+                    "hops": hops,
+                    "status": resp.status_code,
+                }
+    except Exception as exc:
+        return {
+            "ok": False,
+            "motivo": "timeout" if "timeout" in str(exc).lower() else "error",
+            "error": str(exc)[:200],
+            "final_url": current,
+            "html": "",
+            "headers": {},
+            "hops": hops,
+        }
+    return {
+        "ok": False,
+        "motivo": "demasiados_redirects",
+        "final_url": current,
+        "html": "",
+        "headers": {},
+        "hops": hops,
+    }
 
 
 async def _request_following_redirects(

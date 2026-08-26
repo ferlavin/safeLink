@@ -299,3 +299,42 @@ def analyze_dns_osint(url: str) -> dict:
         "explicacion": json.dumps(detalle, ensure_ascii=False),
         "detalle": detalle,
     }
+
+
+def lookup_domain_age_days(domain: str, timeout_s: float = 4.0) -> dict:
+    """WHOIS de edad con timeout corto. No lanza: el motor unificado sigue igual."""
+    from concurrent.futures import ThreadPoolExecutor
+    from concurrent.futures import TimeoutError as FuturesTimeout
+
+    if not domain:
+        return {"disponible": False, "edad_dias": None, "motivo": "sin_dominio"}
+
+    def _run() -> dict:
+        w = whois.whois(domain)
+        created = w.creation_date
+        if isinstance(created, list):
+            created = created[0]
+        if not created:
+            return {"disponible": True, "edad_dias": None, "motivo": "sin_fecha"}
+        tz = getattr(created, "tzinfo", None)
+        c = created.replace(tzinfo=timezone.utc) if tz is None else created
+        age_days = (datetime.now(timezone.utc) - c).days
+        return {"disponible": True, "edad_dias": age_days, "motivo": ""}
+
+    pool = ThreadPoolExecutor(max_workers=1)
+    try:
+        return pool.submit(_run).result(timeout=timeout_s)
+    except FuturesTimeout:
+        return {"disponible": False, "edad_dias": None, "motivo": "timeout"}
+    except Exception as exc:
+        return {
+            "disponible": False,
+            "edad_dias": None,
+            "motivo": "error",
+            "error": str(exc)[:200],
+        }
+    finally:
+        try:
+            pool.shutdown(wait=False, cancel_futures=True)
+        except TypeError:
+            pool.shutdown(wait=False)
