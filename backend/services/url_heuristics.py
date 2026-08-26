@@ -1,5 +1,21 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, unquote, urlparse
+
+REDIRECT_KEYS = {
+    "url",
+    "redirect",
+    "redir",
+    "next",
+    "return",
+    "returnurl",
+    "continue",
+    "dest",
+    "destination",
+    "goto",
+    "target",
+    "u",
+    "r",
+}
 
 SUSPICIOUS_TLDS = (".xyz", ".top", ".click", ".buzz", ".tk", ".ml", ".ga", ".cf", ".gq")
 LOGIN_PATH_RE = re.compile(r"(login|signin|secure|account|verify|update)", re.I)
@@ -46,8 +62,13 @@ def analyze_url_heuristics(url: str, *, official: bool = False) -> dict:
         score += 10
         alerts.append("Pide datos sensibles en la direccion (login, verificar, etc.).")
 
+    external_redirect = _external_redirect(parsed, host_no_port)
+    if external_redirect:
+        score += 40
+        alerts.append("El enlace manda a otro sitio escondido en los parametros.")
+
     return {
-        "score": min(score, 45),
+        "score": min(score, 55),
         "alerts": alerts,
         "ip_host": ip_host,
         "at_trick": at_trick,
@@ -55,4 +76,26 @@ def analyze_url_heuristics(url: str, *, official: bool = False) -> dict:
         "login_path": login_path and not official,
         "many_dots": many_dots,
         "long_path": long_path,
+        "external_redirect": external_redirect,
     }
+
+
+def _external_redirect(parsed, page_host: str) -> bool:
+    page_host = (page_host or "").lower()
+    qs = parse_qs(parsed.query, keep_blank_values=False)
+    for key, values in qs.items():
+        if key.lower().replace("_", "") not in REDIRECT_KEYS and key.lower() not in REDIRECT_KEYS:
+            continue
+        for raw in values:
+            value = unquote(raw or "").strip()
+            if value.startswith("//"):
+                value = "https:" + value
+            if not value.lower().startswith(("http://", "https://")):
+                continue
+            other = (urlparse(value).hostname or "").lower()
+            if other.startswith("www."):
+                other = other[4:]
+            page = page_host[4:] if page_host.startswith("www.") else page_host
+            if other and other != page and not other.endswith("." + page):
+                return True
+    return False

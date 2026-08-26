@@ -16,6 +16,19 @@ TYPOS = [
     pytest.param("https://afip.com/login", id="afip_no_oficial_login"),
     pytest.param("https://mercadopaqo.com.ar/", id="mercadopago_una_letra"),
     pytest.param("https://mercadopago.xyz/login", id="mercadopago_tld_xyz_login"),
+    pytest.param(
+        "https://secure.galicia.com.ar.verify-user.xyz/login",
+        id="galicia_oficial_embebido",
+    ),
+    pytest.param("https://login.afip.gob.ar.seguridad.com/", id="afip_oficial_embebido"),
+    pytest.param(
+        "https://galicia.com.ar@phishing-login.xyz/secure",
+        id="galicia_truco_arroba",
+    ),
+    pytest.param(
+        "https://galicia.com.ar/login?url=https://evil-login.xyz/",
+        id="galicia_redirect_oculto",
+    ),
 ]
 
 

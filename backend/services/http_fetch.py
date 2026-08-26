@@ -134,6 +134,23 @@ def assert_public_http_url(url: str) -> str:
     return raw
 
 
+def assert_scan_http_url(url: str) -> str:
+    """Normaliza para analizar. No resuelve DNS: un dominio trucho igual se puntua."""
+    raw = normalize_url(url)
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("http", "https"):
+        raise UnsafeUrlError("Solo se permiten URLs http o https")
+    host = parsed.hostname
+    if not host:
+        raise UnsafeUrlError("URL invalida")
+    if _hostname_blocked(host):
+        raise UnsafeUrlError(_blocked_message())
+    literal = _ip_from_host_literal(host)
+    if literal is not None and _is_blocked_ip(literal):
+        raise UnsafeUrlError(_blocked_message())
+    return raw
+
+
 def is_blocked_ip_str(ip: str) -> bool:
     try:
         return _is_blocked_ip(ipaddress.ip_address(ip))

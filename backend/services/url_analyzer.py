@@ -119,21 +119,30 @@ def _decide_level(
     web3_drain: bool,
     policy_hit: bool,
     phishing_anchor: bool,
+    credential_trick: bool,
 ) -> str:
-    if official and not sb_listed:
+    if (
+        official
+        and not sb_listed
+        and not phishing_heur
+        and not strong_typo
+        and not credential_trick
+    ):
         return "bajo"
 
     level = "bajo"
     if strong_typo:
         level = "critico" if typo_aggravated else "alto"
+    if credential_trick:
+        level = _at_least(level, "alto")
     if sb_listed:
         level = _at_least(level, "critico" if sb_severe else "alto")
     if web3_drain:
         level = _at_least(level, "alto")
-    if new_domain and (strong_typo or phishing_heur):
+    if new_domain and (strong_typo or phishing_heur or credential_trick):
         level = _bump(level)
 
-    strong = strong_typo or sb_listed or web3_drain
+    strong = strong_typo or sb_listed or web3_drain or credential_trick
     if not strong:
         weak = "bajo"
         if entropy_hit or tld_only or nlp_hit or phishing_heur:
@@ -165,7 +174,7 @@ def _build_resumen(
     strong_typo: bool,
     sb_listed: bool,
 ) -> list[str]:
-    if official and not sb_listed:
+    if official and not sb_listed and level == "bajo":
         return [
             "Es el sitio oficial de la marca; el login u otras paginas internas no lo hacen peligroso.",
             *alerts[:4],
@@ -196,15 +205,17 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
     oauth = instant["oauth"] or {"tiene_senal": False, "alertas": []}
 
     strong_typo = bool(typos.get("fuerte"))
-    phishing_heur = bool(
+    credential_trick = bool(
         heuristics.get("at_trick")
         or heuristics.get("ip_host")
-        or heuristics.get("login_path")
+        or heuristics.get("external_redirect")
+    )
+    phishing_heur = bool(
+        credential_trick or heuristics.get("login_path")
     )
     typo_aggravated = strong_typo and (
         heuristics.get("login_path")
-        or heuristics.get("at_trick")
-        or heuristics.get("ip_host")
+        or credential_trick
         or heuristics.get("shady_tld")
     )
     tld_only = bool(heuristics.get("shady_tld")) and not strong_typo and not phishing_heur
@@ -224,9 +235,8 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
         nlp_hit=nlp_hit,
         web3_drain=False,
         policy_hit=bool(oauth.get("tiene_senal")),
-        phishing_anchor=strong_typo
-        or heuristics.get("at_trick")
-        or heuristics.get("ip_host"),
+        phishing_anchor=strong_typo or credential_trick,
+        credential_trick=credential_trick,
     )
     ambiguous = (not official) and _rank(provisional) <= _rank("medio")
 
@@ -336,15 +346,17 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
                     nlp = instant_dest["nlp"]
                     oauth = instant_dest["oauth"] or oauth
                     strong_typo = bool(typos.get("fuerte"))
-                    phishing_heur = bool(
+                    credential_trick = bool(
                         heuristics.get("at_trick")
                         or heuristics.get("ip_host")
-                        or heuristics.get("login_path")
+                        or heuristics.get("external_redirect")
+                    )
+                    phishing_heur = bool(
+                        credential_trick or heuristics.get("login_path")
                     )
                     typo_aggravated = strong_typo and (
                         heuristics.get("login_path")
-                        or heuristics.get("at_trick")
-                        or heuristics.get("ip_host")
+                        or credential_trick
                         or heuristics.get("shady_tld")
                     )
                     tld_only = bool(heuristics.get("shady_tld")) and not strong_typo and not phishing_heur
@@ -398,8 +410,7 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
     )
     phishing_anchor = bool(
         strong_typo
-        or heuristics.get("at_trick")
-        or heuristics.get("ip_host")
+        or credential_trick
         or sb_listed
     )
 
@@ -417,6 +428,7 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
         web3_drain=web3_drain,
         policy_hit=policy_hit,
         phishing_anchor=phishing_anchor,
+        credential_trick=credential_trick,
     )
 
     score = LEVEL_SCORE.get(level, 12)
@@ -489,6 +501,7 @@ def analyze_url(url: str, *, slow_signals: bool = True) -> dict:
                 "at_trick": heuristics.get("at_trick"),
                 "shady_tld": heuristics.get("shady_tld"),
                 "login_path": heuristics.get("login_path"),
+                "external_redirect": heuristics.get("external_redirect"),
             },
             "nlp": {
                 "modelo": nlp.get("modelo"),

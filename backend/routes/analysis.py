@@ -20,7 +20,7 @@ from services.url_analyzer import analyze_url
 from services.user_copy import humanize_detalle, humanize_resumen
 from services import analysis_service
 from services.dns_osint import analyze_dns_osint
-from services.http_fetch import UnsafeUrlError, assert_public_http_url
+from services.http_fetch import UnsafeUrlError, assert_scan_http_url
 from services.js_analyzer import analyze_page_javascript
 from services.pdf_scanner import analyze_pdf
 from services.rate_limit import enforce_fetch_rate_limit
@@ -48,7 +48,7 @@ def _nivel_to_estado(nivel: str) -> str:
 def _guard_url(request: Request, url: str, user: User | None) -> str:
     enforce_fetch_rate_limit(request, user)
     try:
-        return assert_public_http_url(url.strip())
+        return assert_scan_http_url(url.strip())
     except UnsafeUrlError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)

@@ -41,25 +41,95 @@ def _load_official_domains() -> list[dict]:
 
 def extract_domain(url: str) -> str | None:
     parsed = urlparse(url if "://" in url else f"https://{url}")
-    host = (parsed.netloc or parsed.path.split("/")[0]).lower()
-    if host.startswith("www."):
-        host = host[4:]
-    if ":" in host and host.count(":") == 1:
-        host = host.split(":", 1)[0]
-    return host or None
+    host = (parsed.hostname or "").lower()
+    if not host:
+        netloc = (parsed.netloc or parsed.path.split("/")[0]).lower()
+        if "@" in netloc:
+            netloc = netloc.rsplit("@", 1)[-1]
+        host = netloc.split(":")[0]
+    return _bare_host(host) or None
 
 
 def is_official_domain(domain: str | None) -> bool:
     if not domain:
         return False
-    domain = domain.lower()
-    if domain.startswith("www."):
-        domain = domain[4:]
+    host = _bare_host(domain)
     for entry in _load_official_domains():
         for official in entry.get("dominios", []):
-            if domain == official or domain.endswith(f".{official}"):
+            off = _bare_host(official)
+            if host == off or host.endswith(f".{off}"):
                 return True
     return False
+
+
+def _bare_host(host: str) -> str:
+    host = (host or "").lower().rstrip(".")
+    if host.startswith("www."):
+        host = host[4:]
+    return host
+
+
+_CONFUSABLES = str.maketrans(
+    {
+        "а": "a",
+        "е": "e",
+        "о": "o",
+        "р": "p",
+        "с": "c",
+        "х": "x",
+        "у": "y",
+        "і": "i",
+        "ԁ": "d",
+        "ɡ": "g",
+        "４": "4",
+        "１": "1",
+        "０": "0",
+    }
+)
+
+
+def _fold_host(host: str) -> str:
+    text = _bare_host(host)
+    try:
+        text = text.encode("ascii").decode("idna")
+    except (UnicodeError, UnicodeDecodeError, UnicodeEncodeError):
+        pass
+    return text.translate(_CONFUSABLES)
+
+
+def _embedded_official(domain: str) -> tuple[str, str] | None:
+    """Marca + dominio oficial si aparecen como bloque dentro de otro host."""
+    host = _bare_host(domain)
+    labels = [p for p in _fold_host(host).split(".") if p]
+    for entry in _load_official_domains():
+        marca = entry.get("marca", "")
+        for official in entry.get("dominios", []):
+            off = _bare_host(official)
+            parts = [p for p in off.split(".") if p]
+            n = len(parts)
+            if n < 2 or len(labels) < n:
+                continue
+            for i in range(0, len(labels) - n + 1):
+                if labels[i : i + n] != parts:
+                    continue
+                if host == off or host.endswith(f".{off}"):
+                    continue
+                return marca, official
+    return None
+
+
+def _folded_official(domain: str) -> tuple[str, str] | None:
+    if is_official_domain(domain):
+        return None
+    folded = _fold_host(domain)
+    if folded == _bare_host(domain):
+        return None
+    for entry in _load_official_domains():
+        for official in entry.get("dominios", []):
+            off = _bare_host(official)
+            if folded == off or folded.endswith(f".{off}"):
+                return entry.get("marca", ""), official
+    return None
 
 
 def _is_official_domain(domain: str) -> bool:
@@ -89,6 +159,8 @@ def analyze_typosquatting(url: str) -> dict:
         }
 
     base = domain.split(".")[0]
+    if "@" in base:
+        base = base.split("@")[-1]
     norm_base = _normalize(base)
     matches = []
     score = 0
@@ -106,6 +178,25 @@ def analyze_typosquatting(url: str) -> dict:
         )
         score = max(score, pts)
         alerts.append(reason)
+
+    embedded = _embedded_official(domain)
+    if embedded:
+        marca, official = embedded
+        _add_match(
+            marca,
+            0,
+            f"'{domain}' mete el sitio oficial {official} dentro de otra direccion.",
+            55,
+        )
+    folded = _folded_official(domain)
+    if folded:
+        marca, official = folded
+        _add_match(
+            marca,
+            1,
+            f"'{domain}' usa letras parecidas para imitar {official}.",
+            55,
+        )
 
     brands = _load_brands()
     for brand in brands:

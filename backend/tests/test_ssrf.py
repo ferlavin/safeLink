@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from services.http_fetch import UnsafeUrlError, assert_public_http_url, fetch_html
+from services.http_fetch import UnsafeUrlError, assert_public_http_url, assert_scan_http_url, fetch_html
 
 LOOPBACK = [
     pytest.param("http://127.0.0.1/", id="ipv4_loopback"),
@@ -30,3 +30,18 @@ def test_fetch_html_127_no_abre_httpx(monkeypatch):
     monkeypatch.setattr("services.http_fetch.httpx.AsyncClient", boom)
     with pytest.raises(UnsafeUrlError):
         asyncio.run(fetch_html("http://127.0.0.1/"))
+
+
+def test_scan_acepta_dominio_inexistente():
+    url = "https://no-existe-safelink-test.invalid/login"
+    assert assert_scan_http_url(url) == url
+
+
+def test_scan_acepta_truco_arroba():
+    url = "https://galicia.com.ar@evil.example/login"
+    assert assert_scan_http_url(url) == url
+
+
+def test_scan_sigue_bloqueando_localhost():
+    with pytest.raises(UnsafeUrlError):
+        assert_scan_http_url("http://127.0.0.1/")
