@@ -19,3 +19,6 @@ class Reporte(Base):
     motivo: Mapped[str | None] = mapped_column(Text, nullable=True)
     estado: Mapped[str | None] = mapped_column(String(20), default="Pendiente")
     fecha_reporte: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    origin_type: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    origin_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    screenshot_path: Mapped[str | None] = mapped_column(String(255), nullable=True)

@@ -118,6 +118,9 @@ export default {
     secondaryLead: 'También podés',
     secondaryPdf: 'subir un PDF',
     secondaryWeb3: 'revisar una página que pide conectar la billetera',
+    antiPhishingBanner:
+      'Configurá tu palabra clave de seguridad para detectar emails falsos de SafeLink.',
+    antiPhishingLink: 'Ir al perfil',
   },
   auth: {
     loginTitle: 'Iniciar sesión',
@@ -149,6 +152,15 @@ export default {
     guideBody: 'Volvé a ver el tutorial interactivo o consultá la ayuda paso a paso.',
     repeatTutorial: 'Repetir tutorial',
     viewHelp: 'Ver ayuda completa',
+    antiPhishingTitle: 'Palabra clave de seguridad',
+    antiPhishingLabel: 'Tu palabra secreta',
+    antiPhishingHelp:
+      'SafeLink va a incluir esta palabra en todos los correos que te enviemos. Si recibís un mensaje nuestro sin esta palabra, no lo abras.',
+    antiPhishingSave: 'Guardar palabra clave',
+    antiPhishingChange: 'Cambiar',
+    antiPhishingCancel: 'Cancelar',
+    antiPhishingSaved: 'Palabra clave actualizada correctamente',
+    antiPhishingPlaceholder: 'Ej. luna roja',
   },
   ayuda: {
     tag: 'Ayuda',

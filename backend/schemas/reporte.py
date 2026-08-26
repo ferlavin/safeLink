@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class ReporteCreate(BaseModel):
     enlace_id: int
     motivo: str = Field(..., min_length=3, max_length=1000)
+    origin_type: str | None = None
+    origin_message: str | None = None
 
 
 class ReporteUpdate(BaseModel):
@@ -37,6 +39,9 @@ class ReporteOut(BaseModel):
     estado: str | None
     fecha_reporte: datetime | None
     enlace_url: str | None = None
+    origin_type: str | None = None
+    origin_message: str | None = None
+    screenshot_path: str | None = None
     unread_count: int = 0
     ultimo_mensaje: str | None = None
 

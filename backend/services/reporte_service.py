@@ -9,6 +9,38 @@ from models.reporte import Reporte
 from models.reporte_mensaje import ReporteMensaje
 from models.user import User
 from schemas.reporte import ReporteDetailOut, ReporteMensajeOut, ReporteOut
+from services.report_screenshot import save_report_screenshot
+
+ORIGIN_TYPES = frozenset({"whatsapp", "email", "sms", "otro"})
+ORIGIN_MESSAGE_MAX = 5000
+
+
+def normalize_origin_type(value: str | None) -> str | None:
+    if value is None:
+        return None
+    cleaned = str(value).strip().lower()
+    if not cleaned:
+        return None
+    if cleaned not in ORIGIN_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Origen invalido. Usa whatsapp, email, sms u otro",
+        )
+    return cleaned
+
+
+def normalize_origin_message(value: str | None) -> str | None:
+    if value is None:
+        return None
+    text = str(value).replace("\x00", "").strip()
+    if not text:
+        return None
+    if len(text) > ORIGIN_MESSAGE_MAX:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El mensaje original no puede superar 5000 caracteres",
+        )
+    return text
 
 
 def _get_enlace_url(db: Session, enlace_id: int | None) -> str | None:
@@ -50,6 +82,9 @@ def _serialize_reporte(db: Session, row: Reporte, for_admin: bool) -> ReporteOut
         estado=row.estado,
         fecha_reporte=row.fecha_reporte,
         enlace_url=_get_enlace_url(db, row.enlace_id),
+        origin_type=row.origin_type,
+        origin_message=row.origin_message,
+        screenshot_path=row.screenshot_path,
         unread_count=_unread_count(db, row.id, for_admin=for_admin),
         ultimo_mensaje=_last_message_preview(db, row.id),
     )
@@ -89,7 +124,14 @@ def _assert_can_access(row: Reporte, user: User, is_admin: bool) -> None:
 
 
 def create_reporte(
-    db: Session, user_id: int, enlace_id: int, motivo: str
+    db: Session,
+    user_id: int,
+    enlace_id: int,
+    motivo: str,
+    *,
+    origin_type: str | None = None,
+    origin_message: str | None = None,
+    screenshot: tuple[bytes, str | None, str | None] | None = None,
 ) -> ReporteOut:
     enlace = db.query(Enlace).filter(Enlace.id == enlace_id).first()
     if not enlace:
@@ -97,27 +139,45 @@ def create_reporte(
             status_code=status.HTTP_404_NOT_FOUND, detail="Enlace no encontrado"
         )
 
+    origin = normalize_origin_type(origin_type)
+    message = normalize_origin_message(origin_message)
+
     row = Reporte(
         usuario_id=user_id,
         enlace_id=enlace_id,
         motivo=motivo,
         estado="Pendiente",
         fecha_reporte=datetime.now(timezone.utc),
+        origin_type=origin,
+        origin_message=message,
     )
     db.add(row)
     db.flush()
 
-    initial = ReporteMensaje(
-        reporte_id=row.id,
-        autor_id=user_id,
-        es_admin=False,
-        cuerpo=motivo.strip(),
-        fecha=datetime.now(timezone.utc),
-        leido=False,
-    )
-    db.add(initial)
-    db.commit()
-    db.refresh(row)
+    try:
+        if screenshot:
+            content, filename, content_type = screenshot
+            row.screenshot_path = save_report_screenshot(
+                row.id,
+                content,
+                filename=filename,
+                content_type=content_type,
+            )
+
+        initial = ReporteMensaje(
+            reporte_id=row.id,
+            autor_id=user_id,
+            es_admin=False,
+            cuerpo=motivo.strip(),
+            fecha=datetime.now(timezone.utc),
+            leido=False,
+        )
+        db.add(initial)
+        db.commit()
+        db.refresh(row)
+    except Exception:
+        db.rollback()
+        raise
     return _serialize_reporte(db, row, for_admin=False)
 
 

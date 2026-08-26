@@ -51,6 +51,9 @@ class User(Base):
     )
     modo_simple: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     idioma: Mapped[str] = mapped_column(String(5), default="es", nullable=False)
+    anti_phishing_word: Mapped[str | None] = mapped_column(
+        String(100), nullable=True
+    )
 
     @property
     def is_active_bool(self) -> bool:

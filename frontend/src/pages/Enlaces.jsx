@@ -7,6 +7,17 @@ import EstadoBadge from '../components/EstadoBadge'
 import client from '../api/client'
 import usePageView from '../hooks/usePageView'
 
+const ORIGIN_OPTIONS = [
+  { value: '', label: 'Elegí una opción' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'email', label: 'Email' },
+  { value: 'sms', label: 'SMS' },
+  { value: 'otro', label: 'Otro' },
+]
+
+const SCREENSHOT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+const SCREENSHOT_MAX = 5 * 1024 * 1024
+
 function formatDate(value) {
   if (!value) return '—'
   return new Date(value).toLocaleString('es-AR', {
@@ -27,6 +38,10 @@ export default function Enlaces() {
   const [motivo, setMotivo] = useState('')
   const [reporting, setReporting] = useState(false)
   const [reportMsg, setReportMsg] = useState('')
+  const [originType, setOriginType] = useState('')
+  const [originMessage, setOriginMessage] = useState('')
+  const [screenshot, setScreenshot] = useState(null)
+  const [screenshotPreview, setScreenshotPreview] = useState('')
 
   const loadEnlaces = async () => {
     setLoading(true)
@@ -44,6 +59,47 @@ export default function Enlaces() {
   useEffect(() => {
     loadEnlaces()
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview)
+    }
+  }, [screenshotPreview])
+
+  const resetReportForm = () => {
+    setMotivo('')
+    setOriginType('')
+    setOriginMessage('')
+    setScreenshot(null)
+    setReportMsg('')
+    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview)
+    setScreenshotPreview('')
+  }
+
+  const handleScreenshot = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview)
+      setScreenshot(null)
+      setScreenshotPreview('')
+      return
+    }
+    const typeOk = SCREENSHOT_TYPES.includes(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name)
+    if (!typeOk) {
+      setReportMsg('La captura tiene que ser JPG, PNG o WebP')
+      event.target.value = ''
+      return
+    }
+    if (file.size > SCREENSHOT_MAX) {
+      setReportMsg('La captura supera el límite de 5 MB')
+      event.target.value = ''
+      return
+    }
+    if (screenshotPreview) URL.revokeObjectURL(screenshotPreview)
+    setScreenshot(file)
+    setScreenshotPreview(URL.createObjectURL(file))
+    setReportMsg('')
+  }
 
   const toggleEscaneos = async (enlaceId) => {
     if (expandedId === enlaceId) {
@@ -70,15 +126,35 @@ export default function Enlaces() {
     setReporting(true)
     setReportMsg('')
     try {
-      await client.post('/reportes', {
-        enlace_id: reportTarget.id,
-        motivo: motivo.trim(),
-      })
+      if (screenshot) {
+        const form = new FormData()
+        form.append('enlace_id', String(reportTarget.id))
+        form.append('motivo', motivo.trim())
+        form.append('url', reportTarget.url)
+        form.append('reason', motivo.trim())
+        if (originType) form.append('origin_type', originType)
+        if (originMessage.trim()) form.append('origin_message', originMessage.trim())
+        form.append('screenshot', screenshot)
+        await client.post('/reportes', form)
+      } else {
+        const payload = {
+          enlace_id: reportTarget.id,
+          motivo: motivo.trim(),
+        }
+        if (originType) payload.origin_type = originType
+        if (originMessage.trim()) payload.origin_message = originMessage.trim()
+        await client.post('/reportes', payload)
+      }
       window.dispatchEvent(
         new CustomEvent('safelink-url-reported', { detail: { url: reportTarget.url } }),
       )
       setReportMsg('Reporte enviado. Podés seguirlo en Mensajes.')
       setMotivo('')
+      setOriginType('')
+      setOriginMessage('')
+      setScreenshot(null)
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview)
+      setScreenshotPreview('')
       setTimeout(() => {
         setReportTarget(null)
         setReportMsg('')
@@ -155,8 +231,7 @@ export default function Enlaces() {
                       type="button"
                       onClick={() => {
                         setReportTarget(enlace)
-                        setMotivo('')
-                        setReportMsg('')
+                        resetReportForm()
                       }}
                       className="app-btn-ghost inline-flex items-center gap-1 px-2.5 py-1 text-xs"
                       title="Reportar enlace"
@@ -217,6 +292,58 @@ export default function Enlaces() {
                 placeholder="Ej: Posible phishing, sitio fraudulento..."
               />
             </div>
+            <details className="rounded-lg border border-[var(--app-border)] px-3 py-2">
+              <summary className="cursor-pointer text-sm font-medium text-[var(--app-text)]">
+                ¿Querés agregar más contexto? (opcional)
+              </summary>
+              <div className="mt-3 space-y-3">
+                <div className="auth-field">
+                  <label htmlFor="origin-type">¿Cómo recibiste este link?</label>
+                  <select
+                    id="origin-type"
+                    value={originType}
+                    onChange={(e) => setOriginType(e.target.value)}
+                    className="app-input"
+                  >
+                    {ORIGIN_OPTIONS.map((option) => (
+                      <option key={option.value || 'none'} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="origin-message">Pegá el mensaje original</label>
+                  <textarea
+                    id="origin-message"
+                    rows={4}
+                    maxLength={5000}
+                    value={originMessage}
+                    onChange={(e) => setOriginMessage(e.target.value)}
+                    className="app-input resize-y"
+                    placeholder="Copiá acá el texto del mensaje donde te llegó este link"
+                  />
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="screenshot">Adjuntar captura de pantalla</label>
+                  <input
+                    id="screenshot"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    onChange={handleScreenshot}
+                    className="app-input text-xs"
+                  />
+                  <p className="mt-1 text-xs text-muted">Solo JPG, PNG o WebP. Máximo 5 MB.</p>
+                  {screenshotPreview && (
+                    <img
+                      src={screenshotPreview}
+                      alt="Vista previa de la captura"
+                      className="mt-2 max-h-40 rounded-lg border border-[var(--app-border)] object-contain"
+                    />
+                  )}
+                </div>
+              </div>
+            </details>
             {reportMsg && (
               <p
                 className={`text-xs ${
@@ -229,7 +356,7 @@ export default function Enlaces() {
               </p>
             )}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setReportTarget(null)} className="btn-outline-gradient text-sm px-4 py-2">
+              <button type="button" onClick={() => { resetReportForm(); setReportTarget(null) }} className="btn-outline-gradient text-sm px-4 py-2">
                 Cancelar
               </button>
               <button type="submit" disabled={reporting} className="btn-gradient text-sm px-4 py-2 disabled:opacity-60">

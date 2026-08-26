@@ -16,6 +16,7 @@ const initialForm = {
   birthDate: '',
   country: 'AR',
   experienceLevel: '',
+  antiPhishingWord: '',
 }
 
 function parseApiError(err) {
@@ -77,6 +78,11 @@ export default function Register() {
     }
     if (age < 13) return 'Debés tener al menos 13 años para registrarte'
 
+    const keyword = form.antiPhishingWord.trim()
+    if (keyword && keyword.length < 3) {
+      return 'La palabra clave debe tener al menos 3 caracteres'
+    }
+
     return null
   }
 
@@ -119,6 +125,7 @@ export default function Register() {
         experience_level: form.experienceLevel || null,
         accept_terms: form.acceptTerms,
         security_alerts: form.securityAlerts,
+        anti_phishing_word: form.antiPhishingWord.trim() || null,
       })
       navigate('/dashboard')
     } catch (err) {
@@ -313,6 +320,27 @@ export default function Register() {
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div className="auth-field">
+                      <label htmlFor="antiPhishingWord">
+                        Palabra clave de seguridad{' '}
+                        <span className="font-normal">(opcional)</span>
+                      </label>
+                      <input
+                        id="antiPhishingWord"
+                        type="text"
+                        maxLength={100}
+                        value={form.antiPhishingWord}
+                        onChange={(e) => update('antiPhishingWord', e.target.value)}
+                        className="app-input"
+                        placeholder="Ej. luna roja"
+                        autoComplete="off"
+                      />
+                      <p className="mt-1 text-xs text-[var(--app-text-muted)]">
+                        SafeLink la va a incluir en todos los correos oficiales. Si un mensaje
+                        nuestro no la tiene, no lo abras.
+                      </p>
                     </div>
 
                     <div className="auth-field">

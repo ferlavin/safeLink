@@ -3,6 +3,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 from models.user import ExperienceLevel, UserRole
+from services.anti_phishing import AntiPhishingWordError, sanitize_anti_phishing_word
 
 
 class UserBase(BaseModel):
@@ -21,6 +22,7 @@ class UserCreate(BaseModel):
     experience_level: ExperienceLevel | None = None
     accept_terms: bool
     security_alerts: bool = False
+    anti_phishing_word: str | None = None
     role: UserRole = UserRole.usuario
 
     @model_validator(mode="after")
@@ -40,6 +42,16 @@ class UserCreate(BaseModel):
         if self.birth_date > today:
             raise ValueError("La fecha de nacimiento no puede ser futura")
         return self
+
+    @field_validator("anti_phishing_word")
+    @classmethod
+    def clean_anti_phishing_word(cls, value: str | None) -> str | None:
+        if value is None or str(value).strip() == "":
+            return None
+        try:
+            return sanitize_anti_phishing_word(value)
+        except AntiPhishingWordError as exc:
+            raise ValueError(str(exc)) from exc
 
     @property
     def full_name(self) -> str:

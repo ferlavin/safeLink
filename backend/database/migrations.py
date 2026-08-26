@@ -1,7 +1,8 @@
 """Parches de schema para bases que ya existían antes de SQLAlchemy create_all.
 
-No agregar más ALTER TABLE ni CREATE sueltos acá. No es Alembic: es una lista
-frágil de IF NOT EXISTS. Un esquema nuevo sale de los modelos en models/.
+No es Alembic: es una lista frágil de IF NOT EXISTS. Un esquema nuevo sale de
+los modelos en models/. Solo agregar ALTER cuando una columna nueva tiene que
+aparecer en bases que ya están en producción.
 """
 
 from sqlalchemy import text
@@ -18,6 +19,10 @@ _SCHEMA_STATEMENTS = (
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS tutorial_completado BOOLEAN DEFAULT FALSE",
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS modo_simple BOOLEAN DEFAULT FALSE",
     "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS idioma VARCHAR(5) DEFAULT 'es'",
+    "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS anti_phishing_word VARCHAR(100)",
+    "ALTER TABLE reportes ADD COLUMN IF NOT EXISTS origin_type VARCHAR(20)",
+    "ALTER TABLE reportes ADD COLUMN IF NOT EXISTS origin_message TEXT",
+    "ALTER TABLE reportes ADD COLUMN IF NOT EXISTS screenshot_path VARCHAR(255)",
     """
     CREATE TABLE IF NOT EXISTS usage_events (
         id SERIAL PRIMARY KEY,

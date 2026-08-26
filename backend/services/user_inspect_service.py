@@ -192,6 +192,9 @@ def inspect_user(db: Session, user_id: int, days: int = 30) -> UserInspectRespon
             estado=row.estado,
             fecha_reporte=row.fecha_reporte,
             enlace_url=url,
+            origin_type=row.origin_type,
+            origin_message=row.origin_message,
+            screenshot_path=row.screenshot_path,
         )
         for row, url in reporte_rows
     ]

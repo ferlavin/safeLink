@@ -5,6 +5,14 @@ import { REPORTE_ESTADOS } from '../constants/labels'
 import EmptyState from './EmptyState'
 import StatusBadge from './StatusBadge'
 import { useT } from '../i18n/I18nContext.jsx'
+import { resolveAssetUrl } from '../utils/assetUrl'
+
+const ORIGIN_LABEL = {
+  whatsapp: 'WhatsApp',
+  email: 'Email',
+  sms: 'SMS',
+  otro: 'Otro',
+}
 
 function formatDate(value) {
   if (!value) return '—'
@@ -187,6 +195,36 @@ export default function ReporteInbox({ mode = 'user' }) {
               <div>
                 <h2>Reporte #{detail.id}</h2>
                 <p className="app-inbox-thread-url">{detail.enlace_url || `Enlace #${detail.enlace_id}`}</p>
+                {(detail.origin_type || detail.origin_message || detail.screenshot_path) && (
+                  <div className="mt-3 space-y-2 text-xs text-[var(--app-text-muted)]">
+                    {detail.origin_type && (
+                      <p>
+                        Recibido por{' '}
+                        <strong className="text-[var(--app-text)]">
+                          {ORIGIN_LABEL[detail.origin_type] || detail.origin_type}
+                        </strong>
+                      </p>
+                    )}
+                    {detail.origin_message && (
+                      <p className="whitespace-pre-wrap rounded-lg border border-[var(--app-border)] px-3 py-2 text-[var(--app-text)]">
+                        {detail.origin_message}
+                      </p>
+                    )}
+                    {detail.screenshot_path && (
+                      <a
+                        href={resolveAssetUrl(detail.screenshot_path)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={resolveAssetUrl(detail.screenshot_path)}
+                          alt="Captura adjunta al reporte"
+                          className="mt-1 max-h-48 rounded-lg border border-[var(--app-border)] object-contain"
+                        />
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
               {isAdmin ? (
                 <select

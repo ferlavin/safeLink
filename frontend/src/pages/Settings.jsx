@@ -40,6 +40,150 @@ function roleLabel(role) {
   return 'Usuario'
 }
 
+function parseApiError(err, fallback) {
+  const detail = err.response?.data?.detail
+  if (typeof detail === 'string') return detail
+  if (Array.isArray(detail)) {
+    return detail.map((item) => item.msg || item.message).filter(Boolean).join('. ')
+  }
+  return fallback
+}
+
+function AntiPhishingWordSection() {
+  const { t } = useT()
+  const [savedWord, setSavedWord] = useState(null)
+  const [draft, setDraft] = useState('')
+  const [editing, setEditing] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [toast, setToast] = useState('')
+
+  useEffect(() => {
+    let active = true
+    client
+      .get('/users/me/anti-phishing-word')
+      .then(({ data }) => {
+        if (!active) return
+        const word = data?.word || null
+        setSavedWord(word)
+        setDraft(word || '')
+        setEditing(!word)
+      })
+      .catch(() => {
+        if (active) setError('')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [t])
+
+  useEffect(() => {
+    if (!toast) return undefined
+    const timer = setTimeout(() => setToast(''), 3500)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  useEffect(() => {
+    if (window.location.hash !== '#anti-phishing') return
+    document.getElementById('anti-phishing')?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
+  const handleSave = async (event) => {
+    event.preventDefault()
+    setError('')
+    setSaving(true)
+    try {
+      const { data } = await client.put('/users/me/anti-phishing-word', { word: draft })
+      const { data: fresh } = await client.get('/users/me/anti-phishing-word')
+      const word = fresh?.word || draft.trim()
+      setSavedWord(word)
+      setDraft(word)
+      setEditing(false)
+      setToast(data?.message || t('settings.antiPhishingSaved'))
+    } catch (err) {
+      setError(parseApiError(err, 'No se pudo guardar la palabra clave'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setDraft(savedWord || '')
+    setEditing(!savedWord)
+    setError('')
+  }
+
+  return (
+    <section id="anti-phishing" className="app-card mt-6 rounded-2xl p-6">
+      <h2 className="text-sm font-semibold text-[var(--app-text)]">
+        {t('settings.antiPhishingTitle')}
+      </h2>
+      <p className="mt-1 mb-4 text-xs text-[var(--app-text-muted)]">
+        {t('settings.antiPhishingHelp')}
+      </p>
+
+      {toast && (
+        <div className="app-alert app-alert--success" role="status">
+          {toast}
+        </div>
+      )}
+      {error && <div className="app-alert app-alert--error">{error}</div>}
+
+      {loading ? (
+        <p className="text-xs text-[var(--app-text-muted)]">{t('common.loading')}</p>
+      ) : (
+        <form onSubmit={handleSave} className="space-y-3">
+          <label htmlFor="anti-phishing-word" className="block text-sm font-medium text-[var(--app-text)]">
+            {t('settings.antiPhishingLabel')}
+          </label>
+          <input
+            id="anti-phishing-word"
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            readOnly={!editing}
+            minLength={3}
+            maxLength={100}
+            autoComplete="off"
+            className="app-input"
+            placeholder={t('settings.antiPhishingPlaceholder')}
+          />
+          <div className="flex flex-wrap gap-2">
+            {editing ? (
+              <>
+                <button type="submit" disabled={saving} className="btn-gradient text-xs px-3 py-1.5">
+                  {saving ? t('common.sending') : t('settings.antiPhishingSave')}
+                </button>
+                {savedWord && (
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="btn-outline-gradient text-xs px-3 py-1.5"
+                  >
+                    {t('settings.antiPhishingCancel')}
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="btn-outline-gradient text-xs px-3 py-1.5"
+              >
+                {t('settings.antiPhishingChange')}
+              </button>
+            )}
+          </div>
+        </form>
+      )}
+    </section>
+  )
+}
+
 export default function Settings() {
   const { user } = useAuth()
   const { prefs, setFontScale, setLayout, setHighContrast, resetPrefs } = useTheme()
@@ -175,6 +319,8 @@ export default function Settings() {
             </div>
           </dl>
         </section>
+
+        <AntiPhishingWordSection />
 
         <section className="app-card mt-6 rounded-2xl p-6">
           <h2 className="text-sm font-semibold text-[var(--app-text)]">Avatar</h2>

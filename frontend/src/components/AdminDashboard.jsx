@@ -4,6 +4,7 @@ import { CheckCircle, WarningCircle } from '@phosphor-icons/react'
 import AppShell from './AppShell'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
+import AntiPhishingBanner from './AntiPhishingBanner'
 import { useT } from '../i18n/I18nContext.jsx'
 
 function StatCard({ label, value, children }) {
@@ -59,6 +60,8 @@ export default function AdminDashboard() {
       </div>
 
       {error && <div className="app-alert app-alert--error mt-6">{error}</div>}
+
+      <AntiPhishingBanner />
 
       <div className="app-stat-grid mt-6">
         <StatCard label={t('dashboard.systemStatus')}>

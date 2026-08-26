@@ -423,6 +423,7 @@ export default function AdminUserInspect() {
                           <td className="cell-main">
                             <span className="app-url-cell inline-block" title={row.motivo || ''}>
                               {row.motivo || t('inspect.none')}
+                              {row.origin_type ? ` · ${row.origin_type}` : ''}
                             </span>
                           </td>
                           <td>{row.estado || t('inspect.none')}</td>

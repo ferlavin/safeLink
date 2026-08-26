@@ -18,6 +18,7 @@ from models.usage_event import UsageEvent
 from models.user import User, UserRole
 from schemas.user import AdminUserCreate, UserCreate, UserUpdate
 from services import avatar_service
+from services.anti_phishing import AntiPhishingWordError, sanitize_anti_phishing_word
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
@@ -56,6 +57,7 @@ def create_user(db: Session, data: UserCreate) -> User:
         experience_level=data.experience_level.value if data.experience_level else None,
         security_alerts=data.security_alerts,
         terms_accepted_at=now if data.accept_terms else None,
+        anti_phishing_word=data.anti_phishing_word,
     )
     db.add(user)
     db.commit()
@@ -291,3 +293,15 @@ def update_preferences(db: Session, user: User, data):
         modo_simple=bool(user.modo_simple),
         idioma=user.idioma or "es",
     )
+
+
+def set_anti_phishing_word(db: Session, user: User, word: str) -> User:
+    try:
+        user.anti_phishing_word = sanitize_anti_phishing_word(word)
+    except AntiPhishingWordError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+    db.commit()
+    db.refresh(user)
+    return user

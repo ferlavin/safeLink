@@ -45,6 +45,9 @@ class InspectReporteItem(BaseModel):
     estado: str | None = None
     fecha_reporte: datetime | None = None
     enlace_url: str | None = None
+    origin_type: str | None = None
+    origin_message: str | None = None
+    screenshot_path: str | None = None
 
 
 class InspectActivityItem(BaseModel):

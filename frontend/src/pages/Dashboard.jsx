@@ -21,6 +21,7 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
 import usePageView from '../hooks/usePageView'
+import AntiPhishingBanner from '../components/AntiPhishingBanner'
 import { useT } from '../i18n/I18nContext.jsx'
 
 const ACTIVITY_DAYS = 14
@@ -145,6 +146,8 @@ function UserDashboard() {
       {prefs.modo_simple && (
         <div className="app-alert app-alert--info mb-6">{t('dashboard.simpleMode')}</div>
       )}
+
+      <AntiPhishingBanner />
 
       <section className="mb-8">
         <h2 className="sl-h2">{t('dashboard.toolsTitle')}</h2>

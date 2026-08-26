@@ -117,6 +117,9 @@ export default {
     secondaryLead: 'You can also',
     secondaryPdf: 'upload a PDF',
     secondaryWeb3: 'review a page that asks to connect a wallet',
+    antiPhishingBanner:
+      'Set your security keyword so you can spot fake SafeLink emails.',
+    antiPhishingLink: 'Go to profile',
   },
   auth: {
     loginTitle: 'Sign in',
@@ -147,6 +150,15 @@ export default {
     guideBody: 'Replay the interactive tutorial or read step-by-step help.',
     repeatTutorial: 'Replay tutorial',
     viewHelp: 'View full help',
+    antiPhishingTitle: 'Security keyword',
+    antiPhishingLabel: 'Your secret word',
+    antiPhishingHelp:
+      'SafeLink will include this word in every email we send you. If you get a message from us without this word, do not open it.',
+    antiPhishingSave: 'Save keyword',
+    antiPhishingChange: 'Change',
+    antiPhishingCancel: 'Cancel',
+    antiPhishingSaved: 'Keyword updated',
+    antiPhishingPlaceholder: 'E.g. red moon',
   },
   ayuda: {
     tag: 'Help',

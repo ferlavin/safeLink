@@ -19,8 +19,9 @@ from models import usage_event as _usage_event_models  # noqa: F401
 from models import encuesta as _encuesta_models  # noqa: F401
 from models import encuesta_pregunta as _encuesta_pregunta_models  # noqa: F401
 from models import encuesta_respuesta as _encuesta_respuesta_models  # noqa: F401
-from routes import analysis, auth, encuestas, enlaces, reportes, stats, users
+from routes import account, analysis, auth, encuestas, enlaces, reportes, stats, users
 from services.avatar_service import AVATAR_DIR, ensure_avatar_dir
+from services.report_screenshot import REPORTS_DIR, ensure_reports_dir
 
 
 @asynccontextmanager
@@ -28,6 +29,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     ensure_schema()
     ensure_avatar_dir()
+    ensure_reports_dir()
     yield
 
 
@@ -42,6 +44,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(account.router)
 app.include_router(users.router)
 app.include_router(enlaces.router)
 app.include_router(reportes.router)
@@ -51,7 +54,9 @@ app.include_router(stats.router)
 app.include_router(stats.admin_router)
 
 ensure_avatar_dir()
+ensure_reports_dir()
 app.mount("/uploads/avatars", StaticFiles(directory=AVATAR_DIR), name="avatars")
+app.mount("/uploads/reports", StaticFiles(directory=REPORTS_DIR), name="report-screenshots")
 
 
 @app.get("/")
