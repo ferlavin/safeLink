@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +20,7 @@ from models import encuesta as _encuesta_models  # noqa: F401
 from models import encuesta_pregunta as _encuesta_pregunta_models  # noqa: F401
 from models import encuesta_respuesta as _encuesta_respuesta_models  # noqa: F401
 from routes import analysis, auth, encuestas, enlaces, reportes, stats, users
-from services.avatar_service import ensure_avatar_dir
+from services.avatar_service import AVATAR_DIR, ensure_avatar_dir
 
 
 @asynccontextmanager
@@ -37,11 +36,6 @@ app = FastAPI(title="SafeLink API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_origin_regex=(
-        r"http://(localhost|127\.0\.0\.1):\d+|"
-        r"https://([a-z0-9-]+\.)*vercel\.app|"
-        r"chrome-extension://.*"
-    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,9 +50,8 @@ app.include_router(analysis.router)
 app.include_router(stats.router)
 app.include_router(stats.admin_router)
 
-uploads_dir = Path(__file__).resolve().parent / "uploads"
-uploads_dir.mkdir(exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+ensure_avatar_dir()
+app.mount("/uploads/avatars", StaticFiles(directory=AVATAR_DIR), name="avatars")
 
 
 @app.get("/")

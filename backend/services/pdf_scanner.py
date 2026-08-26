@@ -4,6 +4,7 @@ from io import BytesIO
 
 from pypdf import PdfReader
 
+from services.http_fetch import UnsafeUrlError, assert_public_http_url
 from services.url_analyzer import analyze_url, score_to_level
 
 URL_RE = re.compile(
@@ -36,6 +37,10 @@ def analyze_pdf(content: bytes, filename: str) -> dict:
     max_score = 0
 
     for url in urls[:30]:
+        try:
+            assert_public_http_url(url)
+        except UnsafeUrlError:
+            continue
         r = analyze_url(url)
         max_score = max(max_score, r["puntuacion_riesgo"])
         link_results.append(

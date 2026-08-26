@@ -31,7 +31,7 @@ EVENT_LABELS: dict[str, str] = {
     "analyze_forms": "Formularios",
     "analyze_page": "Detección JS",
     "analyze_check": "Check extensión",
-    "threat_map_view": "Mapa de amenazas",
+    "threat_map_view": "Reportes de la comunidad",
     "enlaces_view": "Mis enlaces",
     "extension_page_view": "Página extensión",
     "dashboard_view": "Dashboard",

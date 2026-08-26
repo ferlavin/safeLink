@@ -20,8 +20,10 @@ from services.url_analyzer import analyze_url
 from services.user_copy import humanize_detalle, humanize_resumen
 from services import analysis_service
 from services.dns_osint import analyze_dns_osint
+from services.http_fetch import UnsafeUrlError, assert_public_http_url
 from services.js_analyzer import analyze_page_javascript
 from services.pdf_scanner import analyze_pdf
+from services.rate_limit import enforce_fetch_rate_limit
 from services.threat_map import build_threat_map
 from services.typosquatting_realtime import analyze_typosquatting_realtime
 from services.web3_drainer import analyze_web3_drainer
@@ -43,6 +45,16 @@ def _nivel_to_estado(nivel: str) -> str:
     return "peligro"
 
 
+def _guard_url(request: Request, url: str, user: User | None) -> str:
+    enforce_fetch_rate_limit(request, user)
+    try:
+        return assert_public_http_url(url.strip())
+    except UnsafeUrlError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+
+
 @router.post(
     "/url",
     response_model=UrlAnalysisResult,
@@ -55,8 +67,9 @@ def analyze_url_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     return analysis_service.run_and_persist(
-        db, current_user, data.url.strip(), request
+        db, current_user, url, request
     )
 
 @router.post(
@@ -71,13 +84,20 @@ def check_url_extension(
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
-    result = analyze_url(data.url.strip())
+    url = _guard_url(request, data.url, current_user)
+    result = analyze_url(url)
     if current_user:
         analysis_service.persist_result(
             db, current_user, result, request, usage_event="analyze_check"
         )
     detalle = humanize_detalle(result.get("detalle") or {}) or {}
-    resumen = humanize_resumen(detalle.get("resumen", []))[:5]
+    resumen = [
+        line
+        for line in humanize_resumen(detalle.get("resumen", []))[:5]
+        if "Error consultando" not in line
+    ]
+    if not resumen:
+        resumen = ["No encontramos senales claras de peligro."]
     return UrlCheckResponse(
         url=result["url"],
         puntuacion_riesgo=result["puntuacion_riesgo"],
@@ -101,6 +121,7 @@ async def analyze_pdf_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    enforce_fetch_rate_limit(request, current_user)
     if file.content_type not in ("application/pdf", "application/octet-stream"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -139,8 +160,9 @@ async def analyze_page_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = await analyze_page_javascript(data.url.strip())
+        result = await analyze_page_javascript(url)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -160,8 +182,9 @@ def analyze_typosquatting_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = analyze_typosquatting_realtime(data.url.strip())
+        result = analyze_typosquatting_realtime(url)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -181,8 +204,9 @@ async def analyze_web3_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = await analyze_web3_drainer(data.url.strip())
+        result = await analyze_web3_drainer(url)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -202,8 +226,9 @@ def analyze_dns_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = analyze_dns_osint(data.url.strip())
+        result = analyze_dns_osint(url)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -214,8 +239,8 @@ def analyze_dns_endpoint(
 @router.post(
     "/nlp",
     response_model=UrlAnalysisResult,
-    summary="Clasificador NLP de URLs",
-    description="Transformer char-level entrenado solo con URLs; aprende patrones de phishing sin consultar APIs.",
+    summary="Clasificador de lenguaje en la URL",
+    description="Revisa patrones de lenguaje en la propia URL (lexico). No afirma un modelo de IA si no está cargado.",
 )
 def analyze_nlp_endpoint(
     data: UrlAnalysisRequest,
@@ -223,7 +248,8 @@ def analyze_nlp_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = classify_url_transformer(data.url.strip())
+    url = _guard_url(request, data.url, current_user)
+    result = classify_url_transformer(url)
     return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_nlp")
 
 
@@ -239,8 +265,9 @@ async def analyze_headers_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = await analyze_security_headers(data.url.strip())
+        result = await analyze_security_headers(url)
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -260,7 +287,8 @@ async def analyze_oauth_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await analyze_oauth_phishing(data.url.strip())
+    url = _guard_url(request, data.url, current_user)
+    result = await analyze_oauth_phishing(url)
     return analysis_service.persist_result(db, current_user, result, request, usage_event="analyze_oauth")
 
 
@@ -276,8 +304,9 @@ async def analyze_forms_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    url = _guard_url(request, data.url, current_user)
     try:
-        result = await analyze_double_submit(data.url.strip())
+        result = await analyze_double_submit(url)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -288,10 +317,10 @@ async def analyze_forms_endpoint(
 @router.get(
     "/threat-map",
     response_model=ThreatMapResponse,
-    summary="Mapa de alertas de la comunidad",
+    summary="Actividad reciente de reportes",
     description=(
-        "Agrega detecciones reales (riesgo medio o superior) de las ultimas horas. "
-        "Las coordenadas son aproximaciones por IP del analista, no la ubicacion del sitio."
+        "Lista dominios de reportes de la comunidad y de analisis alto/critico. "
+        "No geolocaliza la IP de quien escaneo ni etiquetamos el resultado como en vivo."
     ),
 )
 def threat_map(

@@ -1,17 +1,17 @@
-# SafeLink - Documentacion del MVP
+# SafeLink - Documentación del MVP
 
-Plataforma de inteligencia de amenazas digitales. Este documento cubre el setup
-local y el despliegue del MVP (autenticacion JWT, CRUD de usuarios con roles,
-dashboard diferenciado por rol).
+Semáforo de enlaces (extensión + análisis de URL). Este documento cubre el
+setup local y el despliegue. No hay planes Enterprise ni CRUD como producto.
 
 ## Estructura del proyecto
 
 ```
 safelink/
-├── frontend/        # React + Vite + Tailwind + React Router + Axios
-├── backend/         # FastAPI + SQLAlchemy + JWT
-├── docs/            # Documentacion
-└── docker-compose.yml   # PostgreSQL para desarrollo
+├── frontend/        # React + Vite
+├── backend/         # FastAPI + tests
+├── extension/       # Chrome MV3
+├── docs/            # Documentación
+└── docker-compose.yml   # PostgreSQL para desarrollo local
 ```
 
 ## Requisitos
@@ -22,15 +22,16 @@ safelink/
 
 ## 1. Base de datos (PostgreSQL)
 
-Opcion A - Docker (recomendado para desarrollo):
+Opción A - Docker (recomendado para desarrollo):
 
 ```bash
 docker compose up -d
 ```
 
 Esto levanta PostgreSQL en `localhost:5432` con usuario/clave/base `safelink`.
+**Solo local.** No uses esas credenciales en producción.
 
-Opcion B - PostgreSQL propio: crea una base y ajusta `DATABASE_URL` en el `.env`
+Opción B - PostgreSQL propio: crea una base y ajusta `DATABASE_URL` en el `.env`
 del backend.
 
 ## 2. Backend (FastAPI)
@@ -50,22 +51,29 @@ uvicorn main:app --reload
 ```
 
 - API: http://localhost:8000
-- Documentacion interactiva (Swagger): http://localhost:8000/docs
+- Documentación interactiva (Swagger): http://localhost:8000/docs
 - Al arrancar se crean las tablas y un usuario admin inicial
   (`ADMIN_EMAIL` / `ADMIN_PASSWORD`, por defecto `admin@safelink.app` / `admin1234`).
+  Esos defaults no se permiten si `ENV` no es development.
+
+### Tests
+
+```bash
+cd backend
+python -m pytest
+python -m scripts.calibrate
+```
 
 ### Endpoints principales
 
-| Metodo | Ruta             | Descripcion                         | Acceso |
-| ------ | ---------------- | ----------------------------------- | ------ |
-| POST   | /auth/register   | Registro publico (rol usuario)      | Libre  |
-| POST   | /auth/login      | Login, devuelve JWT                  | Libre  |
-| GET    | /auth/me         | Datos del usuario autenticado       | Token  |
-| GET    | /users           | Listar usuarios                     | Admin  |
-| POST   | /users           | Crear usuario                       | Admin  |
-| GET    | /users/{id}      | Obtener usuario                     | Admin  |
-| PUT    | /users/{id}      | Editar usuario                      | Admin  |
-| DELETE | /users/{id}      | Eliminar usuario                    | Admin  |
+| Método | Ruta                | Descripción                         | Acceso |
+| ------ | ------------------- | ----------------------------------- | ------ |
+| POST   | /auth/register      | Registro                            | Libre  |
+| POST   | /auth/login         | Login, JWT                          | Libre  |
+| GET    | /auth/me            | Usuario autenticado                 | Token  |
+| POST   | /analysis/url       | Análisis de enlace (semáforo)       | Token  |
+| POST   | /analysis/check     | Check liviano (extensión)           | Opcional |
+| GET    | /users              | Listar usuarios                     | Admin  |
 
 ## 3. Frontend (React + Vite)
 
@@ -77,7 +85,8 @@ npm run dev
 ```
 
 - App: http://localhost:5173
-- `VITE_API_URL` debe apuntar al backend (por defecto http://localhost:8000).
+- En desarrollo Vite proxy `/api` → backend. `VITE_API_URL` vacío está bien en local.
+
 
 ## 4. Despliegue
 
@@ -107,7 +116,8 @@ npm run dev
 
 | Variable                     | Descripcion                          |
 | ---------------------------- | ------------------------------------ |
-| DATABASE_URL                 | Cadena de conexion a PostgreSQL      |
+| DATABASE_URL                 | PostgreSQL. Local: user/pass safelink (no prod) |
+| CHROME_EXTENSION_ID          | ID(s) de la extensión para CORS                 |
 | JWT_SECRET                   | Clave secreta para firmar los JWT    |
 | JWT_ALGORITHM                | Algoritmo JWT (HS256)                |
 | ACCESS_TOKEN_EXPIRE_MINUTES  | Minutos de validez del token         |

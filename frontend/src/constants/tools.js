@@ -54,24 +54,24 @@ export const TOOLS = {
     anchor: 'timeline',
   },
   map: {
-    name: 'Mapa de alertas',
+    name: 'Reportes de la comunidad',
     tag: 'Comunidad',
     href: '/threat-map',
     category: 'Informacion de amenazas',
     shortDesc:
-      'Mapa con detecciones reales de la comunidad. Las ubicaciones son aproximadas.',
+      'Dominios reportados o con riesgo alto en las últimas horas. No es un radar mundial.',
     longDesc:
-      'Reúne los análisis de riesgo medio, alto o crítico de las últimas 24 horas. Cada punto es una zona aproximada (geolocalización por IP), no la dirección exacta del sitio.',
+      'Lista dominios de reportes de la comunidad y de análisis alto o crítico. No ubica amenazas en un mapa a partir de la IP de quien escaneó, ni muestra la URL completa.',
   },
   nlp: {
-    name: 'Clasificador NLP',
+    name: 'Patrones de lenguaje',
     tag: 'Lenguaje',
     href: '/analyze/security',
     category: 'Herramientas avanzadas',
     shortDesc:
-      'Transformer entrenado a nivel de caracteres que aprende a reconocer URLs de phishing.',
+      'Revisa patrones de lenguaje en la URL (palabras de urgencia, login, banco).',
     longDesc:
-      'Modelo de IA (transformer char-level) entrenado solo con URLs. Aprende patrones como "banco-nacion-seguro-login.xy2" sin consultar ninguna API. Devuelve probabilidad de phishing, categoria y confianza.',
+      'Mira la propia dirección en busca de términos típicos de estafa. No es un modelo de IA que se venda por separado: si no hay un clasificador extra cargado, usa el mismo lexico.',
     anchor: 'nlp',
   },
   headers: {

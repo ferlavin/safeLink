@@ -8,6 +8,7 @@ import dns.resolver
 import httpx
 import whois
 
+from services.http_fetch import is_blocked_ip_str
 from services.typosquatting import extract_domain
 from services.url_analyzer import score_to_level
 
@@ -19,14 +20,16 @@ def _load_asn_expected() -> dict:
 
 
 def _resolve_a(domain: str) -> list[str]:
+    ips: list[str] = []
     try:
         answers = dns.resolver.resolve(domain, "A")
-        return [str(r) for r in answers]
+        ips = [str(r) for r in answers]
     except Exception:
         try:
-            return list({item[4][0] for item in socket.getaddrinfo(domain, 443)})
+            ips = list({item[4][0] for item in socket.getaddrinfo(domain, 443)})
         except Exception:
             return []
+    return [ip for ip in ips if not is_blocked_ip_str(ip)]
 
 
 def _asn_lookup(ip: str) -> dict:
@@ -51,6 +54,8 @@ def _asn_lookup(ip: str) -> dict:
 
 
 def _ssl_info(domain: str) -> dict:
+    if not _resolve_a(domain):
+        return {"issuer": None, "valido_desde": None, "valido_hasta": None}
     try:
         ctx = ssl.create_default_context()
         with socket.create_connection((domain, 443), timeout=8) as sock:

@@ -104,7 +104,7 @@ def analyze_typosquatting(url: str) -> dict:
                 brand,
                 dist,
                 f"'{domain}' se parece a '{brand}' (distancia {dist}); posible sitio falso.",
-                40 if dist == 1 else 30 if dist == 2 else 25,
+                51 if dist == 1 else 30 if dist == 2 else 25,
             )
         elif len(norm_brand) >= 5 and norm_brand in norm_base and norm_brand != norm_base:
             _add_match(
@@ -128,7 +128,7 @@ def analyze_typosquatting(url: str) -> dict:
                     marca,
                     dist,
                     f"'{domain}' imita a {marca}; el sitio oficial es {official}.",
-                    40 if dist <= 1 else 30,
+                    51 if dist <= 1 else 30,
                 )
             elif len(norm_official) >= 6 and norm_official in norm_base:
                 _add_match(
@@ -140,7 +140,7 @@ def analyze_typosquatting(url: str) -> dict:
 
     return {
         "domain": domain,
-        "score": min(score, 50),
+        "score": min(score, 55),
         "alerts": alerts,
         "matches": matches,
     }

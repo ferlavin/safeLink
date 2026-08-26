@@ -1,8 +1,7 @@
 import json
 import re
 
-import httpx
-
+from services.http_fetch import fetch_html, normalize_url
 from services.url_analyzer import score_to_level
 
 DRAINER_PATTERNS = [
@@ -18,15 +17,12 @@ DRAINER_PATTERNS = [
 
 
 async def analyze_web3_drainer(url: str) -> dict:
-    raw = url.strip()
-    if not raw.startswith(("http://", "https://")):
-        raw = f"https://{raw}"
-
-    async with httpx.AsyncClient(
-        follow_redirects=True, timeout=15.0, verify=False
-    ) as client:
-        resp = await client.get(raw)
-        html = resp.text.lower()
+    raw = normalize_url(url)
+    try:
+        raw, html, _ = await fetch_html(raw)
+    except Exception as exc:
+        raise ValueError(f"No se pudo obtener la pagina: {exc}") from exc
+    html = html.lower()
 
     score = 0
     alerts = []

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import AppShell from '../components/AppShell'
 import ThemeToggle from '../components/ThemeToggle'
 import AvatarPhotoControls from '../components/AvatarPhotoControls'
@@ -285,6 +286,14 @@ export default function Settings() {
               />
               <span className="text-sm text-[var(--app-text)]">{t('settings.simpleModeEnable')}</span>
             </label>
+          </div>
+
+          <div className="border-t border-[var(--app-border)] pt-5">
+            <h2 className="text-sm font-semibold text-[var(--app-text)]">{t('settings.surveysTitle')}</h2>
+            <p className="mt-1 mb-3 text-xs text-[var(--app-text-muted)]">{t('settings.surveysBody')}</p>
+            <Link to="/encuestas" className="btn-outline-gradient text-xs px-3 py-1.5">
+              {t('settings.surveysLink')}
+            </Link>
           </div>
 
           <div className="border-t border-[var(--app-border)] pt-5">

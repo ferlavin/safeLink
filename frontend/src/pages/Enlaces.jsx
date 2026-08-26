@@ -74,6 +74,9 @@ export default function Enlaces() {
         enlace_id: reportTarget.id,
         motivo: motivo.trim(),
       })
+      window.dispatchEvent(
+        new CustomEvent('safelink-url-reported', { detail: { url: reportTarget.url } }),
+      )
       setReportMsg('Reporte enviado. Podés seguirlo en Mensajes.')
       setMotivo('')
       setTimeout(() => {

@@ -54,15 +54,15 @@ export default function Login() {
                 <span className="text-gradient">SafeLink</span>
               </h1>
               <p>
-                Ingresá a tu panel de inteligencia de amenazas, revisá enlaces
-                analizados y gestioná alertas de seguridad en un solo lugar.
+                Ingresá para analizar enlaces, ver tu historial y usar el semáforo
+                en el portal.
               </p>
               <div className="auth-benefits">
                 <div className="auth-benefit">
                   <div className="auth-benefit-icon">
                     <ShieldCheck size={16} weight="fill" />
                   </div>
-                  Protección activa en cada sesión
+                  Semáforo de enlaces en el portal
                 </div>
                 <div className="auth-benefit">
                   <div className="auth-benefit-icon">
@@ -74,7 +74,7 @@ export default function Login() {
                   <div className="auth-benefit-icon">
                     <CheckCircle size={16} weight="fill" />
                   </div>
-                  Dashboard, mapa de amenazas y herramientas Pro
+                  Historial de enlaces y reportes
                 </div>
               </div>
             </div>

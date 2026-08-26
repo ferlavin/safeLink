@@ -218,6 +218,10 @@ async def analyze_security_headers(url: str) -> dict:
             )
 
     score = min(100, score)
+    if not es_sensible:
+        # Headers flojos en un sitio generico no son un semaforo en rojo.
+        # Como mucho precaucion (medio). El peligro queda para phishing / contexto sensible.
+        score = min(score, 45)
     ok_count = sum(1 for r in resultados if r["estado"] == "ok")
     grade = "A" if score <= 10 else "B" if score <= 25 else "C" if score <= 45 else "D" if score <= 65 else "F"
 

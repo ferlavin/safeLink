@@ -7,6 +7,12 @@ from database.session import Base
 
 
 class SearchEvent(Base):
+    """Tabla legacy. Ya no se escribe en análisis nuevos.
+
+    Existía para geolocalizar la IP de quien escaneó en un mapa público.
+    El mapa de la comunidad no usa estas IPs. Se conserva el modelo para
+    anonimizar filas viejas al borrar una cuenta. No agregar writes nuevos.
+    """
     __tablename__ = "search_events"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

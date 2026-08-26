@@ -8,7 +8,7 @@ import { SCORE_CLASS } from '../constants/labels'
 import { TOOLS } from '../constants/tools'
 
 const TABS = [
-  { id: 'nlp', label: 'NLP', endpoint: '/analysis/nlp', tool: TOOLS.nlp },
+  { id: 'nlp', label: 'Lenguaje', endpoint: '/analysis/nlp', tool: TOOLS.nlp },
   { id: 'headers', label: 'Headers', endpoint: '/analysis/headers', tool: TOOLS.headers },
   { id: 'oauth', label: 'OAuth', endpoint: '/analysis/oauth', tool: TOOLS.oauth },
   { id: 'forms', label: 'Formularios', endpoint: '/analysis/forms', tool: TOOLS.forms },
@@ -24,12 +24,11 @@ function ResultExtra({ tab, detalle }) {
           Clasificación: <strong className="text-main">{detalle.categoria_label}</strong>
           {detalle.confianza_pct != null && ` · ${detalle.confianza_pct}% confianza`}
         </p>
-        {detalle.probabilidad_phishing != null && (
-          <p className="text-xs text-muted">
-            Probabilidad de phishing (modelo): {Math.round(detalle.probabilidad_phishing * 100)}%
-            {detalle.modelo && ` · ${detalle.modelo}`}
-          </p>
-        )}
+        <p className="text-xs text-muted">
+          Patrones de lenguaje en la URL
+          {detalle.probabilidad_phishing != null &&
+            ` · ${Math.round(detalle.probabilidad_phishing * 100)}% coincidencia con patrones de phishing`}
+        </p>
       </div>
     )
   }

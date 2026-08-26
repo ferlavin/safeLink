@@ -128,8 +128,9 @@ _OWNED_BY_USER = (
     (HistorialLogin, HistorialLogin.usuario_id),
 )
 
-# Datos que siguen valiendo sin la cuenta (inteligencia de amenazas compartida y
-# metricas del panel admin): se conservan pero quedan sin autor.
+# Datos que siguen valiendo sin la cuenta (reportes, métricas admin, filas
+# legacy de search_events). Se conservan pero quedan sin autor.
+# SearchEvent ya no se escribe; no usar su IP para un mapa público.
 _ANONYMISED_ON_DELETE = (
     (Enlace, Enlace.usuario_id),
     (Escaneo, Escaneo.usuario_id),

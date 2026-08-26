@@ -1,4 +1,16 @@
-import ipaddress
+"""Persistencia de un análisis autenticado.
+
+Un scan escribe tres historias, cada una con un dueño:
+
+- ``AnalisisUrl`` — detalle del veredicto (puntaje, nivel, explicación).
+- ``Enlace`` + ``Escaneo`` — “Mis enlaces”: un link por usuario y su historial.
+- ``UsageEvent`` — conteos del panel admin (qué herramienta se usó).
+
+Ya no se escribe ``SearchEvent``. Esa tabla nació para geolocalizar la IP de
+quien escaneó en un mapa público; el mapa no usa esas IPs. Las filas viejas
+siguen existiendo para poder anonimizarlas al borrar una cuenta.
+"""
+
 import json
 from datetime import datetime, timezone
 
@@ -6,7 +18,6 @@ from fastapi import Request
 from sqlalchemy.orm import Session
 
 from models.analysis import AnalisisUrl
-from models.search_event import SearchEvent
 from models.user import User
 from schemas.analysis import UrlAnalysisHistoryItem
 from services.url_analyzer import analyze_url
@@ -30,54 +41,6 @@ def save_analysis(db: Session, user: User, result: dict) -> AnalisisUrl:
     return row
 
 
-def _client_ip(request: Request | None) -> str | None:
-    """IP pública del analista. Usa X-Forwarded-For detrás de un proxy."""
-    if not request:
-        return None
-    candidates: list[str] = []
-    forwarded = request.headers.get("x-forwarded-for") or ""
-    candidates.extend(part.strip() for part in forwarded.split(",") if part.strip())
-    if request.client and request.client.host:
-        candidates.append(request.client.host)
-
-    public = None
-    for raw in candidates:
-        try:
-            addr = ipaddress.ip_address(raw)
-        except ValueError:
-            continue
-        if addr.is_global:
-            public = str(addr)
-            break
-    return public or (candidates[0] if candidates else None)
-
-
-def log_search_event(
-    db: Session,
-    user: User,
-    url: str,
-    level: str,
-    request: Request | None = None,
-) -> None:
-    ip = None
-    user_agent = None
-    if request:
-        ip = _client_ip(request)
-        user_agent = request.headers.get("user-agent")
-
-    event = SearchEvent(
-        user_id=user.id,
-        email=user.email,
-        url=url,
-        level=level,
-        created_at=datetime.now(timezone.utc),
-        ip=ip,
-        user_agent=user_agent,
-    )
-    db.add(event)
-    db.commit()
-
-
 def _format_response(row: AnalisisUrl, detalle: dict | None) -> dict:
     return {
         "id": row.id,
@@ -95,9 +58,10 @@ def persist_result(
     user: User,
     result: dict,
     request: Request | None = None,
-    log_search: bool = True,
     usage_event: str = "analyze_url",
 ) -> dict:
+    """Guarda detalle, mis enlaces y un evento de uso. No registra IP."""
+    del request  # se acepta por compatibilidad con las rutas; no se persiste
     row = save_analysis(db, user, result)
     enlace_service.persist_scan(
         db,
@@ -106,8 +70,6 @@ def persist_result(
         result["nivel_riesgo"],
         result["puntuacion_riesgo"],
     )
-    if log_search:
-        log_search_event(db, user, result["url"], result["nivel_riesgo"], request)
     from services import usage_service
 
     usage_service.log_event(db, usage_event, user.id)

@@ -80,7 +80,7 @@ def classify_url_transformer(url: str) -> dict:
         from services.nlp_url_classifier import classify_url_nlp
 
         result = classify_url_nlp(url)
-        result["detalle"]["modelo"] = "lexico (fallback, transformer no disponible)"
+        result["detalle"]["modelo"] = "patrones de lenguaje en la URL"
         result["explicacion"] = json.dumps(result["detalle"], ensure_ascii=False)
         return result
 
@@ -98,9 +98,9 @@ def classify_url_transformer(url: str) -> dict:
     confianza = int(round(abs(prob - 0.5) * 2 * 100))
 
     resumen = [
-        f"El modelo estima {score}% de probabilidad de phishing.",
+        f"Patrones de caracteres: {score}% de coincidencia con URLs de phishing.",
         f"Clasificacion: {categoria_label} (confianza {confianza}%).",
-        "Veredicto aprendido a nivel de caracteres, sin consultar listas ni APIs.",
+        "Revision a nivel de caracteres, sin consultar listas ni APIs.",
     ]
     if categoria == "phishing_probable":
         resumen.insert(
@@ -110,7 +110,7 @@ def classify_url_transformer(url: str) -> dict:
 
     detalle = {
         "tipo": "nlp_url_transformer",
-        "modelo": "transformer char-level (PyTorch)",
+        "modelo": "patrones de caracteres en la URL",
         "url": url,
         "probabilidad_phishing": round(prob, 4),
         "categoria": categoria,

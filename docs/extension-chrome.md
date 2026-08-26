@@ -1,50 +1,40 @@
-# Extension SafeLink para Google Chrome
+# Extensión SafeLink para Google Chrome
 
-## Que hace
+## Qué hace
 
-- **Barra de herramientas**: punto de color (verde / amarillo / rojo) segun si el sitio abierto parece seguro.
-- **Google Search**: el mismo punto aparece **al lado** de cada resultado. El popup en Google solo explica los colores; no revisa la URL de la busqueda.
-- **Popup**: resumen en lenguaje claro, inicio de sesion e historial (Seguros / A revisar / Peligrosos).
+- **Pestaña actual:** semáforo en el icono (Seguro / Precaución / Peligroso).
+- **Google (.com y .ar):** punto de color junto a cada resultado. No bloquea el clic.
+- **Popup:** el mismo lenguaje que la web, resumen corto, “Ver en SafeLink” si hay sesión.
+- Si Render está dormido, el popup dice que está calentando y reintenta.
+
+No está publicada en Chrome Web Store salvo que configures `VITE_CHROME_WEB_STORE_URL`.
 
 ## Requisitos
 
-1. Backend SafeLink activo (`uvicorn main:app --reload` en `backend/`).
+1. API SafeLink activa (`uvicorn main:app --reload` en `backend/`, o la de Render).
 2. Google Chrome.
 
-## Instalacion
-
-### Produccion (recomendado)
-
-Publica la extension en **Chrome Web Store** y configura en el frontend:
-
-```env
-VITE_CHROME_WEB_STORE_URL=https://chrome.google.com/webstore/detail/TU_ID
-```
-
-Los usuarios instalan con **Agregar a Chrome** sin descargar ZIP.
-
-### Desarrollo
+## Instalación (modo desarrollador)
 
 1. `chrome://extensions/` → Modo de desarrollador
 2. **Cargar descomprimida** → carpeta `extension/` del repo
-3. Recarga la extension tras cada cambio en el codigo
+3. Recargá la extensión tras cada cambio
 
-Paquete ZIP opcional (generar con el script abajo):
+En la app, `/extension` tiene la misma guía.
 
-```powershell
-.\scripts\package-extension.ps1
-```
+## Configuración
 
-## Configuracion
+- API por defecto: la de producción en `extension/config.js` (cambiable en el popup).
+- `POST /analysis/check` — con Bearer token guarda en historial (`analisis_urls` + Mis enlaces).
+- CORS: el backend **no** acepta `chrome-extension://*`. Poné el ID (lo muestra el popup) en `CHROME_EXTENSION_ID`.
 
-- API por defecto: `http://localhost:8000` (cambiable en el popup)
-- `POST /analysis/check` — con Bearer token guarda en `analisis_urls`
+## Permiso `<all_urls>`
 
-## CORS
+Hace falta para el semáforo en cualquier pestaña. No se piden permisos de bloqueo de navegación.
 
-El backend acepta origenes `chrome-extension://`.
+## Archivos
 
-## Archivos de contenido
-
-- `extension/content/inject.js` — analisis de enlaces en Google
-- `extension/content/site-bridge.js` — la web detecta si la extension esta instalada
+- `extension/background.js` — check, cache 5 min, cold start
+- `extension/popup.js` — UI del semáforo
+- `extension/content/inject.js` — puntos en Google
+- `extension/content/site-bridge.js` — la web detecta la extensión e invalida cache al reportar

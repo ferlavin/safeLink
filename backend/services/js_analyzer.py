@@ -2,8 +2,7 @@ import json
 import re
 from collections import Counter
 
-import httpx
-
+from services.http_fetch import fetch_html, normalize_url
 from services.url_entropy import shannon_entropy
 from services.url_analyzer import score_to_level
 
@@ -44,12 +43,7 @@ def _analyze_js_block(code: str) -> dict:
 
 
 async def fetch_page_scripts(url: str) -> tuple[str, list[dict]]:
-    async with httpx.AsyncClient(
-        follow_redirects=True, timeout=15.0, verify=False
-    ) as client:
-        resp = await client.get(url)
-        resp.raise_for_status()
-        html = resp.text
+    _, html, _ = await fetch_html(url)
 
     scripts = []
     for match in re.finditer(r"<script[^>]*>(.*?)</script>", html, re.I | re.S):
@@ -66,9 +60,7 @@ async def fetch_page_scripts(url: str) -> tuple[str, list[dict]]:
 
 
 async def analyze_page_javascript(url: str) -> dict:
-    raw_url = url.strip()
-    if not raw_url.startswith(("http://", "https://")):
-        raw_url = f"https://{raw_url}"
+    raw_url = normalize_url(url)
 
     try:
         html, script_meta = await fetch_page_scripts(raw_url)

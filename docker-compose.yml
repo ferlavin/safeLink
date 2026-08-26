@@ -1,3 +1,5 @@
+# PostgreSQL de desarrollo local.
+# Usuario / clave / base: safelink. No uses estas credenciales en producción.
 services:
   db:
     image: postgres:16-alpine

@@ -1,24 +1,31 @@
-const LABELS = {
-  seguro: 'Puedes entrar con tranquilidad',
-  precaucion: 'Mejor revisar antes de entrar',
-  peligro: 'No te recomendamos entrar',
-  unknown: 'Aun sin revisar',
+const BADGE = {
+  seguro: 'Seguro',
+  precaucion: 'Precaución',
+  peligro: 'Peligroso',
+  unknown: 'Sin revisar',
 }
 
-const NIVEL_LABELS = {
-  bajo: 'Parece seguro',
-  medio: 'Ten cuidado',
-  alto: 'Riesgo alto',
-  critico: 'Muy peligroso',
+const SUMMARY = {
+  seguro: 'Podés entrar con más tranquilidad.',
+  precaucion: 'Revisá antes de poner contraseñas o datos.',
+  peligro: 'No te recomendamos entrar.',
+  unknown: 'Todavía no hay veredicto.',
 }
 
 function isGoogleSearchPage(url) {
   try {
     const u = new URL(url)
-    return /(^|\.)google\.[a-z.]+$/i.test(u.hostname) && u.pathname === '/search'
+    const host = u.hostname.replace(/^www\./, '')
+    return (host === 'google.com' || host === 'google.com.ar') && u.pathname === '/search'
   } catch {
     return false
   }
+}
+
+function appBase() {
+  return typeof PRODUCTION_APP_URL !== 'undefined'
+    ? PRODUCTION_APP_URL.replace(/\/$/, '')
+    : 'https://safe-link-two.vercel.app'
 }
 
 let historyData = { bajo: [], medio: [], alto: [] }
@@ -47,10 +54,19 @@ function showAuth(user) {
   document.getElementById('auth-guest').classList.toggle('hidden', !!user)
   document.getElementById('auth-user').classList.toggle('hidden', !user)
   document.getElementById('history-section').classList.toggle('hidden', !user)
+  const openApp = document.getElementById('open-app')
   if (user) {
     document.getElementById('userEmail').textContent = user.email
+    openApp.classList.remove('hidden')
+    openApp.href = `${appBase()}/enlaces`
     loadHistoryByRisk()
+  } else {
+    openApp.classList.add('hidden')
   }
+}
+
+function setWarming(on) {
+  document.getElementById('warming').classList.toggle('hidden', !on)
 }
 
 async function loadHistoryByRisk() {
@@ -92,32 +108,85 @@ function renderHistoryTab(risk) {
 }
 
 function renderResult(data) {
+  setWarming(false)
+  const estado = data.estado || 'unknown'
   const sem = document.getElementById('semaphore')
-  sem.className = `semaphore ${data.estado}`
+  sem.className = `semaphore ${estado}`
 
-  document.getElementById('score-box').classList.remove('hidden')
+  const scoreBox = document.getElementById('score-box')
+  scoreBox.classList.remove('hidden')
+  const badge = document.getElementById('status-badge')
+  badge.textContent = BADGE[estado] || estado
+  badge.className = `status-badge ${estado}`
+
   const scoreEl = document.getElementById('score')
   scoreEl.textContent = data.puntuacion_riesgo
-  scoreEl.className = `score ${data.estado}`
+  scoreEl.className = `score ${estado}`
 
-  document.getElementById('level').textContent =
-    NIVEL_LABELS[data.nivel_riesgo] || data.nivel_riesgo
-  document.getElementById('status-label').textContent =
-    LABELS[data.estado] || data.estado
+  document.getElementById('status-label').textContent = SUMMARY[estado] || SUMMARY.unknown
 
   const savedHint = document.getElementById('saved-hint')
-  if (data.guardado_en_historial) {
-    savedHint.classList.remove('hidden')
-  } else {
-    savedHint.classList.add('hidden')
-  }
+  savedHint.classList.toggle('hidden', !data.guardado_en_historial)
 
   const list = document.getElementById('resumen')
   list.innerHTML = ''
-  ;(data.resumen || []).forEach((line) => {
+  ;(data.resumen || []).slice(0, 4).forEach((line) => {
     const li = document.createElement('li')
     li.textContent = line
     list.appendChild(li)
+  })
+
+  const openApp = document.getElementById('open-app')
+  if (!openApp.classList.contains('hidden')) {
+    openApp.href = `${appBase()}/analyze`
+  }
+}
+
+function renderSerp(url) {
+  setWarming(false)
+  document.getElementById('url').textContent = url || '—'
+  document.getElementById('serp-hint').classList.remove('hidden')
+  document.getElementById('score-box').classList.add('hidden')
+  document.getElementById('semaphore').className = 'semaphore unknown'
+  document.getElementById('status-label').textContent =
+    'Mirá el punto de color al lado de cada resultado: Seguro, Precaución o Peligroso.'
+  document.getElementById('resumen').innerHTML = ''
+  document.getElementById('saved-hint').classList.add('hidden')
+}
+
+function renderInternal(url) {
+  setWarming(false)
+  document.getElementById('url').textContent = url || '—'
+  document.getElementById('serp-hint').classList.add('hidden')
+  document.getElementById('score-box').classList.add('hidden')
+  document.getElementById('semaphore').className = 'semaphore unknown'
+  document.getElementById('status-label').textContent = 'Página interna del navegador. No hay enlace para revisar.'
+  document.getElementById('resumen').innerHTML = ''
+}
+
+function renderError(cold) {
+  document.getElementById('score-box').classList.add('hidden')
+  document.getElementById('semaphore').className = 'semaphore unknown'
+  if (cold) {
+    setWarming(true)
+    document.getElementById('status-label').textContent =
+      'El servidor (Render) está arrancando. Esperá unos segundos y se reintenta solo.'
+  } else {
+    setWarming(false)
+    document.getElementById('status-label').textContent =
+      'No pudimos revisar este sitio. Probá de nuevo en un momento.'
+  }
+}
+
+async function requestStatus() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ type: 'GET_ACTIVE_STATUS' }, (res) => {
+      if (chrome.runtime.lastError) {
+        resolve({ kind: 'error', cold: true })
+        return
+      }
+      resolve(res || { kind: 'error', cold: true })
+    })
   })
 }
 
@@ -129,29 +198,12 @@ async function init() {
   ])
 
   const tab = tabs[0]
-  const onGoogleSerp = tab?.url && isGoogleSearchPage(tab.url)
-  const serpHint = document.getElementById('serp-hint')
-  const scoreBox = document.getElementById('score-box')
-  const statusLabel = document.getElementById('status-label')
-  const sem = document.getElementById('semaphore')
-
   document.getElementById('url').textContent = tab?.url || '—'
   const apiDefault = typeof PRODUCTION_API_URL !== 'undefined'
     ? PRODUCTION_API_URL
     : 'https://safelink-api-csqe.onrender.com'
   document.getElementById('apiUrl').value = apiUrl || apiDefault
-
-  if (onGoogleSerp) {
-    serpHint.classList.remove('hidden')
-    scoreBox.classList.add('hidden')
-    sem.className = 'semaphore seguro'
-    statusLabel.textContent =
-      'Mira el punto de color junto a cada resultado en Google'
-    document.getElementById('resumen').innerHTML = ''
-    document.getElementById('saved-hint').classList.add('hidden')
-  } else {
-    serpHint.classList.add('hidden')
-  }
+  document.getElementById('ext-id').textContent = `ID para CORS: ${chrome.runtime.id}`
 
   if (user && token) {
     showAuth(user)
@@ -159,20 +211,43 @@ async function init() {
     showAuth(null)
   }
 
+  if (tab?.url && isGoogleSearchPage(tab.url)) {
+    renderSerp(tab.url)
+  } else if (lastCheck && tab?.url === lastCheck.url) {
+    renderResult(lastCheck)
+  }
+
+  const status = await requestStatus()
+  if (status.kind === 'serp') renderSerp(status.url)
+  else if (status.kind === 'internal') renderInternal(status.url)
+  else if (status.kind === 'result' && status.data) renderResult(status.data)
+  else if (status.kind === 'error') renderError(!!status.cold)
+
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const email = document.getElementById('loginEmail').value.trim()
     const password = document.getElementById('loginPassword').value
     const errEl = document.getElementById('authError')
     errEl.classList.add('hidden')
     try {
-      const res = await apiFetch('/auth/login', {
+      let res = await apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
+      if (!res.ok && (res.status === 502 || res.status === 503 || res.status === 504)) {
+        setWarming(true)
+        errEl.textContent = 'Calentando el servidor… reintentando'
+        errEl.classList.remove('hidden')
+        await new Promise((r) => setTimeout(r, 2500))
+        res = await apiFetch('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        })
+      }
       if (!res.ok) {
-        const e = await res.json()
+        const e = await res.json().catch(() => ({}))
         throw new Error(e.detail || 'Login fallido')
       }
+      setWarming(false)
       const data = await res.json()
       await chrome.storage.local.set({
         token: data.access_token,
@@ -181,7 +256,10 @@ async function init() {
       showAuth(data.user)
       chrome.runtime.sendMessage({ type: 'refresh' })
     } catch (e) {
-      errEl.textContent = e.message
+      const network = e.message === 'Failed to fetch' || e.name === 'TypeError'
+      errEl.textContent = network
+        ? 'Calentando el servidor… reintentá en unos segundos. Si sigue fallando, copiá el ID de abajo en CHROME_EXTENSION_ID del backend.'
+        : e.message
       errEl.classList.remove('hidden')
     }
   })
@@ -201,15 +279,16 @@ async function init() {
     chrome.runtime.sendMessage({ type: 'refresh' })
   })
 
-  if (!onGoogleSerp && lastCheck && tab?.url === lastCheck.url) {
-    renderResult(lastCheck)
-  }
-
   chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.type === 'CHECK_PROGRESS' && msg.phase === 'warming') {
+      setWarming(true)
+      document.getElementById('status-label').textContent =
+        'Calentando el servidor… reintentando'
+    }
     if (msg.type === 'historyUpdated') {
       loadHistoryByRisk()
-      chrome.storage.local.get(['lastCheck'], ({ lastCheck }) => {
-        if (lastCheck) renderResult(lastCheck)
+      chrome.storage.local.get(['lastCheck'], ({ lastCheck: latest }) => {
+        if (latest) renderResult(latest)
       })
     }
   })

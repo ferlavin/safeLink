@@ -15,54 +15,61 @@
     </header>
 
     <section id="auth-guest" class="auth-box">
-      <p class="auth-title">Inicia sesion para recordar los sitios que revisaste</p>
+      <p class="auth-title">Iniciá sesión para guardar lo que revisás</p>
       <input id="loginEmail" type="email" placeholder="Email" />
-      <input id="loginPassword" type="password" placeholder="Contrasena" />
-      <button id="loginBtn" type="button">Iniciar sesion</button>
+      <input id="loginPassword" type="password" placeholder="Contraseña" />
+      <button id="loginBtn" type="button">Iniciar sesión</button>
       <p id="authError" class="auth-error hidden"></p>
     </section>
 
     <section id="auth-user" class="auth-box hidden">
       <p class="auth-title">
-        Sesion: <span id="userEmail"></span>
+        Sesión: <span id="userEmail"></span>
       </p>
-      <button id="logoutBtn" type="button" class="btn-secondary">Cerrar sesion</button>
+      <button id="logoutBtn" type="button" class="btn-secondary">Cerrar sesión</button>
     </section>
 
     <p id="url" class="url">—</p>
     <p id="serp-hint" class="serp-hint hidden">
-      En Google veras un punto de color al lado de cada resultado. Verde = seguro, amarillo = cuidado, rojo = peligro.
+      En Google el semáforo está junto a cada resultado. Esta pestaña es la búsqueda, no un sitio para puntuar.
     </p>
 
+    <p id="warming" class="warming hidden">Calentando el servidor… reintentando</p>
+
     <div id="score-box" class="score-box hidden">
+      <span id="status-badge" class="status-badge unknown">Revisando…</span>
       <span id="score" class="score">0</span>
       <span class="score-max">/100</span>
-      <span id="level" class="level">—</span>
     </div>
 
-    <p id="status-label" class="status-label">Revisando...</p>
-    <p id="saved-hint" class="saved-hint hidden">Guardado en tu lista</p>
+    <p id="status-label" class="status-label">Revisando este sitio…</p>
+    <p id="saved-hint" class="saved-hint hidden">Guardado en tu historial</p>
 
     <ul id="resumen" class="resumen"></ul>
+
+    <a id="open-app" class="open-app hidden" target="_blank" rel="noopener">Ver en SafeLink</a>
 
     <section id="history-section" class="history-section hidden">
       <h2 class="history-title">Sitios que revisaste</h2>
       <div class="history-tabs">
-        <button type="button" class="tab active" data-risk="bajo">Seguros</button>
-        <button type="button" class="tab" data-risk="medio">A revisar</button>
-        <button type="button" class="tab" data-risk="alto">Peligrosos</button>
+        <button type="button" class="tab active" data-risk="bajo">Seguro</button>
+        <button type="button" class="tab" data-risk="medio">Precaución</button>
+        <button type="button" class="tab" data-risk="alto">Peligroso</button>
       </div>
       <ul id="history-list" class="history-list"></ul>
-      <p id="history-empty" class="history-empty hidden">No hay sitios en esta categoria</p>
+      <p id="history-empty" class="history-empty hidden">No hay sitios en esta categoría</p>
     </section>
 
     <section class="settings">
       <label for="apiUrl">Servidor SafeLink</label>
       <input id="apiUrl" type="url" placeholder="https://safelink-api-csqe.onrender.com" />
       <button id="saveApi" type="button">Guardar API</button>
+      <p id="ext-id" class="ext-id"></p>
     </section>
 
-    <p class="hint">Pasa el cursor sobre el icono o un punto de color para ver el resumen. Con sesion, guardamos los sitios que visitas.</p>
+    <p class="hint">
+      Mismo semáforo que en la web: Seguro, Precaución o Peligroso. SafeLink avisa; no bloquea la navegación.
+    </p>
 
     <script src="config.js"></script>
     <script src="popup.js"></script>

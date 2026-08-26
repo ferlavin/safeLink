@@ -1,4 +1,4 @@
-/** Semaforos junto a enlaces y URLs visibles en resultados de Google. */
+/** Semáforos junto a resultados de Google (.com / .ar). Avisa; no bloquea clics. */
 
 const analyzed = new WeakSet()
 const urlCache = new Map()
@@ -6,7 +6,13 @@ const pending = new Set()
 const MAX_TARGETS = 32
 const CONCURRENCY = 4
 
-const GOOGLE_HOST = /(^|\.)google\.[a-z.]+$/i
+const GOOGLE_HOST = /(^|\.)google\.(com|com\.ar)$/i
+
+const BADGE = {
+  seguro: 'Seguro',
+  precaucion: 'Precaución',
+  peligro: 'Peligroso',
+}
 
 function resolveUrl(href) {
   if (!href) return null
@@ -37,13 +43,11 @@ function insertDotBefore(el, estado, data) {
   const dot = document.createElement('span')
   dot.className = `safelink-dot ${estado}`
   if (data?.puntuacion_riesgo != null) {
-    const nivel =
-      { bajo: 'Parece seguro', medio: 'Ten cuidado', alto: 'Riesgo alto', critico: 'Muy peligroso' }[
-        data.nivel_riesgo
-      ] || data.nivel_riesgo
+    const badge = BADGE[data.estado] || data.estado
     const lines = [
-      `SafeLink: ${nivel} (${data.puntuacion_riesgo} de 100)`,
+      `SafeLink: ${badge} (${data.puntuacion_riesgo} de 100)`,
       ...(data.resumen || []).slice(0, 3),
+      'Avisa; no bloquea el clic.',
     ]
     dot.title = lines.join('\n')
   } else {

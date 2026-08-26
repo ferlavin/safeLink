@@ -1,3 +1,9 @@
+"""Parches de schema para bases que ya existían antes de SQLAlchemy create_all.
+
+No agregar más ALTER TABLE ni CREATE sueltos acá. No es Alembic: es una lista
+frágil de IF NOT EXISTS. Un esquema nuevo sale de los modelos en models/.
+"""
+
 from sqlalchemy import text
 
 from database.session import engine

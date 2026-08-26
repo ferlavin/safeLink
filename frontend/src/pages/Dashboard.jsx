@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import {
   ArrowRight,
   ChartLineUp,
+  LinkSimple,
+  MagnifyingGlass,
   PuzzlePiece,
   Question,
   ShieldCheck,
@@ -18,7 +20,6 @@ import StatusBadge from '../components/StatusBadge'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { usePreferences } from '../context/PreferencesContext'
-import { TOOL_CATEGORIES } from '../constants/tools'
 import usePageView from '../hooks/usePageView'
 import { useT } from '../i18n/I18nContext.jsx'
 
@@ -102,19 +103,28 @@ function UserDashboard() {
   const activity = useMemo(() => buildActivity(enlaces), [enlaces])
   const activityTotal = activity.reduce((sum, day) => sum + day.value, 0)
 
-  const visibleCategories = prefs.modo_simple
-    ? TOOL_CATEGORIES.filter((cat) => cat.id === 'tecnico')
-    : TOOL_CATEGORIES
-
-  const catDescription = (id) => {
-    if (id === 'amenazas') return t('dashboard.catAmenazas')
-    if (id === 'intel') return t('dashboard.catIntel')
-    if (id === 'tecnico') return t('dashboard.catTecnico')
-    if (id === 'avanzado') return t('dashboard.catAvanzado')
-    return ''
-  }
-
   const clear = stats.threats === 0
+
+  const primaryActions = [
+    {
+      to: '/analyze',
+      icon: MagnifyingGlass,
+      title: t('dashboard.actionAnalyze'),
+      body: t('dashboard.actionAnalyzeBody'),
+    },
+    {
+      to: '/extension',
+      icon: PuzzlePiece,
+      title: t('dashboard.actionExtension'),
+      body: t('dashboard.actionExtensionBody'),
+    },
+    {
+      to: '/enlaces',
+      icon: LinkSimple,
+      title: t('dashboard.actionHistory'),
+      body: t('dashboard.actionHistoryBody'),
+    },
+  ]
 
   return (
     <AppShell>
@@ -135,6 +145,36 @@ function UserDashboard() {
       {prefs.modo_simple && (
         <div className="app-alert app-alert--info mb-6">{t('dashboard.simpleMode')}</div>
       )}
+
+      <section className="mb-8">
+        <h2 className="sl-h2">{t('dashboard.toolsTitle')}</h2>
+        <p className="sl-lead mt-1 mb-4">{t('dashboard.toolsSubtitle')}</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {primaryActions.map(({ to, icon: Icon, title, body }) => (
+            <Link key={to} to={to} className="app-tool-card group block p-4 sm:p-5">
+              <span className="sl-icon sl-icon--sm sl-icon--accent">
+                <Icon size={16} weight="bold" />
+              </span>
+              <h3 className="sl-h3 mt-2">{title}</h3>
+              <p className="sl-meta mt-2">{body}</p>
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[var(--mint-400)] transition-all group-hover:gap-2">
+                {t('common.open')}
+                <ArrowRight size={14} weight="bold" />
+              </span>
+            </Link>
+          ))}
+        </div>
+        <p className="sl-meta mt-4">
+          {t('dashboard.secondaryLead')}{' '}
+          <Link to="/analyze/pdf" className="text-[var(--mint-400)]">
+            {t('dashboard.secondaryPdf')}
+          </Link>
+          {' · '}
+          <Link to="/analyze/web3" className="text-[var(--mint-400)]">
+            {t('dashboard.secondaryWeb3')}
+          </Link>
+        </p>
+      </section>
 
       <section className="sl-metric-grid mb-8">
         <article className="sl-metric sl-metric--feature">
@@ -238,22 +278,6 @@ function UserDashboard() {
         </div>
       </section>
 
-      <section className="app-highlight-card mb-8 p-5 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-lg">
-            <span className="sl-eyebrow mb-2">
-              <PuzzlePiece size={14} weight="fill" />
-              {t('dashboard.extensionTag')}
-            </span>
-            <h2 className="sl-h3">{t('dashboard.extensionTitle')}</h2>
-            <p className="sl-lead mt-2">{t('dashboard.extensionBody')}</p>
-          </div>
-          <Link to="/extension" className="btn-gradient shrink-0">
-            {t('dashboard.installExtension')}
-          </Link>
-        </div>
-      </section>
-
       <section className="app-card mb-8 p-5 sm:p-6">
         <h2 className="sl-h3">{t('dashboard.linksTitle')}</h2>
         <p className="sl-lead mt-1">{t('dashboard.linksBody')}</p>
@@ -266,30 +290,6 @@ function UserDashboard() {
           </Link>
         </div>
       </section>
-
-      {visibleCategories.map((cat) => (
-        <section key={cat.id} className="mb-8 sm:mb-10">
-          <h2 className="sl-h2">{cat.title}</h2>
-          <p className="sl-lead mt-1 mb-4">{catDescription(cat.id)}</p>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {cat.tools.map((tool) => (
-              <Link
-                key={tool.name}
-                to={tool.anchor ? `${tool.href}#${tool.anchor}` : tool.href}
-                className="app-tool-card group block p-4 sm:p-5"
-              >
-                {tool.tag && <span className="sl-eyebrow">{tool.tag}</span>}
-                <h3 className="sl-h3 mt-1">{tool.name}</h3>
-                <p className="sl-meta mt-2">{tool.shortDesc}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[var(--mint-400)] transition-all group-hover:gap-2">
-                  {t('common.open')}
-                  <ArrowRight size={14} weight="bold" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ))}
     </AppShell>
   )
 }

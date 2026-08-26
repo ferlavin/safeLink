@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import RiskBadge from '../components/RiskBadge'
 import ToolHeader from '../components/ToolHeader'
 import AppShell from '../components/AppShell'
@@ -89,6 +90,17 @@ export default function Analyze() {
           {loading ? 'Revisando...' : 'Revisar enlace'}
         </button>
       </form>
+      <p className="mt-3 text-sm text-muted">
+        También podés{' '}
+        <Link to="/analyze/pdf" className="text-[var(--mint-400)]">
+          subir un PDF
+        </Link>{' '}
+        o{' '}
+        <Link to="/analyze/web3" className="text-[var(--mint-400)]">
+          revisar una página que pide conectar la billetera
+        </Link>
+        .
+      </p>
 
       {error && <div className="app-alert app-alert--error mt-4">{typeof error === 'string' ? error : JSON.stringify(error)}</div>}
 

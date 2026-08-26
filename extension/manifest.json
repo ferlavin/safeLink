@@ -2,14 +2,14 @@
   "manifest_version": 3,
   "name": "SafeLink",
   "version": "1.0.0",
-  "description": "Te avisa con colores si un enlace es seguro antes de hacer clic.",
+  "description": "Semáforo en la pestaña actual y en resultados de Google (.com / .ar). Avisa; no bloquea la navegación.",
   "permissions": ["tabs", "storage"],
   "host_permissions": [
     "https://safelink-api-csqe.onrender.com/*",
-    "https://*.onrender.com/*",
     "http://localhost:8000/*",
     "http://127.0.0.1:8000/*",
     "https://www.google.com/*",
+    "https://www.google.com.ar/*",
     "<all_urls>"
   ],
   "background": {
@@ -20,13 +20,7 @@
       "matches": [
         "*://www.google.com/search*",
         "*://google.com/search*",
-        "*://www.google.com.ar/search*",
-        "*://www.google.com.mx/search*",
-        "*://www.google.es/search*",
-        "*://www.google.co.uk/search*",
-        "*://www.google.it/search*",
-        "*://www.google.de/search*",
-        "*://www.google.fr/search*"
+        "*://www.google.com.ar/search*"
       ],
       "js": ["content/inject.js"],
       "css": ["content/inject.css"],
@@ -44,7 +38,7 @@
     }
   ],
   "action": {
-    "default_title": "SafeLink — Analizando...",
+    "default_title": "SafeLink — Revisando…",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

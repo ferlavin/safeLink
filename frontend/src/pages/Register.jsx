@@ -138,12 +138,12 @@ export default function Register() {
             <div className="auth-info">
               <span className="auth-info-tag">Nueva cuenta</span>
               <h1>
-                Unite a la red de defensa{' '}
+                Creá tu cuenta{' '}
                 <span className="text-gradient">SafeLink</span>
               </h1>
               <p>
-                Creá tu cuenta en dos pasos y accedé al semáforo de seguridad, análisis
-                de enlaces, mapa de amenazas y alertas personalizadas.
+                Registro gratis: semáforo de enlaces, historial en Mis enlaces y la
+                extensión de Chrome. Un solo producto, sin planes pagos.
               </p>
               <div className="auth-benefits">
                 <div className="auth-benefit">
@@ -162,7 +162,7 @@ export default function Register() {
                   <div className="auth-benefit-icon">
                     <CheckCircle size={16} weight="fill" />
                   </div>
-                  Alertas de amenazas opcionales por email
+                  Historial de enlaces y semáforo
                 </div>
               </div>
             </div>

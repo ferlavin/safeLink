@@ -149,6 +149,7 @@ def classify_url_nlp(url: str) -> dict:
 
     detalle = {
         "tipo": "nlp_url_classifier",
+        "modelo": "patrones de lenguaje en la URL",
         "url": url,
         "categoria": categoria,
         "categoria_label": categoria_label,

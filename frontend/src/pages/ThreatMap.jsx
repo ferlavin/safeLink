@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-  GlobeHemisphereWest,
-  Info,
-  MapPin,
-  Pulse,
-  ShieldWarning,
-} from '@phosphor-icons/react'
+import { Info, Pulse, ShieldWarning, ArrowsClockwise } from '@phosphor-icons/react'
 import ToolHeader from '../components/ToolHeader'
 import AppShell from '../components/AppShell'
 import StatusBadge from '../components/StatusBadge'
@@ -13,14 +7,9 @@ import WorldDotMap from '../components/WorldDotMap'
 import client from '../api/client'
 import { TOOLS } from '../constants/tools'
 import { RISK_LABELS } from '../constants/labels'
-import { projectToPercent } from '../utils/mapProjection'
 import { useT } from '../i18n/I18nContext.jsx'
 
-const LEVELS = [
-  { id: 'medio', color: 'var(--warn-400)' },
-  { id: 'alto', color: 'var(--high-400)' },
-  { id: 'critico', color: 'var(--danger-400)' },
-]
+const REFRESH_MS = 60_000
 
 export default function ThreatMap() {
   const { t, dateLocale } = useT()
@@ -31,23 +20,23 @@ export default function ThreatMap() {
   const loadMap = useCallback(() => {
     client
       .get('/analysis/threat-map', { params: { hours: 24 } })
-      .then((res) => setData(res.data))
+      .then((res) => {
+        setData(res.data)
+        setError('')
+      })
       .catch((err) => setError(err.response?.data?.detail || t('threatMap.loadError')))
       .finally(() => setLoading(false))
   }, [t])
 
   useEffect(() => {
     loadMap()
-    const interval = setInterval(loadMap, 15000)
+    const interval = setInterval(loadMap, REFRESH_MS)
     return () => clearInterval(interval)
   }, [loadMap])
 
-  const points = data?.points || []
-  const detections = data?.amenazas_activas || 0
-  const unknown = data?.sin_ubicacion || 0
+  const dominios = data?.dominios || []
+  const detections = dominios.length
   const hasDetections = detections > 0
-  const emptyNoData = data && !hasDetections
-  const emptyNoGeo = data && hasDetections && points.length === 0
 
   const updatedLabel = data?.actualizado
     ? t('threatMap.updatedAt', {
@@ -58,17 +47,15 @@ export default function ThreatMap() {
       })
     : t('threatMap.refreshHint')
 
+  const sourceLabel = (fuente) =>
+    fuente === 'reporte' ? t('threatMap.sourceReport') : t('threatMap.sourceAnalysis')
+
   return (
     <AppShell>
       <div className="app-page-top">
         <ToolHeader tag={TOOLS.map.tag} name={TOOLS.map.name} description={TOOLS.map.longDesc} />
         {data && (
-          <StatusBadge
-            tone={hasDetections ? 'warn' : 'safe'}
-            size="lg"
-            pulse={false}
-            className="shrink-0"
-          >
+          <StatusBadge tone={hasDetections ? 'warn' : 'safe'} size="lg" pulse={false} className="shrink-0">
             {hasDetections ? t('threatMap.badgeData') : t('threatMap.badgeWatching')}
           </StatusBadge>
         )}
@@ -94,13 +81,6 @@ export default function ThreatMap() {
             </span>
             <h2>{t('threatMap.notTitle')}</h2>
             <p>{t('threatMap.notBody')}</p>
-          </article>
-          <article className="app-help-card">
-            <span className="sl-icon sl-icon--sm sl-icon--accent">
-              <MapPin size={16} weight="bold" />
-            </span>
-            <h2>{t('threatMap.geoTitle')}</h2>
-            <p>{t('threatMap.geoBody')}</p>
           </article>
         </div>
       </section>
@@ -131,87 +111,81 @@ export default function ThreatMap() {
 
             <article className="sl-metric">
               <div className="sl-metric__head">
-                <span className="sl-metric__label">{t('threatMap.mapPoints')}</span>
-                <span className="sl-icon sl-icon--sm">
-                  <GlobeHemisphereWest size={16} weight="bold" />
-                </span>
+                <span className="sl-metric__label">{t('threatMap.reports')}</span>
               </div>
               <p className="sl-metric__value" data-numeric>
-                {data.total_puntos}
+                {data.total_reportes ?? 0}
               </p>
               <p className="sl-metric__foot">
-                {updatedLabel}. {t('threatMap.mapPointsFoot')}
+                {updatedLabel}. {t('threatMap.refreshHint')}
               </p>
             </article>
+          </div>
 
-            {unknown > 0 && (
-              <article className="sl-metric">
-                <div className="sl-metric__head">
-                  <span className="sl-metric__label">{t('threatMap.unknown')}</span>
-                  <span className="sl-icon sl-icon--sm">
-                    <MapPin size={16} weight="bold" />
-                  </span>
-                </div>
-                <p className="sl-metric__value" data-numeric>
-                  {unknown}
-                </p>
-                <p className="sl-metric__foot">{t('threatMap.unknownFoot')}</p>
-              </article>
-            )}
+          <div className="mb-4 flex justify-end">
+            <button type="button" className="btn-outline-gradient text-xs px-3 py-1.5" onClick={loadMap}>
+              <ArrowsClockwise size={14} weight="bold" />
+              {t('threatMap.refresh')}
+            </button>
           </div>
 
           <div className="sl-map">
             <WorldDotMap />
             <div className="sl-map__meridians" aria-hidden="true" />
             <div className="sl-map__equator" aria-hidden="true" />
-            <div className="sl-map__sweep" aria-hidden="true" />
-
-            {points.map((p, i) => {
-              const { x, y } = projectToPercent(p.lat, p.lon)
-              const size = Math.min(26, 9 + p.weight * 4)
-              const levelLabel = RISK_LABELS[p.level] || p.level
-              return (
-                <div
-                  key={`${p.lat}-${p.lon}-${p.level}-${i}`}
-                  title={t('threatMap.tooltipApprox', {
-                    country: p.country || t('threatMap.unknown'),
-                    level: levelLabel,
-                    weight: p.weight,
-                  })}
-                  className={`sl-threat sl-threat--${p.level}`}
-                  style={{ left: `${x}%`, top: `${y}%`, width: size, height: size }}
-                />
-              )
-            })}
-
             <div className="sl-map__vignette" aria-hidden="true" />
-
-            {(emptyNoData || emptyNoGeo) && (
-              <div className="sl-map__idle">
-                <span className="sl-icon sl-icon--lg sl-icon--accent sl-icon--glow">
-                  <Pulse size={24} weight="duotone" />
-                </span>
-                <h2 className="sl-empty__title">
-                  {emptyNoGeo ? t('threatMap.emptyGeoTitle') : t('threatMap.emptyTitle')}
-                </h2>
-                <p className="sl-empty__text">
-                  {emptyNoGeo ? t('threatMap.emptyGeoBody') : t('threatMap.emptyBody')}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-            <div className="sl-legend">
-              {LEVELS.map((level) => (
-                <span key={level.id} style={{ color: level.color }}>
-                  <i />
-                  <span className="text-[var(--text-secondary)]">{RISK_LABELS[level.id]}</span>
-                </span>
-              ))}
+            <div className="sl-map__idle">
+              <span className="sl-icon sl-icon--lg sl-icon--accent sl-icon--glow">
+                <Pulse size={24} weight="duotone" />
+              </span>
+              <h2 className="sl-empty__title">
+                {hasDetections ? t('threatMap.emptyGeoTitle') : t('threatMap.emptyTitle')}
+              </h2>
+              <p className="sl-empty__text">
+                {hasDetections ? t('threatMap.emptyGeoBody') : t('threatMap.emptyBody')}
+              </p>
             </div>
-            <p className="sl-meta">{t('threatMap.legendNote')}</p>
           </div>
+
+          <section className="mt-8">
+            <h2 className="mb-4 text-lg font-semibold">{t('threatMap.domainsTitle')}</h2>
+            <div className="app-table-wrap">
+              <table className="app-table">
+                <thead>
+                  <tr>
+                    <th>{t('threatMap.domainCol')}</th>
+                    <th>{t('threatMap.levelCol')}</th>
+                    <th>{t('threatMap.sourceCol')}</th>
+                    <th>{t('threatMap.countCol')}</th>
+                    <th>{t('threatMap.updatedCol')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dominios.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="app-table-empty">
+                        {t('threatMap.domainsEmpty')}
+                      </td>
+                    </tr>
+                  ) : (
+                    dominios.map((row) => (
+                      <tr key={row.dominio}>
+                        <td className="cell-main">{row.dominio}</td>
+                        <td>{RISK_LABELS[row.nivel] || row.nivel}</td>
+                        <td>{sourceLabel(row.fuente)}</td>
+                        <td>{row.peso}</td>
+                        <td>
+                          {row.ultimo_evento
+                            ? new Date(row.ultimo_evento).toLocaleString(dateLocale)
+                            : '—'}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </>
       )}
     </AppShell>

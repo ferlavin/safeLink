@@ -13,17 +13,21 @@ const DEV_STEPS = [
   'Clic en "Cargar descomprimida" y elegí la carpeta extension/ del proyecto SafeLink.',
   'Fijá el icono SafeLink en la barra de herramientas.',
   'Opcional: iniciá sesión en el popup para guardar los sitios que revisás.',
+  'Si el login del popup falla, copiá el ID de la extensión (chrome://extensions o el popup) en CHROME_EXTENSION_ID del backend. CORS no acepta chrome-extension://* suelto.',
 ]
 
 export default function ExtensionInstall() {
   const { user } = useAuth()
   const [installed, setInstalled] = useState(false)
+  const [extensionId, setExtensionId] = useState('')
 
   usePageView('extension_page_view')
 
   useEffect(() => {
     const check = () => {
       setInstalled(document.documentElement.getAttribute('data-safelink-installed') === '1')
+      const id = document.documentElement.getAttribute('data-safelink-extension-id') || ''
+      if (id) setExtensionId(id)
     }
     check()
     window.addEventListener('safelink-extension-ready', check)
@@ -33,14 +37,6 @@ export default function ExtensionInstall() {
       clearInterval(t)
     }
   }, [])
-
-  const handleInstall = () => {
-    if (CHROME_STORE_URL) {
-      window.open(CHROME_STORE_URL, '_blank', 'noopener,noreferrer')
-      return
-    }
-    window.open('https://chrome.google.com/webstore/category/extensions', '_blank', 'noopener')
-  }
 
   return (
     <AppShell guest={!user}>
@@ -52,44 +48,59 @@ export default function ExtensionInstall() {
           </span>
           <div>
             <h1>SafeLink para Chrome</h1>
-            <p>Google Chrome · Manifest V3</p>
+            <p>Google Chrome · Manifest V3 · semáforo, no bloqueo</p>
           </div>
         </div>
       </div>
 
       {installed && (
         <div className="app-alert app-alert--success">
-          La extensión SafeLink ya está instalada en este navegador.
+          La extensión SafeLink ya está instalada en este navegador
+          {extensionId ? ` (ID ${extensionId}).` : '.'}
         </div>
       )}
 
       <section className="app-section-card app-section-card--accent">
-        <h2>Qué hace la extensión</h2>
+        <h2>Qué hace de verdad</h2>
         <p className="mt-3">
-          SafeLink muestra un punto de color en la barra de Chrome y al lado de cada resultado en
-          Google, antes de que hagas clic.
+          El producto principal es el semáforo de la pestaña actual: el icono de la barra cambia a
+          verde, amarillo o rojo según el enlace que estás viendo. En Google (.com y .com.ar)
+          además pone un punto de color junto a cada resultado, antes de que hagas clic.
         </p>
         <ul className="mt-4 space-y-3">
           <li className="flex items-center gap-3">
-            <StatusBadge tone="safe">Verde</StatusBadge>
-            <span>podés entrar con tranquilidad</span>
+            <StatusBadge tone="safe">Seguro</StatusBadge>
+            <span>podés entrar con más tranquilidad</span>
           </li>
           <li className="flex items-center gap-3">
-            <StatusBadge tone="warn">Amarillo</StatusBadge>
-            <span>mejor revisar antes</span>
+            <StatusBadge tone="warn">Precaución</StatusBadge>
+            <span>revisá antes de poner contraseñas o datos</span>
           </li>
           <li className="flex items-center gap-3">
-            <StatusBadge tone="danger">Rojo</StatusBadge>
+            <StatusBadge tone="danger">Peligroso</StatusBadge>
             <span>no te recomendamos entrar</span>
           </li>
         </ul>
+        <p className="mt-4 text-sm text-muted">
+          SafeLink avisa. No bloquea la navegación: si igual querés entrar, el sitio carga.
+        </p>
+      </section>
+
+      <section className="app-section-card">
+        <h2>Permiso &lt;all_urls&gt;</h2>
+        <p className="mt-3 text-sm">
+          Hace falta para leer la URL de cualquier pestaña y pintar el semáforo en el icono. Sin
+          ese permiso solo veríamos Chrome interno o los sitios listados uno por uno. También
+          pedimos el host de la API y Google (.com / .ar) para el check y los puntos del buscador.
+          No se piden permisos extra (no hay bloqueo de navegación).
+        </p>
       </section>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        {!installed && (
-          <button type="button" onClick={handleInstall} className="btn-gradient">
-            {CHROME_STORE_URL ? 'Agregar a Chrome' : 'Instalar en Chrome'}
-          </button>
+        {CHROME_STORE_URL && !installed && (
+          <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-gradient">
+            Agregar a Chrome
+          </a>
         )}
         {user ? (
           <Link to="/dashboard" className="btn-outline-gradient">
@@ -102,16 +113,15 @@ export default function ExtensionInstall() {
         )}
       </div>
 
-      {!CHROME_STORE_URL && !installed && (
+      {!CHROME_STORE_URL && (
         <p className="mt-3 text-xs text-muted">
-          Chrome no permite instalar extensiones con un solo clic desde una web sin publicarlas en
-          Chrome Web Store. Usá la instalación de desarrollador abajo o configurá{' '}
-          <code>VITE_CHROME_WEB_STORE_URL</code> en el frontend.
+          Esta extensión no está publicada en Chrome Web Store. Se carga en modo desarrollador,
+          como abajo. No hay un botón mágico de “instalar desde la tienda”.
         </p>
       )}
 
       <section className="app-section-card">
-        <h2>{installed ? 'Extensión activa' : 'Instalación para desarrollo'}</h2>
+        <h2>{installed ? 'Extensión activa' : 'Instalación (modo desarrollador)'}</h2>
         {!installed && (
           <ol className="mt-4 list-decimal space-y-3 pl-5">
             {DEV_STEPS.map((step) => (
@@ -119,11 +129,16 @@ export default function ExtensionInstall() {
             ))}
           </ol>
         )}
+        {installed && extensionId && (
+          <p className="mt-4 text-sm">
+            Para CORS del backend: <code>CHROME_EXTENSION_ID={extensionId}</code>
+          </p>
+        )}
         <p className="mt-4 text-xs">
-          Requisito: API SafeLink en la nube (por defecto{' '}
-          <code>https://safelink-api-csqe.onrender.com</code>). En desarrollo
-          local podés usar <code>http://localhost:8000</code> desde el
-          popup de la extensión.
+          La API vive en Render (por defecto{' '}
+          <code>https://safelink-api-csqe.onrender.com</code>). Si el servicio está dormido, el
+          popup dice “calentando / reintentando”; no es un fallo mudo. En desarrollo local podés
+          apuntar el popup a <code>http://localhost:8000</code>.
         </p>
       </section>
 

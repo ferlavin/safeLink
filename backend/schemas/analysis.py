@@ -27,17 +27,27 @@ class ThreatMapPoint(BaseModel):
     aproximado: bool = True
 
 
+class ThreatMapDomain(BaseModel):
+    dominio: str
+    nivel: str
+    peso: int = 1
+    fuente: str = "analisis"
+    ultimo_evento: str | None = None
+
+
 class ThreatMapResponse(BaseModel):
-    points: list[ThreatMapPoint]
-    total_puntos: int
+    points: list[ThreatMapPoint] = []
+    dominios: list[ThreatMapDomain] = []
+    total_puntos: int = 0
     amenazas_activas: int = 0
     sin_ubicacion: int = 0
     ventana_horas: int = 24
     actualizado: str | None = None
     en_vivo: bool = False
-    ubicacion_aproximada: bool = True
+    ubicacion_aproximada: bool = False
     resumen_niveles: dict[str, int]
     total_analisis: int
+    total_reportes: int = 0
 
 
 class UrlAnalysisResult(BaseModel):

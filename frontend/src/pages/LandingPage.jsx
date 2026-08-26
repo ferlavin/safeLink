@@ -1,24 +1,25 @@
 import {
   ShieldCheck,
-  Globe,
-  Users,
   MagnifyingGlass,
   PuzzlePiece,
   SignIn,
   EnvelopeSimple,
   ChatCircle,
   Headset,
-  MapPin,
   TwitterLogo,
   GithubLogo,
   LinkedinLogo,
   ArrowRight,
+  ChatText,
+  Bank,
+  LinkSimple,
 } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import LandingHeader from '../components/LandingHeader'
 import WorldDotMap from '../components/WorldDotMap'
 import StatusBadge from '../components/StatusBadge'
 
+// Ilustración del semáforo, no un feed de amenazas en vivo.
 const HERO_THREATS = [
   { x: 22, y: 38, level: 'critico', size: 12 },
   { x: 48, y: 42, level: 'alto', size: 10 },
@@ -29,106 +30,105 @@ const HERO_THREATS = [
 
 const PILLARS = [
   {
-    icon: MagnifyingGlass,
-    title: 'Análisis integral',
-    desc: 'Más de 10 módulos de detección para cubrir cada tipo de amenaza en la web.',
-    to: '/info/analisis-integral',
+    icon: ShieldCheck,
+    title: 'Semáforo antes de hacer clic',
+    desc: 'Verde, amarillo o rojo. Una señal clara para decidir si conviene abrir el enlace.',
+    to: '/info/semaforo',
   },
   {
-    icon: Globe,
-    title: 'Infraestructura',
-    desc: 'Motor liviano, mapa de alertas de la comunidad y panel con historial de enlaces analizados.',
-    to: '/info/infraestructura',
+    icon: ChatText,
+    title: 'Hecho para el día a día en Argentina',
+    desc: 'WhatsApp, home banking y marcas locales. El caso típico es un dominio trucho que imita uno oficial.',
+    to: '/info/typosquatting',
   },
   {
-    icon: Users,
-    title: 'El equipo',
-    desc: 'Comunidad activa de usuarios que comparte detecciones para proteger a todos.',
-    to: '/info/equipo',
+    icon: PuzzlePiece,
+    title: 'Extensión en Chrome',
+    desc: 'Un punto de color al lado de los resultados de Google y en la barra, cuando estás por entrar.',
+    to: '/info/extension',
   },
   {
     icon: ShieldCheck,
-    title: 'Protección 24/7',
-    desc: 'La extensión vigila cada clic y Google Search antes de que entres a un sitio.',
-    to: '/info/proteccion',
+    title: 'Historial si tenés cuenta',
+    desc: 'Sin cuenta no hay historial. Con cuenta, cada análisis queda en Mis enlaces para consultarlo o reportarlo.',
+    to: '/info/portal',
   },
 ]
 
 const QUICK_SERVICES = [
-  { icon: MagnifyingGlass, title: 'Analizar URL', hint: 'Revisión instantánea', to: '/info/analisis-url' },
-  { icon: PuzzlePiece, title: 'Extensión Chrome', hint: 'Semáforo en el navegador', to: '/info/extension' },
-  { icon: SignIn, title: 'Portal SafeLink', hint: 'Dashboard y historial', to: '/info/portal' },
-  { icon: Globe, title: 'Mapa de alertas', hint: 'Detecciones de la comunidad', to: '/info/mapa-alertas' },
+  { icon: MagnifyingGlass, title: 'Analizar un enlace', hint: 'Pegá la URL y leé el semáforo', to: '/info/analisis-url' },
+  { icon: PuzzlePiece, title: 'Extensión Chrome', hint: 'Semáforo en el navegador', to: '/extension' },
+  { icon: SignIn, title: 'Crear cuenta', hint: 'Gratis: historial y reportes', to: '/register' },
 ]
 
 const STEPS = [
   {
     n: '01',
     title: 'Pegá el enlace',
-    desc: 'SafeLink evalúa dominio, reputación y patrones sospechosos. El veredicto llega en segundos.',
+    desc: 'La dirección completa, como la ves en WhatsApp, el mail o el navegador.',
     to: '/info/analisis-url',
   },
   {
     n: '02',
     title: 'Leé el semáforo',
-    desc: 'Verde, amarillo o rojo: el mismo lenguaje en la extensión, el historial y el mapa.',
+    desc: 'Verde: razonable. Amarillo: no pongas contraseñas sin revisar. Rojo: mejor no entrar.',
     to: '/info/semaforo',
   },
   {
     n: '03',
-    title: 'Seguí el rastro',
-    desc: 'Todo queda en tu portal: historial, reportes a la comunidad y alertas del equipo.',
+    title: 'Guardá o reportá',
+    desc: 'Con cuenta, el resultado queda en Mis enlaces. Si el sitio te parece falso, podés reportarlo.',
     to: '/info/portal',
   },
 ]
 
-const TOOLS = [
-  { title: 'Análisis de URLs', desc: 'Heurísticas, entropía y typosquatting en un solo escaneo.', to: '/info/analisis-url' },
-  { title: 'Revisión de PDF', desc: 'Extrae y analiza enlaces ocultos dentro de archivos adjuntos.', to: '/info/pdf' },
-  { title: 'Guardia DNS', desc: 'Comprueba si el dominio apunta a servidores de confianza.', to: '/info/dns' },
-  { title: 'Sentinela Web3', desc: 'Detecta páginas sospechosas que piden conectar tu billetera.', to: '/info/web3' },
-  { title: 'Typosquatting', desc: 'Identifica dominios que imitan marcas conocidas.', to: '/info/typosquatting' },
-  { title: 'Seguridad avanzada', desc: 'NLP, headers HTTP, OAuth falso y formularios maliciosos.', to: '/info/seguridad-avanzada' },
-]
-
-const TESTIMONIALS = [
-  { initials: 'MR', name: 'María R.', role: 'CISO, fintech', quote: 'SafeLink nos da visibilidad inmediata sobre enlaces sospechosos sin fricción para el equipo.' },
-  { initials: 'JL', name: 'Julián L.', role: 'DevOps Lead', quote: 'La extensión detectó un sitio de phishing antes de que alguien ingresara credenciales.' },
-  { initials: 'AP', name: 'Ana P.', role: 'Security Analyst', quote: 'El mapa de alertas de la comunidad y los reportes nos ayudan a ver tendencias, con ubicaciones aproximadas.' },
-]
-
-const PLANS = [
-  { name: 'Standard', price: 'Gratis', period: 'Para uso personal', desc: 'Extensión, análisis básico y semáforo de seguridad.', featured: false, to: '/info/plan-standard' },
-  { name: 'Enterprise', price: 'Pro', period: 'Equipos y empresas', desc: 'Panel admin, mapa de alertas de la comunidad y reportes avanzados.', featured: true, to: '/info/plan-enterprise' },
-  { name: 'SafeLink Prime', price: 'Custom', period: 'Infraestructura crítica', desc: 'API, SLA dedicado y despliegue on-premise.', featured: false, to: '/info/plan-prime' },
-]
-
 const FAQS = [
-  { q: '¿Cómo funciona el análisis de enlaces?', a: 'SafeLink evalúa la URL con heurísticas, reputación DNS y señales de la comunidad en milisegundos.' },
-  { q: '¿El mapa de alertas es un radar mundial de ataques?', a: 'No. Muestra detecciones reales de usuarios de SafeLink. Las ubicaciones son aproximadas por IP (país o región), como suele ser en ciberseguridad.' },
-  { q: '¿Protege transacciones Web3?', a: 'Sí. Detectamos sitios que imitan wallets, contratos maliciosos y firmas sospechosas.' },
-  { q: '¿Mis datos de navegación se comparten?', a: 'No enviamos historial completo. Solo analizamos el enlace que revisás.' },
-  { q: '¿Puedo usar SafeLink en equipo?', a: 'El plan Enterprise incluye panel admin y gestión de usuarios.' },
-  { q: '¿Qué navegadores soporta?', a: 'Chrome y navegadores basados en Chromium.' },
-  { q: '¿Cómo reporto una amenaza?', a: 'Desde la extensión o el dashboard podés marcar enlaces peligrosos.' },
+  {
+    q: '¿Qué es SafeLink?',
+    a: 'Un semáforo para enlaces: te dice si conviene hacer clic antes de abrir un sitio. Es un MVP gratis (extensión + análisis), no un producto Enterprise.',
+  },
+  {
+    q: '¿Cómo funciona el verde, amarillo y rojo?',
+    a: 'Revisa cómo está escrita la URL y si imita una marca conocida. Verde: se ve razonable. Amarillo: hay señales dudosas. Rojo: alto riesgo; no te recomendamos entrar. Ningún semáforo es infalible.',
+  },
+  {
+    q: '¿Qué URL se manda?',
+    a: 'Solo la que vos pegás para analizar, o la que la extensión revisa en ese momento (resultado de Google o página que estás por abrir). No enviamos tu historial de navegación completo.',
+  },
+  {
+    q: '¿Hace falta una cuenta?',
+    a: 'Para usar el portal (analizar, guardar historial y reportar) sí. La extensión puede marcar resultados en Chrome; si no iniciás sesión, ese check no se guarda en tu historial.',
+  },
+  {
+    q: '¿Hay planes pagos, SLA o on-premise?',
+    a: 'No. Hay un solo producto: gratis / MVP. Extensión, análisis de enlaces y semáforo. Nada de precios inventados.',
+  },
+  {
+    q: '¿Qué navegadores soporta?',
+    a: 'Chrome y navegadores basados en Chromium, con la extensión instalada. El análisis desde la web pide cuenta.',
+  },
+  {
+    q: '¿Cómo reporto un sitio?',
+    a: 'Desde Mis enlaces, después de analizarlo. El equipo ve el reporte en Mensajes. No hace falta un mail aparte para el caso típico.',
+  },
 ]
 
 const FOOTER_LINKS = {
   Plataforma: [
     { label: 'Iniciar sesión', to: '/login' },
     { label: 'Registrarse', to: '/register' },
-    { label: 'Extensión', to: '/info/extension' },
+    { label: 'Extensión', to: '/extension' },
     { label: 'Portal SafeLink', to: '/info/portal' },
   ],
-  Servicios: [
-    { label: 'Análisis de URLs', to: '/info/analisis-url' },
-    { label: 'Revisión PDF', to: '/info/pdf' },
-    { label: 'Seguridad Web3', to: '/info/web3' },
+  Producto: [
+    { label: 'Analizar un enlace', to: '/info/analisis-url' },
+    { label: 'El semáforo', to: '/info/semaforo' },
+    { label: 'Revisión de PDF', to: '/info/pdf' },
   ],
   Recursos: [
-    { label: 'Mapa de alertas', to: '/info/mapa-alertas' },
-    { label: 'Reportar amenaza', to: '/info/reportes' },
+    { label: 'Cómo reportar', to: '/info/reportes' },
     { label: 'El semáforo', to: '/info/semaforo' },
+    { label: 'Cookies', to: '/info/cookies' },
   ],
   Legal: [
     { label: 'Privacidad', to: '/info/privacidad' },
@@ -145,13 +145,14 @@ export default function LandingPage() {
       <section className="landing-hero" id="institucion">
         <div className="landing-wrap landing-hero-grid">
           <div className="landing-hero-copy">
-            <span className="section-tag">Inteligencia de amenazas</span>
+            <span className="section-tag">Semáforo de enlaces</span>
             <h1 className="landing-hero-title">
               Sabé si un enlace es seguro <em>antes</em> de hacer clic.
             </h1>
             <p className="landing-hero-desc">
-              SafeLink analiza URLs, PDFs y sitios Web3, y marca el riesgo con un semáforo
-              en Chrome. Sin ruido, sin terminal verde, sin plantilla genérica.
+              SafeLink es un MVP gratis: pegás una URL o usás la extensión en Chrome
+              y ves verde, amarillo o rojo. Pensado para WhatsApp, home banking y
+              marcas locales, no para un radar mundial de ciberataques.
             </p>
             <div className="landing-hero-actions">
               <Link to="/extension" className="btn-gradient">
@@ -164,16 +165,16 @@ export default function LandingPage() {
             </div>
             <div className="landing-hero-metrics">
               <div>
-                <strong data-numeric>10+</strong>
-                <span>módulos de análisis</span>
+                <strong>Gratis</strong>
+                <span>un solo producto, sin planes</span>
               </div>
               <div>
-                <strong data-numeric>&lt;2s</strong>
-                <span>para un veredicto</span>
+                <strong>Chrome</strong>
+                <span>semáforo en el navegador</span>
               </div>
               <div>
-                <strong data-numeric>24/7</strong>
-                <span>en el navegador</span>
+                <strong>AR</strong>
+                <span>marcas y bancos locales</span>
               </div>
             </div>
           </div>
@@ -183,7 +184,6 @@ export default function LandingPage() {
               <WorldDotMap />
               <div className="sl-map__meridians" aria-hidden="true" />
               <div className="sl-map__equator" aria-hidden="true" />
-              <div className="sl-map__sweep" aria-hidden="true" />
               {HERO_THREATS.map((point) => (
                 <div
                   key={`${point.x}-${point.y}`}
@@ -199,10 +199,9 @@ export default function LandingPage() {
               <div className="sl-map__vignette" aria-hidden="true" />
               <div className="landing-map-caption">
                 <span>
-                  <MapPin size={14} weight="fill" />
-                  Vista ilustrativa
+                  <ShieldCheck size={14} weight="fill" />
+                  Ilustración del semáforo — no es un feed de amenazas en vivo
                 </span>
-                <Link to="/info/mapa-alertas">Ver mapa de la comunidad</Link>
               </div>
             </div>
           </div>
@@ -212,8 +211,8 @@ export default function LandingPage() {
       <section>
         <div className="landing-wrap">
           <div className="landing-section-head">
-            <span className="section-tag">Plataforma</span>
-            <h2>Hecho para decidir rápido, no para decorar un dashboard</h2>
+            <span className="section-tag">Qué es</span>
+            <h2>Un semáforo. No una suite de inteligencia.</h2>
           </div>
           <div className="landing-pillars">
             {PILLARS.map(({ icon: Icon, title, desc, to }) => (
@@ -232,8 +231,8 @@ export default function LandingPage() {
       <section id="servicios" className="landing-section-alt">
         <div className="landing-wrap">
           <div className="landing-section-head">
-            <span className="section-tag">Servicios</span>
-            <h2>Empezá por donde te haga falta</h2>
+            <span className="section-tag">Cómo empezar</span>
+            <h2>Extensión, análisis o cuenta. Eso es el producto.</h2>
           </div>
           <div className="landing-quick-grid">
             {QUICK_SERVICES.map(({ icon: Icon, title, hint, to }) => (
@@ -253,7 +252,7 @@ export default function LandingPage() {
         <div className="landing-wrap">
           <div className="landing-section-head">
             <span className="section-tag">Cómo funciona</span>
-            <h2>Tres pasos. El mismo semáforo en todos lados.</h2>
+            <h2>Tres pasos. El mismo semáforo en la web y en Chrome.</h2>
           </div>
           <div className="landing-steps">
             {STEPS.map(({ n, title, desc, to }) => (
@@ -284,16 +283,31 @@ export default function LandingPage() {
       <section className="landing-section-alt">
         <div className="landing-wrap">
           <div className="landing-section-head">
-            <span className="section-tag">Herramientas</span>
-            <h2>Análisis especializado</h2>
+            <span className="section-tag">Un ejemplo</span>
+            <h2>Dominio oficial vs dominio trucho</h2>
           </div>
           <div className="landing-tools-grid">
-            {TOOLS.map(({ title, desc, to }) => (
-              <Link key={title} to={to} className="landing-tool-link">
-                <h3>{title}</h3>
-                <p>{desc}</p>
-              </Link>
-            ))}
+            <article className="landing-tool-link">
+              <h3>
+                <Bank size={18} weight="bold" className="inline" /> Oficiales
+              </h3>
+              <p>
+                <code>www.galicia.ar</code> o <code>www.mercadopago.com.ar</code> son
+                sitios de marcas conocidas. Si el enlace coincide con el dominio
+                oficial, el semáforo suele ir a verde.
+              </p>
+            </article>
+            <article className="landing-tool-link">
+              <h3>
+                <LinkSimple size={18} weight="bold" className="inline" /> Truchos
+              </h3>
+              <p>
+                <code>galicia-seguridad-login.com</code> o{' '}
+                <code>mercadopago-ayuda.xyz</code> imitan el nombre. Una letra, un
+                guión o un <code>.com</code> en vez de <code>.com.ar</code> alcanzan
+                para una estafa.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -301,70 +315,21 @@ export default function LandingPage() {
       <section id="portal">
         <div className="landing-wrap">
           <div className="landing-portal-banner">
-            <span className="section-tag">Portal SafeLink</span>
-            <h2>Historial, alertas y más de 10 herramientas en un solo lugar</h2>
+            <span className="section-tag">Gratis / MVP</span>
+            <h2>Un solo producto: extensión, análisis y semáforo</h2>
             <p>
-              Creá una cuenta para guardar cada análisis, reportar sitios y seguir la conversación
-              con el equipo.
+              No hay plan Enterprise, Prime, SLA ni on-premise. Creá una cuenta
+              para guardar el historial y reportar sitios, o instalá la extensión
+              para ver el semáforo en Chrome.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Link to="/login" className="btn-gradient">
-                Ir a mi portal
+              <Link to="/extension" className="btn-gradient">
+                Instalar extensión
               </Link>
               <Link to="/register" className="btn-outline-gradient">
                 Crear cuenta gratis
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="equipo">
-        <div className="landing-wrap">
-          <div className="landing-section-head text-center">
-            <span className="section-tag">Comunidad</span>
-            <h2>Quienes ya lo usan</h2>
-          </div>
-          <div className="landing-testimonial-grid">
-            {TESTIMONIALS.map(({ initials, name, role, quote }) => (
-              <article key={name} className="landing-testimonial">
-                <div className="landing-testimonial-avatar">{initials}</div>
-                <h4>{name}</h4>
-                <p className="role">{role}</p>
-                <blockquote>&ldquo;{quote}&rdquo;</blockquote>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="landing-section-alt">
-        <div className="landing-wrap">
-          <div className="landing-section-head text-center">
-            <span className="section-tag">Planes</span>
-            <h2>Elegí tu nivel de protección</h2>
-          </div>
-          <div className="landing-pricing-grid">
-            {PLANS.map((plan) => (
-              <article
-                key={plan.name}
-                className={
-                  plan.featured
-                    ? 'landing-price-card landing-price-card--featured'
-                    : 'landing-price-card'
-                }
-              >
-                <h3>{plan.name}</h3>
-                <div>
-                  <div className="price-amount">{plan.price}</div>
-                  <div className="price-period">{plan.period}</div>
-                </div>
-                <p className="price-desc">{plan.desc}</p>
-                <Link to={plan.to} className="btn-price">
-                  {plan.featured ? 'Comenzar ahora' : 'Seleccionar'}
-                </Link>
-              </article>
-            ))}
           </div>
         </div>
       </section>
@@ -387,7 +352,7 @@ export default function LandingPage() {
               <span className="sl-icon sl-icon--sm sl-icon--accent">
                 <ChatCircle size={16} weight="bold" />
               </span>
-              <p>Reportar amenaza</p>
+              <p>Reportar un sitio</p>
               <Link to="/info/reportes">Cómo reportar</Link>
             </div>
             <div className="landing-contact-item">
@@ -433,22 +398,6 @@ export default function LandingPage() {
                 </ul>
               </div>
             ))}
-            <div className="landing-status-widget">
-              <h5>SafeLink Status</h5>
-              <div className="landing-status-row">
-                <span className="landing-status-label">Uptime</span>
-                <span className="landing-status-value">99,99%</span>
-              </div>
-              <div className="landing-status-bars">
-                <span style={{ height: '45%' }} />
-                <span style={{ height: '70%' }} />
-                <span style={{ height: '55%' }} />
-                <span style={{ height: '85%' }} />
-                <span style={{ height: '60%' }} />
-                <span style={{ height: '92%' }} />
-                <span style={{ height: '75%' }} />
-              </div>
-            </div>
           </div>
           <div className="landing-footer-bottom">
             <div className="landing-social">
