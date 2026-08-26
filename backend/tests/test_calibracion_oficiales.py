@@ -9,7 +9,7 @@ from services.url_analyzer import analyze_url
 
 DATA = Path(__file__).resolve().parent.parent / "data" / "marcas_oficiales.json"
 
-SAMPLE_MARCAS = ("Banco Galicia", "AFIP", "Mercado Pago", "ANSES")
+SAMPLE_MARCAS = ("Banco Galicia", "AFIP", "Mercado Pago", "ANSES", "YouTube", "example")
 
 
 def _dominios_de(marca: str) -> list[str]:

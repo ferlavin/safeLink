@@ -136,6 +136,82 @@ def _is_official_domain(domain: str) -> bool:
     return is_official_domain(domain)
 
 
+_NOISE_LABELS = frozenset(
+    {
+        "www",
+        "com",
+        "net",
+        "org",
+        "co",
+        "ar",
+        "gob",
+        "gov",
+        "app",
+        "io",
+        "info",
+        "edu",
+        "cdn",
+        "api",
+        "static",
+        "http",
+        "https",
+        "www2",
+    }
+)
+_PHISH_LABEL_PARTS = frozenset(
+    {
+        "login",
+        "secure",
+        "signin",
+        "account",
+        "verify",
+        "update",
+        "support",
+        "seguridad",
+        "cuenta",
+        "auth",
+        "online",
+        "pago",
+        "bank",
+        "banco",
+        "web",
+    }
+)
+
+
+def _meaningful_labels(domain: str) -> list[str]:
+    host = _fold_host(domain)
+    labels: list[str] = []
+    seen: set[str] = set()
+    for part in host.split("."):
+        if not part or part in _NOISE_LABELS or part in seen:
+            continue
+        seen.add(part)
+        labels.append(part)
+    return labels
+
+
+def _max_edit(brand: str) -> int:
+    return 3 if len(brand) >= 8 else 2
+
+
+def _inflated_brand(label: str, brand: str) -> bool:
+    """youtubeee, yexample, galicia-seguridad. No 'internacional' por 'nacion'."""
+    if len(brand) < 5:
+        return False
+    norm_label = _normalize(label)
+    norm_brand = _normalize(brand)
+    if not norm_brand or norm_label == norm_brand or norm_brand not in norm_label:
+        return False
+    extra = len(norm_label) - len(norm_brand)
+    if extra <= 4 and (norm_label.startswith(norm_brand) or norm_label.endswith(norm_brand)):
+        return True
+    parts = [p for p in label.lower().replace("_", "-").split("-") if p]
+    if norm_brand in parts and any(p in _PHISH_LABEL_PARTS for p in parts if p != norm_brand):
+        return True
+    return False
+
+
 def analyze_typosquatting(url: str) -> dict:
     domain = extract_domain(url)
     if not domain:
@@ -158,10 +234,9 @@ def analyze_typosquatting(url: str) -> dict:
             "oficial": True,
         }
 
-    base = domain.split(".")[0]
-    if "@" in base:
-        base = base.split("@")[-1]
-    norm_base = _normalize(base)
+    labels = _meaningful_labels(domain)
+    if not labels:
+        labels = [domain.split(".")[0]]
     matches = []
     score = 0
     alerts = []
@@ -201,55 +276,74 @@ def analyze_typosquatting(url: str) -> dict:
     brands = _load_brands()
     for brand in brands:
         norm_brand = _normalize(brand)
-        if norm_brand == norm_base:
-            if not is_official_domain(domain):
+        if len(norm_brand) < 3:
+            continue
+        for label in labels:
+            norm_label = _normalize(label)
+            if not norm_label:
+                continue
+            if norm_brand == norm_label:
                 _add_match(
                     brand,
                     0,
                     f"'{domain}' usa el nombre '{brand}' pero no es el sitio oficial.",
                     35,
                 )
-            continue
-        dist = _levenshtein(norm_base, norm_brand)
-        max_dist = 3 if len(norm_brand) >= 8 else 2
-        if 1 <= dist <= max_dist:
-            _add_match(
-                brand,
-                dist,
-                f"'{domain}' se parece a '{brand}' (distancia {dist}); posible sitio falso.",
-                51 if dist == 1 else 30 if dist == 2 else 25,
-            )
-        elif len(norm_brand) >= 5 and norm_brand in norm_base and norm_brand != norm_base:
-            _add_match(
-                brand,
-                0,
-                f"'{domain}' contiene '{brand}' pero no es un dominio oficial.",
-                35,
-            )
+                continue
+            dist = _levenshtein(norm_label, norm_brand)
+            max_dist = _max_edit(norm_brand)
+            if 1 <= dist <= max_dist:
+                _add_match(
+                    brand,
+                    dist,
+                    f"'{domain}' se parece a '{brand}' (distancia {dist}); posible sitio falso.",
+                    51 if dist == 1 else 30 if dist == 2 else 25,
+                )
+            elif _inflated_brand(label, brand):
+                _add_match(
+                    brand,
+                    0,
+                    f"'{domain}' contiene '{brand}' pero no es un dominio oficial.",
+                    35,
+                )
 
     for entry in _load_official_domains():
         marca = entry.get("marca", "")
         for official in entry.get("dominios", []):
-            official_base = official.split(".")[0]
+            official_base = _bare_host(official).split(".")[0]
             norm_official = _normalize(official_base)
-            if norm_official == norm_base:
+            if len(norm_official) < 4:
                 continue
-            dist = _levenshtein(norm_base, norm_official)
-            max_dist = 3 if len(norm_official) >= 8 else 2
-            if 1 <= dist <= max_dist:
-                _add_match(
-                    marca,
-                    dist,
-                    f"'{domain}' imita a {marca}; el sitio oficial es {official}.",
-                    51 if dist <= 1 else 30,
-                )
-            elif len(norm_official) >= 6 and norm_official in norm_base:
-                _add_match(
-                    marca,
-                    0,
-                    f"'{domain}' evoca a {marca} pero no coincide con {official}.",
-                    35,
-                )
+            for label in labels:
+                norm_label = _normalize(label)
+                if not norm_label:
+                    continue
+                if norm_official == norm_label:
+                    _add_match(
+                        marca,
+                        0,
+                        f"'{domain}' usa el nombre de {marca} pero el sitio oficial es {official}.",
+                        35,
+                    )
+                    continue
+                if len(norm_official) < 6:
+                    continue
+                dist = _levenshtein(norm_label, norm_official)
+                max_dist = _max_edit(norm_official)
+                if 1 <= dist <= max_dist:
+                    _add_match(
+                        marca,
+                        dist,
+                        f"'{domain}' imita a {marca}; el sitio oficial es {official}.",
+                        51 if dist <= 1 else 30,
+                    )
+                elif _inflated_brand(label, official_base):
+                    _add_match(
+                        marca,
+                        0,
+                        f"'{domain}' evoca a {marca} pero no coincide con {official}.",
+                        35,
+                    )
 
     fuerte = score >= 25 or any(
         m.get("distance", 99) <= 2 or m.get("distance") == 0 for m in matches

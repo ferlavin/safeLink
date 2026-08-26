@@ -29,6 +29,9 @@ TYPOS = [
         "https://galicia.com.ar/login?url=https://evil-login.xyz/",
         id="galicia_redirect_oculto",
     ),
+    pytest.param("https://www.youtubeee.com/rr", id="youtube_letras_de_mas"),
+    pytest.param("https://banconevnezuela.com/", id="banco_venezuela_transpuesto"),
+    pytest.param("http://yexample.com/", id="example_letra_adelante"),
 ]
 
 
