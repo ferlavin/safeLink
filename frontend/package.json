@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "package-extension": "node ../scripts/package-extension.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",

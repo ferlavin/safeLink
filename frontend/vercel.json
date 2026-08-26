@@ -4,6 +4,18 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/safelink-extension.zip",
+      "headers": [
+        { "key": "Content-Type", "value": "application/zip" },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"safelink-extension.zip\""
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -14,7 +26,7 @@
       "destination": "https://safelink-api-csqe.onrender.com/uploads/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ]

@@ -148,7 +148,12 @@ export default function ExtensionInstall() {
           Solo si no tenés el código del proyecto: descargá el ZIP y cargalo descomprimido en
           chrome://extensions.
         </p>
-        <a href="/safelink-extension.zip" download="safelink-extension.zip" className="btn-outline-gradient mt-3">
+        <a
+          href="/safelink-extension.zip"
+          download="safelink-extension.zip"
+          type="application/zip"
+          className="btn-outline-gradient mt-3"
+        >
           Descargar ZIP de respaldo
         </a>
       </section>
