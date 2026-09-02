@@ -3248,6 +3248,16 @@
       padding: 0.875rem 1.25rem;
     }
 
+    .landing-header-actions {
+      gap: 0.5rem;
+    }
+
+    .landing-header-actions .btn-outline-gradient,
+    .landing-header-actions .btn-gradient {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8125rem;
+    }
+
     .landing-hero-grid,
     .landing-hero-metrics,
     .landing-steps,

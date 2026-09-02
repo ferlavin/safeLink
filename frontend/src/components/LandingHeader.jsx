@@ -1,7 +1,9 @@
 import { ShieldCheck } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function LandingHeader({ showNav = true }) {
+  const { pathname } = useLocation()
+
   return (
     <header className="landing-header">
       <div className="landing-header-inner">
@@ -23,12 +25,16 @@ export default function LandingHeader({ showNav = true }) {
         )}
 
         <div className="landing-header-actions">
-          <Link to="/info/analisis-url" className="landing-header-link">
-            Analizar
-          </Link>
-          <Link to="/extension" className="btn-gradient">
-            Extensión
-          </Link>
+          {pathname !== '/login' && (
+            <Link to="/login" className="btn-outline-gradient">
+              Iniciar sesión
+            </Link>
+          )}
+          {pathname !== '/register' && (
+            <Link to="/register" className="btn-gradient">
+              Registrarse
+            </Link>
+          )}
         </div>
       </div>
     </header>
